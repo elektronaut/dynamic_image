@@ -1,5 +1,6 @@
 module DynamicImage
 	class ImageModel < ActiveRecord::Base
+		unloadable
 
 		belongs_to :binary
 
@@ -30,7 +31,7 @@ module DynamicImage
 
 		# Return the binary
 		def data
-			self.binary.data rescue nil
+			self.binary.data# rescue nil
 		end
 
 		# Set the image data, create the binary if necessary
@@ -61,7 +62,7 @@ module DynamicImage
 
 		# Return the image hotspot
 		def hotspot
-			(self.hotspot?) ? self.hotspot : ( Vector2d.new( self.size ) * 0.5 ).round.to_s
+			(self.hotspot?) ? self.hotspot : (Vector2d.new(self.size) * 0.5).round.to_s
 		end
 
 		# Check the image data

@@ -1,8 +1,7 @@
 module DynamicImage
 	class ImagesController < ApplicationController
+		unloadable
 	
-		session :off
-
 		def render_missing_image
 			if self.respond_to?( :render_error )
 				render_error 404
@@ -47,7 +46,7 @@ module DynamicImage
 			DynamicImage.dirty_memory = true # Flag memory for GC
 
 			if image
-				response.headers['Cache-Control'] = nil
+				#response.headers['Cache-Control'] = nil
 				response.headers['Last-Modified'] = imagedata.created_at.httpdate if imagedata.created_at?
 				send_data( 
 					imagedata.data, 
