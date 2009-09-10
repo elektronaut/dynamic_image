@@ -1,6 +1,6 @@
 = DynamicImage
 
-DynamicImage is a rails plugin providing transparent uploading 
+DynamicImage is a Rails plugin providing transparent uploading 
 and processing of image files. Resizing happens on demand, so 
 there's no need for configuration, and the results are cached.
 
@@ -10,6 +10,10 @@ there's no need for configuration, and the results are cached.
 * Ruby on Rails 2.x (http://www.rubyonrails.org)
 * RMagick           (http://rubyforge.org/projects/rmagick)
 
+If you're on Rails 2.0 or 2.1 and using Rails Engines, the plugin
+will function as an engine - no need to run the generators. Read the
+installation instructions carefully. For more info on Engines, 
+see http://rails-engines.org. 
 
 === Note:
 
@@ -27,6 +31,13 @@ Once the plugin is installed, you need to run the generator to create
 the migrations, models, and the controller:
 
  script/generate dynamic_image init
+
+If you happen to be using Rails Engines, skip the step above and instead do:
+
+ script/generate plugin_migration dynamic_image
+
+Finally, run the migrations:
+
  rake db:migrate
 
 The routes also need to be hooked up, add the following line somewhere in
