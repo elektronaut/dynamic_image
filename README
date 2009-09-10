@@ -1,0 +1,101 @@
+= DynamicImage
+
+DynamicImage is a rails plugin providing transparent uploading 
+and processing of image files. 
+
+Resizing happens on demand, so there's no need for configuration, 
+and the results are cached.
+
+
+== Requirements:
+
+* Ruby on Rails 2.x (http://www.rubyonrails.org/)
+* RMagick           (http://rubyforge.org/projects/rmagick/)
+
+
+== Note:
+
+DynamicImage uses two tables, <tt>images</tt> and <tt>binaries</tt>. 
+Please make sure these don't clash with your current database schema.
+
+
+== Installation:
+
+You can install the plugin from github:
+
+  script/plugin install git://github.com/elektronaut/dynamic_image.git
+
+Once the plugin is installed, you need to run the generator to create
+the migrations, models, and the controller:
+
+  script/generate dynamic_image init
+  rake db:migrate
+
+The routes also need to be hooked up, add the following line somewhere in
+your config/routes.rb file:
+
+  map.dynamic_image
+
+
+== Usage:
+
+=== Uploading an image
+
+Creating a new image from an uploaded file is simple, here's some 
+example view code:
+
+  <% form_for 'image', Image.new, :html => {:multipart => true} do |f| %>
+    Name: <%= f.text_field :name %>
+    File: <%= f.file_field :imagefile %>
+    <%= submit_tag "Upload" %>
+  <% end %>
+
+And for the controller:
+
+  @image = Image.create(params[:image])
+
+=== Displaying an image
+
+Use the <tt>dynamic_image_tag</tt> helper in your views to display an image,
+for example:
+
+  <%= dynamic_image_tag @image, :size => '64x64' %>
+  <%= dynamic_image_tag @image, :size => '150x', :filterset => 'dropshadow' %>
+
+See <tt>DynamicImage::Helper.dynamic_image_tag</tt> for more info.
+
+=== Associations
+
+belongs_to_image is a wrapper for belongs_to that allows you to associate 
+records with, well, images:
+
+  class User
+    belongs_to_image :avatar
+  end
+
+And the form:
+
+  <% form_for @user, :html => {:multipart => true} do |f| %>
+    Name: <%= f.text_field :name %>
+    Avatar: <%= f.file_field :avatar %>
+    <%= submit_tag "Save" %>
+  <% end %>
+
+
+
+=== Filtersets
+
+Filtersets provide an easy way to process your thumbnails through ImageMagick. 
+You can create multiple filtersets, and use them in a 
+<tt>dynamic_image_tag</tt> with the <tt>:filterset</tt> option. They are 
+documented in <tt>DynamicImage::Filterset</tt>.
+
+
+== Caching
+
+Processing images on the fly is expensive. Therefore, page caching is enabled
+by default, even in development mode. To disable page caching, add the following
+line in your initializers or environment.rb:
+
+	DynamicImage.page_caching = false
+	
