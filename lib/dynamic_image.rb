@@ -1,3 +1,5 @@
+require 'tempfile'
+require 'digest/sha1'
 
 # Gem dependencies
 require 'rmagick'
@@ -11,6 +13,8 @@ if Rails::VERSION::MAJOR == 3
 	# Load the engine
 	require 'dynamic_image/engine' if defined?(Rails)
 end
+
+
 
 require 'dynamic_image/filterset'
 require 'dynamic_image/helper'
