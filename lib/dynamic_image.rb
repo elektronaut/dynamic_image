@@ -46,6 +46,22 @@ module DynamicImage
 		def page_caching
 			@@page_caching
 		end
+		
+		def max_size
+			@@max_size ||= "2000x2000"
+		end
+		
+		def max_size=(new_max_size)
+			@@max_size = new_max_size
+		end
+
+		def crash_size
+			@@crash_size ||= "10000x10000"
+		end
+		
+		def crash_size=(new_crash_size)
+			@@crash_size = new_crash_size
+		end
 
 		# RMagick stores image data internally, Ruby doesn't see the used memory.
 		# This method performs garbage collection if @@dirty_memory has been flagged.

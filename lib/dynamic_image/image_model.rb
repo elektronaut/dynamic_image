@@ -10,13 +10,6 @@ module DynamicImage
 		                    :with => /^image/,
 			                :message => "you can only upload pictures"
 
-
-		# Images larger than this will be rescaled down
-		MAXSIZE = "2000x2000"
-
-		# Images larger than this will cause a crash
-		CRASHSIZE = "10000x10000"
-
 		attr_accessor :filterset, :binary_set, :data_checked, :skip_maxsize
 
 		# Sanitize the filename and set the name to the filename if omitted
@@ -73,12 +66,14 @@ module DynamicImage
 			if self.data?
 				image     = Magick::ImageList.new.from_blob(self.data)
 				size      = Vector2d.new(image.columns, image.rows)
-				maxsize   = Vector2d.new(MAXSIZE)
-				crashsize = Vector2d.new(CRASHSIZE)
-				if (size.x > crashsize.x || size.y > crashsize.y)
-					raise "Image too large!"
+				if DynamicImage.crash_size
+					crashsize = Vector2d.new(DynamicImage.crash_size)
+					if (size.x > crashsize.x || size.y > crashsize.y)
+						raise "Image too large!"
+					end
 				end
-				unless self.skip_maxsize
+				if DynamicImage.max_size & !self.skip_maxsize
+					maxsize = Vector2d.new(DynamicImage.max_size)
 					if (size.x > maxsize.x || size.y > maxsize.y)
 						size = size.constrain_both(maxsize).round
 						image.resize!(size.x, size.y)
