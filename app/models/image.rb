@@ -22,13 +22,6 @@ class Image < ActiveRecord::Base
 		end
 	end
 
-	# Set the image data
-	#alias_method :binary_data=, :data=
-	#def data=(blob)
-	#	binary_data = blob
-	#	self.check_image_data
-	#end
-
 	# Create the binary from an image file.
 	def imagefile=(image_file)
 		self.filename     = image_file.original_filename rescue File.basename( image_file.path )
@@ -121,12 +114,12 @@ class Image < ActiveRecord::Base
 	# Rescale and crop the image, and return it as a blob.
 	def rescaled_and_cropped_data(*args)
 		DynamicImage.dirty_memory = true                                                       # Flag to perform GC
-		data = Magick::ImageList.new.from_blob(self.data)
+		image_data = Magick::ImageList.new.from_blob(self.data)
 
 		if self.cropped?
 			cropped_start = Vector2d.new(self.crop_start).round
 			cropped_size  = Vector2d.new(self.crop_size).round
-			data = data.crop(cropped_start.x, cropped_start.y, cropped_size.x, cropped_size.y, true)
+			image_data = image_data.crop(cropped_start.x, cropped_start.y, cropped_size.x, cropped_size.y, true)
 		end
 
 		size         = Vector2d.new(self.size)
@@ -144,9 +137,9 @@ class Image < ActiveRecord::Base
 		rect[0].round!
 		rect[1].round!
 
-		data = data.resize(rescale_size.x, rescale_size.y)
-		data = data.crop(rect[0].x, rect[0].y, crop_to_size.x, crop_to_size.y)
-		data.to_blob{self.quality = 90}
+		image_data = image_data.resize(rescale_size.x, rescale_size.y)
+		image_data = image_data.crop(rect[0].x, rect[0].y, crop_to_size.x, crop_to_size.y)
+		image_data.to_blob{self.quality = 90}
 	end
 
 	def constrain_size(*max_size)

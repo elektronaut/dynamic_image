@@ -1,17 +1,19 @@
 class ImagesController < ActionController::Base
 
+	after_filter :cache_dynamic_image
+	after_filter :run_garbage_collection_for_dynamic_image_controller
+
 	unloadable
 
 	public
 
 		# Return the requested image. Rescale, filter and cache it where appropriate.
 		def render_dynamic_image
-			minTime = Time.rfc2822(request.env["HTTP_IF_MODIFIED_SINCE"]) rescue nil
 
 			render_missing_image and return unless Image.exists?(params[:id])
-
 			image = Image.find(params[:id])
 
+			minTime = Time.rfc2822(request.env["HTTP_IF_MODIFIED_SINCE"]) rescue nil
 			if minTime && image.created_at? && image.created_at <= minTime
 				render :text => '304 Not Modified', :status => 304
 				return
@@ -68,13 +70,10 @@ class ImagesController < ActionController::Base
 			cache_page
 			ActionController::Base.perform_caching = cache_setting
 		end
-		after_filter :cache_dynamic_image
 
 		# Perform garbage collection if necessary
 		def run_garbage_collection_for_dynamic_image_controller
 			DynamicImage.clean_dirty_memory
 		end
-		protected    :run_garbage_collection_for_dynamic_image_controller
-		after_filter :run_garbage_collection_for_dynamic_image_controller
 		
 end

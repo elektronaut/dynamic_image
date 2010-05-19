@@ -33,8 +33,6 @@ Gem::Specification.new do |s|
      "lib/dynamic_image/engine.rb",
      "lib/dynamic_image/filterset.rb",
      "lib/dynamic_image/helper.rb",
-     "lib/dynamic_image/image_model.rb",
-     "lib/dynamic_image/images_controller.rb",
      "lib/generators/dynamic_image/USAGE",
      "lib/generators/dynamic_image/dynamic_image_generator.rb",
      "lib/generators/dynamic_image/templates/migrations/create_images.rb",
