@@ -1,3 +1,5 @@
+require 'dynamic_image'
+
 module DynamicImage
 	module Helper
 

@@ -3,10 +3,12 @@ class CreateImages < ActiveRecord::Migration
     create_table :images do |t|
       t.column :name,          :string
       t.column :filename,      :string
+      t.column :byline,        :string
+      t.column :description,   :text
       t.column :content_type,  :string
       t.column :original_size, :string
       t.column :hotspot,       :string
-      t.column :binary_id,     :integer
+      t.column :sha1_hash,     :string
       t.column :cropped,       :boolean, :null => false, :default => false
       t.column :crop_start,    :string
       t.column :crop_size,     :string

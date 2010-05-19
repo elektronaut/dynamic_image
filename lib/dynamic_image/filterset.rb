@@ -1,3 +1,5 @@
+require 'dynamic_image'
+
 module DynamicImage
 
 	@@filtersets = Hash.new
@@ -20,7 +22,7 @@ module DynamicImage
 	# === Example
 	#
 	#   class BlogThumbnailsFilterset < DynamicImage::Filterset
-	#     def self.process( image )
+	#     def self.process(image)
 	#       image = image.sepiatone     # convert the image to sepia tones
 	#     end
 	#   end
@@ -35,7 +37,7 @@ module DynamicImage
 	# This means that you can automatically apply effects on resized images by defining a class called <tt>DefaultFilterset</tt>:
 	#
 	#   class DefaultFilterset < DynamicImage::Filterset
-	#     def self.process( image )
+	#     def self.process(image)
 	#       image = image.unsharp_mask  # apply unsharp mask on images by default.
 	#     end
 	#   end
@@ -45,15 +47,15 @@ module DynamicImage
 	# You can only apply one filterset on an image, but compound filters can easily be created:
 	#
 	#   class CompoundFilterset < DynamicImage::Filterset
-	#     def self.process( image )
-	#       image = MyFirstFilterset.process( image )
-	#       image = SomeOtherFilterset.process( image )
-	#       image = DefaultFilterset.process( image )
+	#     def self.process(image)
+	#       image = MyFirstFilterset.process(image)
+	#       image = SomeOtherFilterset.process(image)
+	#       image = DefaultFilterset.process(image)
 	#     end
 	#   end
 	#
 	class Filterset
-		include Magick
+		include ::Magick
 
 		# Detect inheritance and store the new filterset in the lookup table.
 		def self.inherited(sub)

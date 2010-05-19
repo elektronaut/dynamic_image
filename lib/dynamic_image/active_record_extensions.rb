@@ -1,5 +1,5 @@
 module DynamicImage
-	module Record
+	module ActiveRecordExtensions
 
 		def self.included(base)
 			base.send :extend, ClassMethods
@@ -18,7 +18,7 @@ module DynamicImage
 			#   end
 			#
 			#   # View code
-			#   <% form_for 'person', @person, :html => { :multipart => true } do |f| %>
+			#   <% form_for 'person', @person, :html => {:multipart => true} do |f| %>
 			#     <%= f.file_field :mugshot %>
 			#   <% end %>
 			#

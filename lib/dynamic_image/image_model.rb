@@ -1,6 +1,6 @@
 module DynamicImage
 	class ImageModel < ActiveRecord::Base
-		#unloadable
+		unloadable
 
 		belongs_to :binary
 

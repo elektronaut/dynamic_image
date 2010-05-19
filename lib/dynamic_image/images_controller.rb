@@ -1,5 +1,8 @@
+require 'dynamic_image'
+
 module DynamicImage
-	class ImagesController < ApplicationController
+	class ImagesController < ActionController::Base
+
 		unloadable
 	
 		def render_missing_image

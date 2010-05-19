@@ -13,7 +13,7 @@ begin
 		gem.homepage = "http://github.com/elektronaut/dynamic_image"
 		gem.authors  = ["Inge Jørgensen"]
 		gem.files    = Dir["*", "{lib}/**/*", "{app}/**/*", "{config}/**/*"]
-		gem.add_dependency("rmagick", "~> 2.10.0")
+		gem.add_dependency("rmagick", "~> 2.12.2")
 		gem.add_dependency("vector2d", "~> 1.0.0")
 	end
 	Jeweler::GemcutterTasks.new
