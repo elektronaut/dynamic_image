@@ -28,7 +28,7 @@ You can install the plugin from github:
  script/plugin install git://github.com/elektronaut/dynamic_image.git
 
 Once the plugin is installed, you need to run the generator to create
-the migrations, models, and the controller:
+the migrations:
 
  script/generate dynamic_image init
 
