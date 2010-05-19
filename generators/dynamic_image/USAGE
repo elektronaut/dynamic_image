@@ -1,6 +1,0 @@
-Description:
-    Creates migrations, models and the controller.
-
-Usage:
-    ./script/generate dynamic_image init
-

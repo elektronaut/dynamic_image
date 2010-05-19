@@ -1,14 +1,16 @@
+require 'dynamic_image'
+
 module DynamicImage
 	module Helper
 
 		# Returns an hash consisting of the URL to the dynamic image and parsed options. This is mostly for internal use by 
 		# dynamic_image_tag and dynamic_image_url.
-		def dynamic_image_options( image, options = {} )
+		def dynamic_image_options(image, options = {})
 			options.symbolize_keys!
 
-			options     = { :crop => false }.merge( options )
-			url_options = { :controller => "/images", :action => :render_dynamic_image, :id => image }
-
+			options     = {:crop => false}.merge(options)
+			url_options = {:controller => "/images", :action => :render_dynamic_image, :id => image}
+		
 			if options[:original]
 				url_options[:original] = 'original'
 				options.delete(:original)
@@ -25,7 +27,7 @@ module DynamicImage
 			    end
 
 				unless options[:crop]
-					new_size = image_size.constrain_both( new_size )
+					new_size = image_size.constrain_both(new_size)
 				end
 
 				options[:size] = new_size.round.to_s
@@ -58,15 +60,19 @@ module DynamicImage
 			# Alt attribute
 			options[:alt] ||= image.name if image.name?
 			options[:alt] ||= image.filename.split('.').first.capitalize
-
-			if options.has_key? :only_path
+		
+			if options.has_key?(:only_path)
 				url_options[:only_path] = options[:only_path]
 				options[:only_path] = nil
 			end
-
-			{ :url => url_for( url_options ), :options => options }
+			if options.has_key?(:host)
+				url_options[:host] = options[:host]
+				options[:host] = nil
+			end
+		
+			{:url => url_for(url_options), :options => options}
 		end
-
+	
 		# Returns an image tag for the provided image model, works similar to the rails <tt>image_tag</tt> helper. 
 		# The <tt>alt</tt> tag is set to the image title unless explicitly provided.
 		#
@@ -81,33 +87,35 @@ module DynamicImage
 		# == Examples
 		#
 		# Tag for original image, without rescaling:
-		#   <%= dynamic_image_tag( @image ) %>
+		#   <%= dynamic_image_tag(@image) %>
 		#
 		# Tag for image, rescaled to fit within 100x100 (size will be 100x100 or smaller):
-		#   <%= dynamic_image_tag( @image, :size => "100x100" ) %>
+		#   <%= dynamic_image_tag(@image, :size => "100x100") %>
 		#
 		# Tag for image, cropped and rescaled to 100x100 (size will be 100x100 in all cases):
-		#   <%= dynamic_image_tag( @image, :size => "100x100", :crop => true ) %>
+		#   <%= dynamic_image_tag(@image, :size => "100x100", :crop => true) %>
 		#
 		# Tag for image with a filter set applied:
-		#   <%= dynamic_image_tag( @image, :size => "100x100", :filterset => @filterset ) %>
+		#   <%= dynamic_image_tag(@image, :size => "100x100", :filterset => @filterset) %>
 		#
 		# Tag for image with a named filter set applied:
-		#   <%= dynamic_image_tag( @image, :size => "100x100", :filterset => "thumbnails" ) %>
+		#   <%= dynamic_image_tag(@image, :size => "100x100", :filterset => "thumbnails") %>
 		#
 		# Tag for image without the width/height attributes, and with a custom alt attribute
-		#   <%= dynamic_image_tag( @image, :size => "100x100", :no_size_attr => true, :alt => "Thumbnail for post" %>
-
-		def dynamic_image_tag( image, options = {} )
-			parsed_options = dynamic_image_options( image, options )
-			image_tag( parsed_options[:url], parsed_options[:options] ).gsub(/\?[\d]+/,'')
+		#   <%= dynamic_image_tag(@image, :size => "100x100", :no_size_attr => true, :alt => "Thumbnail for post" %>
+	
+		def dynamic_image_tag(image, options = {})
+			parsed_options = dynamic_image_options(image, options)
+			image_tag(parsed_options[:url], parsed_options[:options] ).gsub(/\?[\d]+/,'')
 		end
-
+	
 		# Returns an url corresponding to the provided image model.
 		# Special options are documented in ApplicationHelper.dynamic_image_tag, only <tt>:size</tt>, <tt>:filterset</tt> and <tt>:crop</tt> apply.
-		def dynamic_image_url( image, options = {} )
-			parsed_options = dynamic_image_options( image, options )
+		def dynamic_image_url(image, options = {})
+			parsed_options = dynamic_image_options(image, options)
 			parsed_options[:url]
 		end
 	end
 end
+
+ActionView::Base.send(:include, DynamicImage::Helper)

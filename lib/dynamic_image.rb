@@ -1,11 +1,24 @@
+require 'tempfile'
+require 'digest/sha1'
+
+# Gem dependencies
+require 'rmagick'
+require 'vector2d'
+require 'rails'
+require 'action_controller'
+require 'active_support'
+require 'active_record'
+
+require 'binary_storage'
+
+if Rails::VERSION::MAJOR == 3
+	# Load the engine
+	require 'dynamic_image/engine' if defined?(Rails)
+end
+
+require 'dynamic_image/active_record_extensions'
 require 'dynamic_image/filterset'
 require 'dynamic_image/helper'
-require 'dynamic_image/record'
-require 'dynamic_image/mapper_extensions'
-
-require 'dynamic_image/images_controller'
-require 'dynamic_image/image_model'
-require 'dynamic_image/binary_model'
 
 module DynamicImage
 	@@dirty_memory = false
@@ -27,6 +40,22 @@ module DynamicImage
 		
 		def page_caching
 			@@page_caching
+		end
+		
+		def max_size
+			@@max_size ||= "2000x2000"
+		end
+		
+		def max_size=(new_max_size)
+			@@max_size = new_max_size
+		end
+
+		def crash_size
+			@@crash_size ||= "10000x10000"
+		end
+		
+		def crash_size=(new_crash_size)
+			@@crash_size = new_crash_size
 		end
 
 		# RMagick stores image data internally, Ruby doesn't see the used memory.
