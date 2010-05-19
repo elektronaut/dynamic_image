@@ -26,8 +26,8 @@ module DynamicImage
 				render :text => '304 Not Modified', :status => 304
 				return
 			end
-		
-			unless image.data
+
+			unless image.data?
 				logger.warn "Image #{image.id} exists, but has no data"
 				render_missing_image and return
 			end
@@ -49,7 +49,7 @@ module DynamicImage
 			DynamicImage.dirty_memory = true # Flag memory for GC
 
 			if image
-				#response.headers['Cache-Control'] = nil
+				response.headers['Cache-Control'] = nil
 				response.headers['Last-Modified'] = imagedata.created_at.httpdate if imagedata.created_at?
 				send_data( 
 					imagedata.data, 
@@ -58,9 +58,9 @@ module DynamicImage
 					:disposition => 'inline'
 				)
 			end
-		
+
 		end
-	
+
 		# Enforce caching of dynamic images, even if caching is turned off
 		def cache_dynamic_image
 			cache_setting = ActionController::Base.perform_caching
@@ -69,13 +69,13 @@ module DynamicImage
 			ActionController::Base.perform_caching = cache_setting
 		end
 		after_filter :cache_dynamic_image
-	
+
 		# Perform garbage collection if necessary
 		def run_garbage_collection_for_dynamic_image_controller
 			DynamicImage.clean_dirty_memory
 		end
 		protected    :run_garbage_collection_for_dynamic_image_controller
 		after_filter :run_garbage_collection_for_dynamic_image_controller
-
+		
 	end
 end
