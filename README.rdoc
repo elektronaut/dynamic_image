@@ -1,13 +1,15 @@
 = DynamicImage
 
-DynamicImage is a Rails plugin providing transparent uploading 
-and processing of image files.
+DynamicImage is a Rails plugin that simplifies image uploading and processing.
 
-Images are processed and cached on demand without need for any 
-configuration.
+No configuration is necessary, as resizing and processing is done on demand and 
+cached rather than on upload. 
+
+*Note:* This version is currently Rails 3 specific, although the final 1.0 
+version will also be compatible with 2.x. 
 
 
-== Installation:
+== Installation
 
 Install the gem:
 
@@ -25,25 +27,34 @@ Do the migrations:
 
 == Getting started:
 
-Use belongs_to_image in your models:
+Let's create a model with an image:
 
  class User
-   belongs_to_image :profile_picture
+   belongs_to_image :mugshot
  end
 
-Create a form:
+Uploading files is pretty straightforward, just add a <tt>file_field</tt>
+to your form and update your record as usual: 
 
  <%= form_for @user, :html => {:multipart => true} do |f| %>
-   Name: <%= f.text_field :name %>
-   Profile picture: <%= f.file_field :profile_picture %>
-   <%= submit_tag "Save" %>
+     Name: <%= f.text_field :name %>
+     Mugshot: <%= f.file_field :mugshot %>
+     <%= submit_tag "Save" %>
  <% end %>
 
-Use the dynamic_image_tag helper to show images:
+You can now use the <tt>dynamic_image_tag</tt> helper to show off your
+new image:
 
- <%= dynamic_image_tag @user.profile_picture, :size => '64x64' %>
- <%= dynamic_image_tag @user.profile_picture, :size => '150x' %>
+ <% if @user.mugshot? %>
+     <%= dynamic_image_tag @user.profile_picture, :size => '64x64' %>
+ <% end %>
 
+
+== How it works
+
+The original master files are stored in the file system and identified a 
+SHA-1 hash of the contents. If you're familiar with the internal workings
+of git, this should seem familiar. 
 
 == Caching
 

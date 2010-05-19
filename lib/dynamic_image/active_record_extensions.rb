@@ -43,6 +43,9 @@ module DynamicImage
 							self.associated_#{association_id} = img_obj
 						end
 					end
+					def #{association_id}?
+						(self.#{association_id} && self.#{association_id}.data?) ? true : false
+					end
 				end_eval
 
 				send :include, DynamicImage::ActiveRecordExtensions::InstanceMethods
