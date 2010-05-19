@@ -1,3 +1,5 @@
+require 'dynamic_image'
+
 module DynamicImage
 	module ActiveRecordExtensions
 
@@ -43,7 +45,7 @@ module DynamicImage
 					end
 				end_eval
 
-				send :include, InstanceMethods
+				send :include, DynamicImage::ActiveRecordExtensions::InstanceMethods
 			end 
 		end
 
@@ -51,3 +53,5 @@ module DynamicImage
 		end
 	end
 end
+
+ActiveRecord::Base.send(:include, DynamicImage::ActiveRecordExtensions)

@@ -82,5 +82,4 @@ module DynamicImage
 end
 
 #ActionController::Routing::RouteSet::Mapper.send :include, DynamicImage::MapperExtensions
-ActiveRecord::Base.send(:include, DynamicImage::ActiveRecordExtensions)
 ActionView::Base.send(:include, DynamicImage::Helper)
