@@ -12,7 +12,7 @@ begin
 		gem.email    = "inge@elektronaut.no"
 		gem.homepage = "http://github.com/elektronaut/dynamic_image"
 		gem.authors  = ["Inge Jørgensen"]
-		gem.files    = Dir["*", "{lib}/**/*"]
+		gem.files    = Dir["*", "{lib}/**/*", "{app}/**/*", "{config}/**/*"]
 		gem.add_dependency("rmagick", "~> 2.10.0")
 		gem.add_dependency("vector2d", "~> 1.0.0")
 	end
