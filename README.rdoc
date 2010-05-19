@@ -1,8 +1,11 @@
 = DynamicImage
 
 DynamicImage is a Rails plugin providing transparent uploading 
-and processing of image files. Resizing happens on demand, so 
-there's no need for configuration, and the results are cached.
+and processing of image files.
+
+Images are processed and cached on demand without need for any 
+configuration.
+
 
 == Installation:
 
@@ -20,7 +23,7 @@ Do the migrations:
  rake db:migrate
 
 
-== Usage:
+== Getting started:
 
 Use belongs_to_image in your models:
 
@@ -28,7 +31,7 @@ Use belongs_to_image in your models:
    belongs_to_image :profile_picture
  end
 
-Form:
+Create a form:
 
  <%= form_for @user, :html => {:multipart => true} do |f| %>
    Name: <%= f.text_field :name %>
@@ -36,7 +39,7 @@ Form:
    <%= submit_tag "Save" %>
  <% end %>
 
-View:
+Use the dynamic_image_tag helper to show images:
 
  <%= dynamic_image_tag @user.profile_picture, :size => '64x64' %>
  <%= dynamic_image_tag @user.profile_picture, :size => '150x' %>
@@ -49,4 +52,8 @@ by default, even in development mode. To disable page caching, add the following
 line in your initializers or environment.rb:
 
  DynamicImage.page_caching = false
+
+== Copyright
+
+Copyright © 2006-2010 Inge Jørgensen. See LICENSE for details.
 	

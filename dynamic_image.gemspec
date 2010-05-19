@@ -5,17 +5,18 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dynamic_image}
-  s.version = "1.0.0"
+  s.version = ""
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Inge J\303\270rgensen"]
   s.date = %q{2010-05-19}
   s.email = %q{inge@elektronaut.no}
   s.extra_rdoc_files = [
-    "README.rdoc"
+    "LICENSE",
+     "README.rdoc"
   ]
   s.files = [
-    "MIT-LICENSE",
+    "LICENSE",
      "README.rdoc",
      "Rakefile",
      "VERSION",
