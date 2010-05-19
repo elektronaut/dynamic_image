@@ -22,7 +22,7 @@ module BinaryStorage
 		end
 
 		def hexdigest(string)
-			Digest::SHA1.hexdigest(path)
+			Digest::SHA1.hexdigest(string)
 		end
 	end
 end

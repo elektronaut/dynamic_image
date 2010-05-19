@@ -19,8 +19,6 @@ end
 require 'dynamic_image/active_record_extensions'
 require 'dynamic_image/filterset'
 require 'dynamic_image/helper'
-require 'dynamic_image/image_model'
-require 'dynamic_image/images_controller'
 
 module DynamicImage
 	@@dirty_memory = false

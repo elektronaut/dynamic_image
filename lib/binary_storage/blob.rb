@@ -41,7 +41,7 @@ module BinaryStorage
 				options[:data] = args
 			end
 			@hash_string = options[:hash_string]
-			data         = options[:data]
+			@data        = options[:data]
 		end
 		
 		def data
@@ -94,7 +94,7 @@ module BinaryStorage
 		def save
 			unless exists?
 				FileUtils.mkdir_p(storage_dir)
-				file = File.new(tmpfile.path, 'wb')
+				file = File.new(storage_path, 'wb')
 				file.write(@data)
 				file.close
 			end

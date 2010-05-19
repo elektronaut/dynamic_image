@@ -51,11 +51,11 @@ module BinaryStorage
 					end
 
 					def #{binary_name}
-						self.get_binary_data(#{binary_name})
+						self.get_binary_data("#{binary_name}")
 					end
 
 					def #{binary_name}=(binary_data)
-						self.set_binary_data(#{binary_name}", binary_data)
+						self.set_binary_data("#{binary_name}", binary_data)
 					end
 
 					def #{binary_name}?
@@ -82,16 +82,16 @@ module BinaryStorage
 			end
 			
 			def binary_hash_string(binary_name)
-				self.attributes[binary_colum(binary_name)]
+				self.attributes[binary_column(binary_name)]
 			end
 
 			def save_binary(binary_name)
 				if binaries.has_key?(binary_name)
 					if binary = binaries[binary_name]
 						binary.save
-						self.attributes[binary_colum(binary_name)] = binary.hash_string
+						self.attributes = self.attributes.merge({binary_column(binary_name).to_sym => binary.hash_string})
 					else
-						self.attributes[binary_colum(binary_name)] = nil
+						self.attributes = self.attributes.merge({binary_column(binary_name).to_sym => nil})
 					end
 				end
 			end
