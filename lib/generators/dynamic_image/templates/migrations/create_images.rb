@@ -12,7 +12,6 @@ class CreateImages < ActiveRecord::Migration
       t.column :crop_size,     :string
       t.column :created_at,    :datetime
       t.column :updated_at,    :datetime
-      t.column :filters,       :text
     end
   end
 
