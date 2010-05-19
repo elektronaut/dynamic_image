@@ -117,3 +117,5 @@ module DynamicImage
 		end
 	end
 end
+
+ActionView::Base.send(:include, DynamicImage::Helper)

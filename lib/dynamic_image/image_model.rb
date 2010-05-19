@@ -4,13 +4,13 @@ module DynamicImage
 	class ImageModel < ActiveRecord::Base
 		unloadable
 
-		belongs_to :binary, :dependent => :destroy
+		binary_storage :data, :sha1_hash
 
 		validates_format_of :content_type, 
 		                    :with => /^image/,
 			                :message => "you can only upload pictures"
 
-		attr_accessor :filterset, :binary_set, :data_checked, :skip_maxsize
+		attr_accessor :filterset, :data_checked, :skip_maxsize
 
 		# Sanitize the filename and set the name to the filename if omitted
 		validate do |image|
@@ -25,28 +25,11 @@ module DynamicImage
 			end
 		end
 
-		before_save do |image|
-			self.binary.save if @binary_set
-		end
-
-		# Return the binary
-		def data
-			self.binary.data rescue nil
-		end
-
-		# Set the image data, create the binary if necessary
+		# Set the image data
+		alias_method :binary_data=, :data=
 		def data=(blob)
-			unless self.binary
-				self.binary = Binary.new
-			end
-			self.binary.data = blob
-			@binary_set = true
+			binary_data = blob
 			self.check_image_data
-		end
-
-		# Returns true if the image has data
-		def data?
-			(self.binary && self.binary.data?) ? true : false
 		end
 
 		# Create the binary from an image file.
@@ -77,12 +60,12 @@ module DynamicImage
 					if (size.x > maxsize.x || size.y > maxsize.y)
 						size = size.constrain_both(maxsize).round
 						image.resize!(size.x, size.y)
-						self.binary.data = image.to_blob
+						self.data = image.to_blob
 					end
 				end
 				# Convert image to a proper format
 				unless image.format =~ /(JPEG|PNG|GIF)/
-					self.binary.data = image.to_blob{self.format = 'JPEG'; self.quality = 90}
+					self.data = image.to_blob{self.format = 'JPEG'; self.quality = 90}
 					self.filename += ".jpg"
 					self.content_type = "image/jpeg"
 				end

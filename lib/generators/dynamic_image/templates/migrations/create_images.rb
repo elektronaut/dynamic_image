@@ -3,8 +3,6 @@ class CreateImages < ActiveRecord::Migration
     create_table :images do |t|
       t.column :name,          :string
       t.column :filename,      :string
-      t.column :byline,        :string
-      t.column :description,   :text
       t.column :content_type,  :string
       t.column :original_size, :string
       t.column :hotspot,       :string
