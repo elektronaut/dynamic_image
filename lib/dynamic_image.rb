@@ -3,7 +3,7 @@ require 'digest/sha1'
 require 'open-uri'
 
 # Gem dependencies
-require 'rmagick'
+require 'RMagick'
 require 'vector2d'
 require 'rails'
 require 'action_controller'
