@@ -21,10 +21,15 @@ class Image < ActiveRecord::Base
 			image.crop_start = "0x0"
 		end
 	end
-
+	
 	# Create the binary from an image file.
 	def imagefile=(image_file)
-		self.filename     = image_file.original_filename rescue File.basename( image_file.path )
+		if image_file.kind_of?(String) && image_file =~ /^(ht|f)tps?:\/\//
+			self.filename = File.basename(image_file)
+			image_file    = open(image_file)
+		else
+			self.filename = image_file.original_filename rescue File.basename(image_file.path)
+		end
 		self.content_type = image_file.content_type.chomp rescue "image/"+image_file.path.split(/\./).last.downcase.gsub(/jpg/,"jpeg") # ugly hack
 		set_image_data(image_file.read)
 	end

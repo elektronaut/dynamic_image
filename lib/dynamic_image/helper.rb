@@ -74,36 +74,22 @@ module DynamicImage
 		end
 	
 		# Returns an image tag for the provided image model, works similar to the rails <tt>image_tag</tt> helper. 
-		# The <tt>alt</tt> tag is set to the image title unless explicitly provided.
 		#
 		# The following options are supported (the rest will be forwarded to <tt>image_tag</tt>):
 		#
-		#   :size         - Resize the image to fit these proportions. Size is given as a string with the format
+		# * :size         - Resize the image to fit these proportions. Size is given as a string with the format
 		#                   '100x100'. Either dimension can be omitted, for example: '100x'
-		#   :crop         - Boolean, default: false. Crop the image to the size given.
-		#   :no_size_attr - Boolean, default: false. Do not include width and height attributes in the image tag.
-		#   :filterset    - Apply the given filterset to the image
+		# * :crop         - Crop the image to the size given. (Boolean, default: <tt>false</tt>)
+		# * :no_size_attr - Do not include width and height attributes in the image tag. (Boolean, default: false)
+		# * :filterset    - Apply the given filterset to the image
 		#
-		# == Examples
+		# ==== Examples
 		#
-		# Tag for original image, without rescaling:
-		#   <%= dynamic_image_tag(@image) %>
+		#  dynamic_image_tag(@image)                                    # Original image
+		#  dynamic_image_tag(@image, :size => "100x")                   # Will be 100px wide
+		#  dynamic_image_tag(@image, :size => "100x100")                # Will fit within 100x100
+		#  dynamic_image_tag(@image, :size => "100x100", :crop => true) # Will be cropped to 100x100
 		#
-		# Tag for image, rescaled to fit within 100x100 (size will be 100x100 or smaller):
-		#   <%= dynamic_image_tag(@image, :size => "100x100") %>
-		#
-		# Tag for image, cropped and rescaled to 100x100 (size will be 100x100 in all cases):
-		#   <%= dynamic_image_tag(@image, :size => "100x100", :crop => true) %>
-		#
-		# Tag for image with a filter set applied:
-		#   <%= dynamic_image_tag(@image, :size => "100x100", :filterset => @filterset) %>
-		#
-		# Tag for image with a named filter set applied:
-		#   <%= dynamic_image_tag(@image, :size => "100x100", :filterset => "thumbnails") %>
-		#
-		# Tag for image without the width/height attributes, and with a custom alt attribute
-		#   <%= dynamic_image_tag(@image, :size => "100x100", :no_size_attr => true, :alt => "Thumbnail for post" %>
-	
 		def dynamic_image_tag(image, options = {})
 			parsed_options = dynamic_image_options(image, options)
 			image_tag(parsed_options[:url], parsed_options[:options] ).gsub(/\?[\d]+/,'')
