@@ -1,6 +1,6 @@
 require 'tempfile'
 require 'digest/sha1'
-require 'openuri'
+require 'open-uri'
 
 # Gem dependencies
 require 'rmagick'
