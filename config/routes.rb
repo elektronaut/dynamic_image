@@ -1,5 +1,5 @@
 # Rails 3 routes
-Rails.application.routes.draw do |map|
+Rails.application.routes.draw do
 	match "dynamic_images/:id/:original(/:size(/:filterset))/*filename" => "images#render_dynamic_image", :size => /\d*x\d*/, :original => /original/
 	match "dynamic_images/:id(/:size(/:filterset))/*filename" => "images#render_dynamic_image", :size => /\d*x\d*/
 	# Legacy
