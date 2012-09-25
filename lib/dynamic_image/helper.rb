@@ -3,14 +3,14 @@ require 'dynamic_image'
 module DynamicImage
 	module Helper
 
-		# Returns an hash consisting of the URL to the dynamic image and parsed options. This is mostly for internal use by 
+		# Returns an hash consisting of the URL to the dynamic image and parsed options. This is mostly for internal use by
 		# dynamic_image_tag and dynamic_image_url.
 		def dynamic_image_options(image, options = {})
 			options.symbolize_keys!
 
 			options     = {:crop => false}.merge(options)
 			url_options = {:controller => "/images", :action => :render_dynamic_image, :id => image}
-		
+
 			if options[:original]
 				url_options[:original] = 'original'
 				options.delete(:original)
@@ -60,7 +60,7 @@ module DynamicImage
 			# Alt attribute
 			options[:alt] ||= image.name if image.name?
 			options[:alt] ||= image.filename.split('.').first.capitalize
-		
+
 			if options.has_key?(:only_path)
 				url_options[:only_path] = options[:only_path]
 				options[:only_path] = nil
@@ -69,11 +69,11 @@ module DynamicImage
 				url_options[:host] = options[:host]
 				options[:host] = nil
 			end
-		
+
 			{:url => url_for(url_options), :options => options}
 		end
-	
-		# Returns an image tag for the provided image model, works similar to the rails <tt>image_tag</tt> helper. 
+
+		# Returns an image tag for the provided image model, works similar to the rails <tt>image_tag</tt> helper.
 		#
 		# The following options are supported (the rest will be forwarded to <tt>image_tag</tt>):
 		#
@@ -92,9 +92,9 @@ module DynamicImage
 		#
 		def dynamic_image_tag(image, options = {})
 			parsed_options = dynamic_image_options(image, options)
-			image_tag(parsed_options[:url], parsed_options[:options] ).gsub(/\?[\d]+/,'')
+			image_tag(parsed_options[:url], parsed_options[:options] ).gsub(/\?[\d]+/,'').html_safe
 		end
-	
+
 		# Returns an url corresponding to the provided image model.
 		# Special options are documented in ApplicationHelper.dynamic_image_tag, only <tt>:size</tt>, <tt>:filterset</tt> and <tt>:crop</tt> apply.
 		def dynamic_image_url(image, options = {})
