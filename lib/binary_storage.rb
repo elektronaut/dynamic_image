@@ -12,11 +12,11 @@ module BinaryStorage
     def storage_dir
       @@storage_dir ||= Rails.root.join('db/binary_storage', Rails.env)
     end
-    
+
     def storage_dir=(new_storage_dir)
       @@storage_dir = new_storage_dir
     end
-    
+
     def hexdigest_file(path)
       Digest::SHA1.file(path).hexdigest
     end

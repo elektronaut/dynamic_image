@@ -19,7 +19,7 @@ class ImagesController < ActionController::Base
         return
       end
 
-      unless image.data
+      unless image.data?
         logger.warn "Image #{image.id} exists, but has no data"
         render_missing_image and return
       end
