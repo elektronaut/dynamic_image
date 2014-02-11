@@ -3,7 +3,7 @@ class Image < ActiveRecord::Base
 
   binary_storage :data, :sha1_hash
 
-  validates_format_of :content_type, 
+  validates_format_of :content_type,
                       :with => /^image/,
                     :message => "you can only upload pictures"
 
@@ -21,7 +21,7 @@ class Image < ActiveRecord::Base
       image.crop_start = "0x0"
     end
   end
-  
+
   # Create the binary from an image file.
   def imagefile=(image_file)
     if image_file.kind_of?(String) && image_file =~ /^(ht|f)tps?:\/\//
@@ -42,7 +42,7 @@ class Image < ActiveRecord::Base
   # Check the image data
   def set_image_data(data)
     self.data = data
-    if self.data?
+    if self.data
       image     = Magick::ImageList.new.from_blob(self.data)
       size      = Vector2d.new(image.columns, image.rows)
       if DynamicImage.crash_size
@@ -177,7 +177,7 @@ class Image < ActiveRecord::Base
   # Decorates to_json with additional attributes
   def to_json
     attributes.merge({
-      :original_width  => self.original_width, 
+      :original_width  => self.original_width,
       :original_height => self.original_height,
       :crop_width      => self.crop_width,
       :crop_height     => self.crop_height,

@@ -19,7 +19,7 @@ class ImagesController < ActionController::Base
         return
       end
 
-      unless image.data?
+      unless image.data
         logger.warn "Image #{image.id} exists, but has no data"
         render_missing_image and return
       end
@@ -43,16 +43,16 @@ class ImagesController < ActionController::Base
       if image
         response.headers['Cache-Control'] = nil
         response.headers['Last-Modified'] = imagedata.created_at.httpdate if imagedata.created_at?
-        send_data( 
-          imagedata.data, 
-          :filename    => image.filename, 
-          :type        => image.content_type, 
+        send_data(
+          imagedata.data,
+          :filename    => image.filename,
+          :type        => image.content_type,
           :disposition => 'inline'
         )
       end
 
     end
-    
+
   protected
 
     def render_missing_image
@@ -75,5 +75,5 @@ class ImagesController < ActionController::Base
     def run_garbage_collection_for_dynamic_image_controller
       DynamicImage.clean_dirty_memory
     end
-    
+
 end
