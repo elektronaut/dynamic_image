@@ -1,5 +1,0 @@
-Description:
-    Creates the migrations
-
-Usage:
-    rails generate dynamic_image
