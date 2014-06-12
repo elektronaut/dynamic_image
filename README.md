@@ -1,4 +1,4 @@
-# DynamicImage
+# DynamicImage [![Build Status](https://travis-ci.org/elektronaut/dynamic_image.png)](https://travis-ci.org/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image.png)](https://codeclimate.com/github/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/coverage.png)](https://codeclimate.com/github/elektronaut/dynamic_image)
 
 > We're programmers. Programmers are, in their hearts, architects, and the
 > first thing they want to do when they get to a site is to bulldoze
