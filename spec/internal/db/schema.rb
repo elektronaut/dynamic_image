@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 # encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
@@ -13,13 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140610232303) do
+ActiveRecord::Schema.define(version: 20140613001619) do
 
   create_table "images", force: true do |t|
-    t.string  "content_hash"
-    t.string  "content_type"
-    t.integer "content_length"
-    t.string  "filename"
+    t.string   "content_hash",   null: false
+    t.string   "content_type",   null: false
+    t.integer  "content_length", null: false
+    t.string   "filename",       null: false
+    t.string   "real_size",      null: false
+    t.string   "crop_start",     null: false
+    t.string   "crop_size",      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
 end
