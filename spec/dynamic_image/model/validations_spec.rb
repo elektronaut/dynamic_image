@@ -81,4 +81,20 @@ describe DynamicImage::Model::Validations do
   describe "real_size validation" do
     it_should_behave_like "a size validation", :real_size
   end
+
+  describe "crop bounds validation" do
+    subject { image.errors[:crop_size] }
+    before { image.valid? }
+    it { is_expected.not_to include("is out of bounds") }
+
+    context "when crop width is out of bounds" do
+      let(:image) { Image.new(real_size: '10x10', crop_start: '6x0', crop_size: '5x5') }
+      it { is_expected.to include("is out of bounds") }
+    end
+
+    context "when crop height is out of bounds" do
+      let(:image) { Image.new(real_size: '10x10', crop_start: '0x6', crop_size: '5x5') }
+      it { is_expected.to include("is out of bounds") }
+    end
+  end
 end
