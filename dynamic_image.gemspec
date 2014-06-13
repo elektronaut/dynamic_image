@@ -21,6 +21,9 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 1.9.2'
 
   s.add_dependency "rails", "~> 4.1.0"
+  s.add_dependency "vector2d", "~> 2.0"
+  # TODO: Pessimistic version locking after Shrouded is released
+  s.add_dependency "shrouded"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails", "~> 3.0.0"
