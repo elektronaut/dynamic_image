@@ -21,16 +21,6 @@ describe DynamicImage::Model::Dimensions do
       let(:image) { Image.new(real_size: '320x200', crop_size: '200x100') }
       it { is_expected.to be true }
     end
-
-    context "when crop_start is 0x0" do
-      let(:image) { Image.new(real_size: '320x200', crop_start: '0x0') }
-      it { is_expected.to be false }
-    end
-
-    context "when crop_start isn't 0x0" do
-      let(:image) { Image.new(real_size: '320x200', crop_start: '4x3') }
-      it { is_expected.to be true }
-    end
   end
 
   describe "#size" do

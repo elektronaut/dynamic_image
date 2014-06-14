@@ -19,19 +19,16 @@ module DynamicImage
         validates :real_size, :crop_size, :crop_start,
           presence: true,
           format: /\A\d+x\d+\z/
-        validate :validate_crop_bounds, if: :needs_crop_bounds_validation?
+        validate :validate_crop_bounds, if: :cropped?
       end
 
       private
 
       def crop_out_of_bounds?
-        crop = vector(crop_size) + vector(crop_start)
+        crop = vector(crop_size)
+        crop += vector(crop_start) if crop_start?
         max = vector(real_size)
         crop.x > max.x || crop.y > max.y
-      end
-
-      def needs_crop_bounds_validation?
-        real_size? && crop_size?
       end
 
       def validate_crop_bounds

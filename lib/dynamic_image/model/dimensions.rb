@@ -4,8 +4,7 @@ module DynamicImage
   module Model
     module Dimensions
       def cropped?
-        (crop_start? && vector(crop_start) != null_vector) ||
-        (crop_size? && vector(real_size) != vector(crop_size))
+        real_size? && (crop_size? && vector(real_size) != vector(crop_size))
       end
 
       def size
@@ -26,8 +25,12 @@ module DynamicImage
         Vector2d.new(0, 0)
       end
 
+      def valid_vector_string?(str)
+        (str && str =~ /^\d+x\d+$/) ? true : false
+      end
+
       def vector(str)
-        return nil unless str =~ /^\d+x\d+$/
+        return nil unless valid_vector_string?(str)
         Vector2d.parse(str)
       end
     end
