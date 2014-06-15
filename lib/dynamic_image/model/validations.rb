@@ -5,6 +5,8 @@ module DynamicImage
     module Validations
       extend ActiveSupport::Concern
       included do
+        validates_data_presence
+
         validates :content_type,
           presence: true,
           format: /\Aimage\/(gif|jpeg|pjpeg|png)\z/
@@ -12,9 +14,6 @@ module DynamicImage
         validates :content_length,
           presence: true,
           numericality: { greater_than: 0, only_integer: true }
-
-        validates :data,
-          presence: true
 
         validates :filename,
           presence: true,

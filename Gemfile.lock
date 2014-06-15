@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/elektronaut/shrouded.git
-  revision: 11d2e06366285de152d830b90549cd217adafa09
+  revision: dd9fa9fa614a7791e6978be58ae0f167b61c79f8
   specs:
     shrouded (0.0.1)
       activejob
