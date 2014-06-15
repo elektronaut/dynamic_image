@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 4.1.0"
   s.add_dependency "vector2d", "~> 2.0"
+  s.add_dependency "mini_magick", "~> 3.7.0"
   # TODO: Pessimistic version locking after Shrouded is released
   s.add_dependency "shrouded"
 

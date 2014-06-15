@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+require 'mini_magick'
 require 'shrouded'
 require 'vector2d'
 
