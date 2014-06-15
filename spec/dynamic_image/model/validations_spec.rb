@@ -6,6 +6,24 @@ describe DynamicImage::Model::Validations do
 
   before { image.valid? }
 
+  describe "colorspace" do
+    subject { image.errors[:colorspace] }
+
+    context "when not present" do
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when invalid" do
+      let(:image) { Image.new(colorspace: "yuv") }
+      it { is_expected.to include("is not included in the list") }
+    end
+
+    context "when valid" do
+      let(:image) { Image.new(colorspace: "rgb") }
+      it { is_expected.to eq([]) }
+    end
+  end
+
   describe "content_type" do
     subject { image.errors[:content_type] }
 

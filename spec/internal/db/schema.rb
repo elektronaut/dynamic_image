@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 20140613001619) do
     t.string   "content_type",   null: false
     t.integer  "content_length", null: false
     t.string   "filename",       null: false
+    t.string   "colorspace"
     t.integer  "real_width",     null: false
     t.integer  "real_height",    null: false
     t.integer  "crop_width"

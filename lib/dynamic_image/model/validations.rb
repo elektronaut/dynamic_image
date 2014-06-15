@@ -7,6 +7,10 @@ module DynamicImage
       included do
         validates_data_presence
 
+        validates :colorspace,
+          presence: true,
+          inclusion: { in: allowed_colorspaces }
+
         validates :content_type,
           presence: true,
           inclusion: { in: allowed_content_types }
@@ -43,6 +47,14 @@ module DynamicImage
       end
 
       module ClassMethods
+        def allowed_colorspaces
+          %w{
+            rgb
+            cmyk
+            gray
+          }
+        end
+
         def allowed_content_types
           %w{
             image/gif

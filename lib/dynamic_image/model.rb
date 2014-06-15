@@ -9,5 +9,21 @@ module DynamicImage
     include Shrouded::Model
     include DynamicImage::Model::Dimensions
     include DynamicImage::Model::Validations
+
+    included do
+      before_validation :read_image_metadata, if: :data_changed?
+    end
+
+    private
+
+    def read_image_metadata
+      metadata = DynamicImage::Metadata.new(self.data)
+      if metadata.valid?
+        self.colorspace = metadata.colorspace
+        self.real_width = metadata.width
+        self.real_height = metadata.height
+        self.content_type = metadata.content_type
+      end
+    end
   end
 end

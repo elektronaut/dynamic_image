@@ -46,7 +46,7 @@ module DynamicImage
     end
 
     def valid?
-      metadata != :invalid
+      @data && metadata != :invalid
     end
 
     private

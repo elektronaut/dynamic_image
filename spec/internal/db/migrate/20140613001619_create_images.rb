@@ -8,6 +8,7 @@ class CreateImages < ActiveRecord::Migration
       t.string  :filename, null: false
 
       # DynamicImage attributes
+      t.string :colorspace, null: false
       t.integer :real_width, :real_height, null: false
       t.integer :crop_width, :crop_height
       t.integer :crop_start_x, :crop_start_y
