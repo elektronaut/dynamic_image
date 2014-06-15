@@ -18,9 +18,14 @@ ActiveRecord::Schema.define(version: 20140613001619) do
     t.string   "content_type",   null: false
     t.integer  "content_length", null: false
     t.string   "filename",       null: false
-    t.string   "real_size",      null: false
-    t.string   "crop_start",     null: false
-    t.string   "crop_size",      null: false
+    t.integer  "real_width",     null: false
+    t.integer  "real_height",    null: false
+    t.integer  "crop_width"
+    t.integer  "crop_height"
+    t.integer  "crop_start_x"
+    t.integer  "crop_start_y"
+    t.integer  "crop_gravity_x"
+    t.integer  "crop_gravity_y"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

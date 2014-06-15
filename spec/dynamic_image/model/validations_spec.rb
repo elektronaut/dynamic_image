@@ -4,96 +4,257 @@ describe DynamicImage::Model::Validations do
 
   let(:image) { Image.new }
 
-  def errors_on(attribute, value)
-    image.send("#{attribute}=", value)
-    image.valid?
-    image.errors[attribute]
-  end
+  before { image.valid? }
 
-  shared_examples "a required attribute" do |attribute|
-    it "should not accept nil" do
-      expect(errors_on(attribute, nil)).to include("can't be blank")
+  describe "content_type" do
+    subject { image.errors[:content_type] }
+
+    context "when not present" do
+      it { is_expected.to include("can't be blank") }
     end
 
-    it "should not accept an empty string" do
-      expect(errors_on(attribute, "")).to include("can't be blank")
-    end
-  end
-
-  shared_examples "a size validation" do |attribute|
-    it_should_behave_like "a required attribute", attribute
-
-    it "should not accept a malformed string" do
-      expect(errors_on(attribute, "100x")).to include("is invalid")
-      expect(errors_on(attribute, "x100")).to include("is invalid")
-      expect(errors_on(attribute, "100.0x100.0")).to include("is invalid")
+    context "when invalid" do
+      let(:image) { Image.new(content_type: "image/foo") }
+      it { is_expected.to include("is invalid") }
     end
 
-    it "should accept a vector string" do
-      expect(errors_on(attribute, "100x100").any?).to be false
+    context "when valid" do
+      let(:image) { Image.new(content_type: "image/jpeg") }
+      it { is_expected.to eq([]) }
     end
   end
 
-  describe "data validation" do
-    it_should_behave_like "a required attribute", :data
-  end
+  describe "content_length" do
+    subject { image.errors[:content_length] }
 
-  describe "content_type validation" do
-    it_should_behave_like "a required attribute", :content_type
-
-    it "should not accept an invalid content type" do
-      expect(errors_on(:content_type, "image/foo")).to include("is invalid")
+    context "when not present" do
+      it { is_expected.to include("can't be blank") }
     end
 
-    it "should accept a valid content type" do
-      expect(errors_on(:content_type, "image/jpeg").any?).to be false
-    end
-  end
-
-  describe "content_length validation" do
-    it_should_behave_like "a required attribute", :content_length
-
-    it "should be more than 0" do
-      expect(errors_on(:content_length, 0)).to include("must be greater than 0")
+    context "when zero" do
+      let(:image) { Image.new(content_length: 0) }
+      it { is_expected.to include("must be greater than 0") }
     end
 
-    it "should accept a number" do
-      expect(errors_on(:content_length, 2048).any?).to be false
+    context "when non-zero" do
+      let(:image) { Image.new(content_length: 2048) }
+      it { is_expected.to eq([]) }
     end
   end
 
-  describe "filename validation" do
-    it_should_behave_like "a required attribute", :filename
+  describe "data" do
+    subject { image.errors[:data] }
 
-    it "should not accept too long names" do
-      expect(errors_on(:filename, ("a" * 252) + ".jpg")).to include("is too long (maximum is 255 characters)")
+    context "when not present" do
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when present" do
+      let(:image) { Image.new(data: "foo") }
+      it { is_expected.to eq([]) }
     end
   end
 
-  describe "crop_size validation" do
-    it_should_behave_like "a size validation", :crop_size
+  describe "real_width" do
+    subject { image.errors[:real_width] }
+
+    context "when not present" do
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(real_width: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(real_width: 2048) }
+      it { is_expected.to eq([]) }
+    end
   end
 
-  describe "crop_start validation" do
-    it_should_behave_like "a size validation", :crop_start
+  describe "real_height" do
+    subject { image.errors[:real_height] }
+
+    context "when not present" do
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(real_height: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(real_height: 2048) }
+      it { is_expected.to eq([]) }
+    end
   end
 
-  describe "real_size validation" do
-    it_should_behave_like "a size validation", :real_size
+  describe "crop_width" do
+    subject { image.errors[:crop_width] }
+
+    context "when not present" do
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop_height is set" do
+      let(:image) { Image.new(crop_height: 100) }
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(crop_width: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(crop_width: 2048) }
+      it { is_expected.to eq([]) }
+    end
   end
 
-  describe "crop bounds validation" do
+  describe "crop_height" do
+    subject { image.errors[:crop_height] }
+
+    context "when not present" do
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop_width is set" do
+      let(:image) { Image.new(crop_width: 100) }
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(crop_height: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(crop_height: 2048) }
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  describe "crop_start_x" do
+    subject { image.errors[:crop_start_x] }
+
+    context "when not present" do
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop_start_y is set" do
+      let(:image) { Image.new(crop_start_y: 100) }
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(crop_start_x: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(crop_start_x: 2048) }
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  describe "crop_start_y" do
+    subject { image.errors[:crop_start_y] }
+
+    context "when not present" do
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop_start_x is set" do
+      let(:image) { Image.new(crop_start_x: 100) }
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(crop_start_y: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(crop_start_y: 2048) }
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  describe "crop_gravity_x" do
+    subject { image.errors[:crop_gravity_x] }
+
+    context "when not present" do
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop_gravity_y is set" do
+      let(:image) { Image.new(crop_gravity_y: 100) }
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(crop_gravity_x: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(crop_gravity_x: 2048) }
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  describe "crop_gravity_y" do
+    subject { image.errors[:crop_gravity_y] }
+
+    context "when not present" do
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop_gravity_x is set" do
+      let(:image) { Image.new(crop_gravity_x: 100) }
+      it { is_expected.to include("can't be blank") }
+    end
+
+    context "when zero" do
+      let(:image) { Image.new(crop_gravity_y: 0) }
+      it { is_expected.to include("must be greater than 0") }
+    end
+
+    context "when non-zero" do
+      let(:image) { Image.new(crop_gravity_y: 2048) }
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  describe "crop bounds" do
     subject { image.errors[:crop_size] }
-    before { image.valid? }
-    it { is_expected.not_to include("is out of bounds") }
 
-    context "when crop width is out of bounds" do
-      let(:image) { Image.new(real_size: '10x10', crop_start: '6x0', crop_size: '5x5') }
-      it { is_expected.to include("is out of bounds") }
+    context "with no dimensions" do
+      it { is_expected.to eq([]) }
     end
 
-    context "when crop height is out of bounds" do
-      let(:image) { Image.new(real_size: '10x10', crop_start: '0x6', crop_size: '5x5') }
+    context "when crop is not out of bounds" do
+      let(:image) {
+        Image.new(
+          real_width: 10, real_height: 10,
+          crop_width: 5, crop_height: 5,
+          crop_start_x: 5, crop_start_y: 5
+        )
+      }
+      it { is_expected.to eq([]) }
+    end
+
+    context "when crop is out of bounds" do
+      let(:image) {
+        Image.new(
+          real_width: 10, real_height: 10,
+          crop_width: 6, crop_height: 5,
+          crop_start_x: 5, crop_start_y: 5
+        )
+      }
       it { is_expected.to include("is out of bounds") }
     end
   end
