@@ -49,6 +49,7 @@ module DynamicImage
             image/jpeg
             image/pjpeg
             image/png
+            image/tiff
           }
         end
       end
