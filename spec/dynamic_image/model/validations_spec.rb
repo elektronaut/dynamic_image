@@ -15,7 +15,7 @@ describe DynamicImage::Model::Validations do
 
     context "when invalid" do
       let(:image) { Image.new(content_type: "image/foo") }
-      it { is_expected.to include("is invalid") }
+      it { is_expected.to include("is not included in the list") }
     end
 
     context "when valid" do

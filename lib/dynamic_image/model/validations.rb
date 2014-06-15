@@ -9,7 +9,7 @@ module DynamicImage
 
         validates :content_type,
           presence: true,
-          format: /\Aimage\/(gif|jpeg|pjpeg|png)\z/
+          inclusion: { in: allowed_content_types }
 
         validates :content_length,
           presence: true,
@@ -40,6 +40,17 @@ module DynamicImage
         validates :crop_gravity_y, presence: true, if: :crop_gravity_x?
 
         validate :validate_crop_bounds, if: :cropped?
+      end
+
+      module ClassMethods
+        def allowed_content_types
+          %w{
+            image/gif
+            image/jpeg
+            image/pjpeg
+            image/png
+          }
+        end
       end
 
       private
