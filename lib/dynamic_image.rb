@@ -6,6 +6,7 @@ require 'vector2d'
 
 require 'dynamic_image/engine'
 require 'dynamic_image/errors'
+require 'dynamic_image/image_sizing'
 require 'dynamic_image/metadata'
 require 'dynamic_image/model'
 require 'dynamic_image/processed_image'

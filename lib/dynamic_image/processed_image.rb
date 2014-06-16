@@ -9,14 +9,9 @@ module DynamicImage
 
     def cropped_and_resized(size)
       normalized do |image|
-        image.crop crop_geometry(size)
+        image.crop image_sizing.crop_geometry_string(size)
         image.resize size
       end
-    end
-
-    def crop_geometry(size)
-      crop_size, start = crop_geometry_vectors(size)
-      crop_size.to_s + "+#{start.x.to_i}+#{start.y.to_i}"
     end
 
     def normalized(&block)
@@ -34,25 +29,12 @@ module DynamicImage
 
     private
 
-    def crop_geometry_vectors(size)
-      # Maximize the crop area to fit the image size
-      crop_size = size.fit(record.size).round
-
-      # Ignore pixels outside the pre-cropped area for now
-      center = record.crop_gravity - record.crop_start
-
-      # Start at center
-      start = center - (crop_size / 2).floor
-
-      # Adjust if the cropping is out of bounds
-      start += shift_vector(start)
-      start -= shift_vector(record.size - (start + crop_size))
-
-      [crop_size, (start + record.crop_start)]
-    end
-
     def format
       @format || record_format
+    end
+
+    def image_sizing
+      @image_sizing ||= DynamicImage::ImageSizing.new(record)
     end
 
     def needs_colorspace_conversion?
@@ -92,17 +74,6 @@ module DynamicImage
       unless record.valid?
         raise DynamicImage::Errors::InvalidImageError
       end
-    end
-
-    def shift_vector(vect)
-      vector(
-        vect.x < 0 ? vect.x.abs : 0,
-        vect.y < 0 ? vect.y.abs : 0
-      )
-    end
-
-    def vector(x, y)
-      Vector2d.new(x, y)
     end
   end
 end
