@@ -59,26 +59,43 @@ describe DynamicImage::ProcessedImage do
     describe "format conversion" do
       subject { metadata.content_type }
 
-      context "with no arguments" do
+      context "when image is GIF" do
+        let(:image) { gif_image }
+        it { is_expected.to eq('image/gif') }
+      end
+
+      context "when image is JPEG" do
+        let(:image) { jpeg_image }
+        it { is_expected.to eq('image/jpeg') }
+      end
+
+      context "when image is PNG" do
+        let(:image) { png_image }
         it { is_expected.to eq('image/png') }
       end
 
-      context "converting to GIF" do
+      context "when image is TIFF" do
+        let(:image) { tiff_image }
+        it { is_expected.to eq('image/tiff') }
+      end
+
+      context "converting PNG to GIF" do
         let(:processed) { DynamicImage::ProcessedImage.new(record, :gif) }
         it { is_expected.to eq('image/gif') }
       end
 
-      context "converting to JPEG" do
+      context "converting PNG to JPEG" do
         let(:processed) { DynamicImage::ProcessedImage.new(record, :jpeg) }
         it { is_expected.to eq('image/jpeg') }
       end
 
-      context "converting to PNG" do
+      context "converting JPEG to PNG" do
+        let(:image) { jpeg_image }
         let(:processed) { DynamicImage::ProcessedImage.new(record, :png) }
         it { is_expected.to eq('image/png') }
       end
 
-      context "converting to TIFF" do
+      context "converting PNG to TIFF" do
         let(:processed) { DynamicImage::ProcessedImage.new(record, :tiff) }
         it { is_expected.to eq('image/tiff') }
       end
