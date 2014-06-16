@@ -23,7 +23,15 @@ module DynamicImage
         self.real_width = metadata.width
         self.real_height = metadata.height
         self.content_type = metadata.content_type
+        @valid_image = true
+      else
+        @valid_image = false
       end
+      true
+    end
+
+    def valid_image?
+      @valid_image ? true : false
     end
   end
 end

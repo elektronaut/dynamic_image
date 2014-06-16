@@ -44,6 +44,7 @@ module DynamicImage
         validates :crop_gravity_y, presence: true, if: :crop_gravity_x?
 
         validate :validate_crop_bounds, if: :cropped?
+        validate :validate_image, if: :data_changed?
       end
 
       module ClassMethods
@@ -72,6 +73,12 @@ module DynamicImage
         required_size = crop_start + crop_size
         if required_size.x > real_size.x || required_size.y > real_size.y
           self.errors.add(:crop_size, "is out of bounds")
+        end
+      end
+
+      def validate_image
+        unless valid_image?
+         self.errors.add(:data, :invalid)
         end
       end
     end

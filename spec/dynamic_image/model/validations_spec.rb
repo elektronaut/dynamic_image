@@ -1,10 +1,27 @@
 require 'spec_helper'
 
 describe DynamicImage::Model::Validations do
+  storage_root = Rails.root.join('tmp', 'spec')
+
+  let(:file) { File.open(File.expand_path("../../../support/fixtures/image.png", __FILE__)) }
+  let(:content_type) { "image/png" }
+  let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
 
   let(:image) { Image.new }
 
+  before(:all) do
+    Shrouded::Storage.layers << Shrouded::Layer.new(Fog::Storage.new({provider: 'Local', local_root: storage_root}))
+  end
+
   before { image.valid? }
+
+  after do
+    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
+  end
+
+  after(:all) do
+    Shrouded::Storage.layers.clear!
+  end
 
   describe "colorspace" do
     subject { image.errors[:colorspace] }
@@ -67,8 +84,19 @@ describe DynamicImage::Model::Validations do
       it { is_expected.to include("can't be blank") }
     end
 
-    context "when present" do
+    context "when not an image" do
       let(:image) { Image.new(data: "foo") }
+      it { is_expected.to include("is invalid") }
+    end
+
+    context "when a valid image" do
+      let(:image) { Image.new(data: uploaded_file) }
+      it { is_expected.to eq([]) }
+    end
+
+    context "when a valid image has been saved previously" do
+      let(:existing_image) { Image.create(file: uploaded_file) }
+      let(:image) { Image.find(existing_image.id) }
       it { is_expected.to eq([]) }
     end
   end
