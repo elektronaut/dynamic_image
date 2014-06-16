@@ -14,6 +14,18 @@ module DynamicImage
       before_validation :read_image_metadata, if: :data_changed?
     end
 
+    def cmyk?
+      colorspace == "cmyk"
+    end
+
+    def gray?
+      colorspace == "gray"
+    end
+
+    def rgb?
+      colorspace == "rgb"
+    end
+
     private
 
     def read_image_metadata

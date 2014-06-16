@@ -7,6 +7,48 @@ describe DynamicImage::Model do
 
   let(:image) { Image.new }
 
+  describe ".cmyk?" do
+    subject { image.cmyk? }
+
+    context "when colorspace is CMYK" do
+      let(:image) { Image.new(colorspace: "cmyk") }
+      it { is_expected.to be true }
+    end
+
+    context "when colorspace isn't CMYK" do
+      let(:image) { Image.new(colorspace: "rgb") }
+      it { is_expected.to be false }
+    end
+  end
+
+  describe ".gray?" do
+    subject { image.gray? }
+
+    context "when colorspace is grayscale" do
+      let(:image) { Image.new(colorspace: "gray") }
+      it { is_expected.to be true }
+    end
+
+    context "when colorspace isn't grayscale" do
+      let(:image) { Image.new(colorspace: "rgb") }
+      it { is_expected.to be false }
+    end
+  end
+
+  describe ".rgb?" do
+    subject { image.rgb? }
+
+    context "when colorspace is rgb" do
+      let(:image) { Image.new(colorspace: "rgb") }
+      it { is_expected.to be true }
+    end
+
+    context "when colorspace isn't rgb" do
+      let(:image) { Image.new(colorspace: "cmyk") }
+      it { is_expected.to be false }
+    end
+  end
+
   describe "metadata parsing" do
     before { image.valid? }
     let(:image) { Image.new(file: uploaded_file) }
