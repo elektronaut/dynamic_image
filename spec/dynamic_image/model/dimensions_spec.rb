@@ -41,6 +41,11 @@ describe DynamicImage::Model::Dimensions do
       let(:image) { Image.new(crop_gravity_x: 320, crop_gravity_y: 200) }
       it { is_expected.to be true }
     end
+
+    context "when gravity is zero" do
+      let(:image) { Image.new(crop_gravity_x: 0, crop_gravity_y: 0) }
+      it { is_expected.to be true }
+    end
   end
 
   describe "#crop_size" do

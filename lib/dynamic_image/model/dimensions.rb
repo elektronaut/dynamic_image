@@ -23,7 +23,7 @@ module DynamicImage
       end
 
       def crop_gravity?
-        crop_gravity_x? && crop_gravity_y?
+        crop_gravity_x.present? && crop_gravity_y.present?
       end
 
       def crop_size

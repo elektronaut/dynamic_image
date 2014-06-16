@@ -7,6 +7,11 @@ module DynamicImage
       @format = format.to_s.upcase if format
     end
 
+    def crop_geometry(size)
+      crop_size, start = crop_geometry_vectors(size)
+      crop_size.to_s + "+#{start.x.to_i}+#{start.y.to_i}"
+    end
+
     def normalized
       require_valid_image!
       process_image
@@ -21,14 +26,21 @@ module DynamicImage
 
     private
 
-    def content_type_to_format(content_type)
-      {
-        'image/png'   => 'PNG',
-        'image/gif'   => 'GIF',
-        'image/jpeg'  => 'JPEG',
-        'image/pjpeg' => 'JPEG',
-        'image/tiff'  => 'TIFF'
-      }[content_type]
+    def crop_geometry_vectors(size)
+      # Maximize the crop area to fit the image size
+      crop_size = size.fit(record.size).round
+
+      # Ignore pixels outside the pre-cropped area for now
+      center = record.crop_gravity - record.crop_start
+
+      # Start at center
+      start = center - (crop_size / 2).floor
+
+      # Adjust if the cropping is out of bounds
+      start += shift_vector(start)
+      start -= shift_vector(record.size - (start + crop_size))
+
+      [crop_size, (start + record.crop_start)]
     end
 
     def format
@@ -84,6 +96,17 @@ module DynamicImage
       unless record.valid?
         raise DynamicImage::Errors::InvalidImageError
       end
+    end
+
+    def shift_vector(vect)
+      vector(
+        vect.x < 0 ? vect.x.abs : 0,
+        vect.y < 0 ? vect.y.abs : 0
+      )
+    end
+
+    def vector(x, y)
+      Vector2d.new(x, y)
     end
   end
 end

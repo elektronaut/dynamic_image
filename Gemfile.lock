@@ -22,7 +22,7 @@ PATH
       mini_magick (~> 3.7.0)
       rails (~> 4.1.0)
       shrouded
-      vector2d (~> 2.0)
+      vector2d (~> 2.0, >= 2.0.1)
 
 GEM
   remote: https://rubygems.org/
@@ -203,7 +203,7 @@ GEM
       polyglot (>= 0.3.1)
     tzinfo (1.2.1)
       thread_safe (~> 0.1)
-    vector2d (2.0.0)
+    vector2d (2.0.1)
 
 PLATFORMS
   ruby
