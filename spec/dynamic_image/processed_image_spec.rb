@@ -1,6 +1,10 @@
 require 'spec_helper'
 
 describe DynamicImage::ProcessedImage do
+  def vector(x, y)
+    Vector2d.new(x, y)
+  end
+
   let(:file) { File.open(File.expand_path("../../support/fixtures/image.png", __FILE__)) }
   let(:source_image) { MiniMagick::Image.read(file.read) }
 
@@ -18,6 +22,14 @@ describe DynamicImage::ProcessedImage do
   let(:record) { Image.new(data: image.to_blob, filename: 'test.png') }
   let(:processed) { DynamicImage::ProcessedImage.new(record) }
 
+  describe "#cropped_and_resized" do
+    let(:size) { vector(149, 149) }
+    let(:normalized) { processed.cropped_and_resized(size) }
+    let(:metadata) { DynamicImage::Metadata.new(normalized) }
+    subject { metadata.dimensions }
+    it { is_expected.to eq(size) }
+  end
+
   describe "#crop_geometry" do
     subject { processed.crop_geometry(crop_size) }
 
@@ -25,29 +37,29 @@ describe DynamicImage::ProcessedImage do
       let(:record) { Image.new(real_width: 321, real_height: 201) }
 
       context "cropping horizontally" do
-        let(:crop_size) { Vector2d.new(200, 200) }
+        let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq("201x201+60+0") }
       end
 
       context "cropping vertically" do
-        let(:crop_size) { Vector2d.new(160, 50) }
+        let(:crop_size) { vector(160, 50) }
         it { is_expected.to eq("321x100+0+50") }
       end
 
       context "cropping with large size" do
-        let(:crop_size) { Vector2d.new(600, 600) }
+        let(:crop_size) { vector(600, 600) }
         it { is_expected.to eq("201x201+60+0") }
       end
 
       context "cropping with top left gravity" do
         let(:record) { Image.new(crop_gravity_x: 0, crop_gravity_y: 0, real_width: 320, real_height: 200) }
-        let(:crop_size) { Vector2d.new(200, 200) }
+        let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq("200x200+0+0") }
       end
 
       context "cropping with bottom right gravity" do
         let(:record) { Image.new(crop_gravity_x: 320, crop_gravity_y: 200, real_width: 320, real_height: 200) }
-        let(:crop_size) { Vector2d.new(200, 200) }
+        let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq("200x200+120+0") }
       end
     end
@@ -56,24 +68,24 @@ describe DynamicImage::ProcessedImage do
       let(:record) { Image.new(real_width: 521, real_height: 401, crop_width: 321, crop_height: 201, crop_start_x: 10, crop_start_y: 10) }
 
       context "cropping horizontally" do
-        let(:crop_size) { Vector2d.new(200, 200) }
+        let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq("201x201+70+10") }
       end
 
       context "cropping vertically" do
-        let(:crop_size) { Vector2d.new(160, 50) }
+        let(:crop_size) { vector(160, 50) }
         it { is_expected.to eq("321x100+10+60") }
       end
 
       context "cropping with top left gravity" do
         let(:record) { Image.new(crop_gravity_x: 0, crop_gravity_y: 0, real_width: 521, real_height: 401, crop_width: 320, crop_height: 200, crop_start_x: 10, crop_start_y: 10) }
-        let(:crop_size) { Vector2d.new(200, 200) }
+        let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq("200x200+10+10") }
       end
 
       context "cropping with bottom right gravity" do
         let(:record) { Image.new(crop_gravity_x: 320, crop_gravity_y: 200, real_width: 521, real_height: 401, crop_width: 320, crop_height: 200, crop_start_x: 10, crop_start_y: 10) }
-        let(:crop_size) { Vector2d.new(200, 200) }
+        let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq("200x200+130+10") }
       end
     end

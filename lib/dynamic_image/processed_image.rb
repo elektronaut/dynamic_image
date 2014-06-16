@@ -7,22 +7,30 @@ module DynamicImage
       @format = format.to_s.upcase if format
     end
 
+    def cropped_and_resized(size)
+      normalized do |image|
+        image.crop crop_geometry(size)
+        image.resize size
+      end
+    end
+
     def crop_geometry(size)
       crop_size, start = crop_geometry_vectors(size)
       crop_size.to_s + "+#{start.x.to_i}+#{start.y.to_i}"
     end
 
-    def normalized
+    def normalized(&block)
       require_valid_image!
-      process_image
+      process_data do |image|
+        image.combine_options do |combined|
+          image.auto_orient
+          image.colorspace('sRGB') if needs_colorspace_conversion?
+          yield(combined) if block_given?
+          image.strip
+        end
+        image.format(format) if needs_format_conversion?
+      end
     end
-
-    # def scaled_and_cropped(size)
-    #   require_valid_image!
-    #   process_image do |image|
-    #     # Stuff
-    #   end
-    # end
 
     private
 
@@ -61,18 +69,6 @@ module DynamicImage
       result = image.to_blob
       image.destroy!
       result
-    end
-
-    def process_image(&block)
-      process_data do |image|
-        image.combine_options do |combined|
-          image.auto_orient
-          image.colorspace('sRGB') if needs_colorspace_conversion?
-          yield(combined) if block_given?
-          image.strip
-        end
-        image.format(format) if needs_format_conversion?
-      end
     end
 
     def record
