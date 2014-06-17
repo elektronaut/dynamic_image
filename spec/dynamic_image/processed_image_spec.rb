@@ -18,6 +18,31 @@ describe DynamicImage::ProcessedImage do
   let(:record) { Image.new(data: image.to_blob, filename: 'test.png') }
   let(:processed) { DynamicImage::ProcessedImage.new(record) }
 
+  describe "#content_type" do
+    let(:record) { Image.new }
+    subject { processed.content_type }
+
+    context "when format is GIF" do
+      let(:processed) { DynamicImage::ProcessedImage.new(record, :gif) }
+      it { is_expected.to eq('image/gif') }
+    end
+
+    context "when format is JPEG" do
+      let(:processed) { DynamicImage::ProcessedImage.new(record, :jpg) }
+      it { is_expected.to eq('image/jpeg') }
+    end
+
+    context "when format is PNG" do
+      let(:processed) { DynamicImage::ProcessedImage.new(record, :png) }
+      it { is_expected.to eq('image/png') }
+    end
+
+    context "when format is TIFF" do
+      let(:processed) { DynamicImage::ProcessedImage.new(record, :tiff) }
+      it { is_expected.to eq('image/tiff') }
+    end
+  end
+
   describe "#cropped_and_resized" do
     let(:size) { Vector2d.new(149, 149) }
     let(:normalized) { processed.cropped_and_resized(size) }

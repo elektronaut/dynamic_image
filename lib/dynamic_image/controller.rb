@@ -6,12 +6,20 @@ module DynamicImage
 
     included do
       before_action :find_record, only: [:show]
-      respond_to :html
+      respond_to :html, :gif, :jpeg, :png, :tiff
     end
 
     def show
+      @size = Vector2d.parse(params[:size])
       respond_with(@record) do |format|
         format.html { render text: "OK" }
+        format.any(:gif, :jpeg, :png, :tiff) do
+          send_data(
+            processed_image.cropped_and_resized(@size),
+            content_type: processed_image.content_type,
+            disposition:  'inline'
+          )
+        end
       end
     end
 
@@ -19,6 +27,14 @@ module DynamicImage
 
     def find_record
       @record = model.find(params[:id])
+    end
+
+    def processed_image
+      @processed_image ||= DynamicImage::ProcessedImage.new(@record, requested_format)
+    end
+
+    def requested_format
+      params[:format]
     end
   end
 end

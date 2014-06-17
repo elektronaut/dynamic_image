@@ -5,6 +5,11 @@ module DynamicImage
     def initialize(record, format=nil)
       @record = record
       @format = format.to_s.upcase if format
+      @format = "JPEG" if @format == "JPG"
+    end
+
+    def content_type
+      "image/#{format}".downcase
     end
 
     def cropped_and_resized(size)
