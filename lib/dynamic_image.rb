@@ -4,6 +4,7 @@ require 'mini_magick'
 require 'shrouded'
 require 'vector2d'
 
+require 'dynamic_image/controller'
 require 'dynamic_image/engine'
 require 'dynamic_image/errors'
 require 'dynamic_image/image_sizing'
