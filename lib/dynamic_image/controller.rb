@@ -11,18 +11,11 @@ module DynamicImage
     end
 
     def show
-      render_image DynamicImage::ProcessedImage.new(
-        @record,
-        format: requested_format
-      )
+      render_image(format: requested_format)
     end
 
     def uncropped
-      render_image DynamicImage::ProcessedImage.new(
-        @record,
-        format: requested_format,
-        uncropped: true
-      )
+      render_image(format: requested_format, uncropped: true)
     end
 
     def original
@@ -49,7 +42,8 @@ module DynamicImage
       @record = model.find(params[:id])
     end
 
-    def render_image(processed_image)
+    def render_image(options)
+      processed_image = DynamicImage::ProcessedImage.new(@record, options)
       if stale?(@record)
         respond_with(@record) do |format|
           format.any(:gif, :jpeg, :png, :tiff) do
