@@ -30,13 +30,43 @@ describe ImagesController, type: :controller do
       end
     end
 
+    context "with If-Modified-Since header" do
+      before do
+        request.env['HTTP_IF_MODIFIED_SINCE'] = (Time.now + 10.minutes).httpdate
+        get :show, id: image.id, size: '100x100', format: :png
+      end
+
+      it "should respond with 304 not modified" do
+        expect(response).to have_http_status(304)
+      end
+    end
+
+    context "with ETag header" do
+      before do
+        request.env['HTTP_IF_MODIFIED_SINCE'] = (Time.now + 10.minutes).httpdate
+        get :show, id: image.id, size: '100x100', format: :png
+      end
+
+      it "should respond with 304 not modified" do
+        expect(response).to have_http_status(304)
+      end
+    end
+
     context "with an existing record" do
       before { get :show, id: image.id, size: '100x100', format: :png }
+
       it "should respond with success" do
         expect(response).to have_http_status(:success)
       end
+
       it "should find the record" do
         expect(assigns(:record)).to eq(image)
+      end
+
+      it "should set the caching headers" do
+        expect(response.headers['Cache-Control']).to eq("max-age=2592000, public")
+        expect(response.headers['Last-Modified']).to be_a(String)
+        expect(response.headers['ETag']).to be_a(String)
       end
     end
 
