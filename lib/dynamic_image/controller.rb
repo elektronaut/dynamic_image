@@ -5,6 +5,7 @@ module DynamicImage
     extend ActiveSupport::Concern
 
     included do
+      before_action :verify_signed_params
       before_action :find_record
       after_action :cache_expiration_header
       respond_to :gif, :jpeg, :png, :tiff
@@ -63,6 +64,20 @@ module DynamicImage
 
     def requested_size
       Vector2d.parse(params[:size])
+    end
+
+    def signed_params
+      case request[:action]
+      when "show", "uncropped"
+        [:action, :id, :size]
+      else
+        [:action, :id]
+      end
+    end
+
+    def verify_signed_params
+      key = signed_params.map { |k| params.require(k) }.join('-')
+      DynamicImage.digest_verifier.verify(key, params[:digest])
     end
   end
 end

@@ -3,6 +3,15 @@ require 'spec_helper'
 describe ImagesController, type: :controller do
   storage_root = Rails.root.join('tmp', 'spec')
 
+  def digest(str)
+    DynamicImage.digest_verifier.generate(str)
+  end
+
+  def digested(action, options={})
+    key = ([action] + [:id, :size].select { |k| options.has_key?(k) }.map { |k| options[k] }).join('-')
+    { digest: digest(key) }.merge(options)
+  end
+
   let(:file) { File.open(File.expand_path("../../support/fixtures/image.png", __FILE__)) }
   let(:content_type) { "image/png" }
   let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
@@ -23,17 +32,43 @@ describe ImagesController, type: :controller do
     Shrouded::Storage.layers.clear!
   end
 
+  describe "signed params verification" do
+    context "without a digest" do
+      it "should raise an error" do
+        expect {
+          get :show, id: 1, size: '100x100'
+        }.to raise_error(DynamicImage::Errors::InvalidSignature)
+      end
+    end
+
+    context "with an invalid digest" do
+      it "should raise an error" do
+        expect {
+          get :show, id: 1, size: '100x101', digest: digest('show-1-100x100')
+        }.to raise_error(DynamicImage::Errors::InvalidSignature)
+      end
+    end
+
+    context "with a missing parameter" do
+      it "should raise an error" do
+        expect {
+          get :show, id: 1, digest: digest('show-1-100x100')
+        }.to raise_error(ActionController::ParameterMissing)
+      end
+    end
+  end
+
   describe "GET show" do
     context "with a nonexistant record" do
       it "should raise an error" do
-        expect { get :show, id: 1 }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { get :show, digested(:show, id: 1, size: '100x100') }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
     context "with If-Modified-Since header" do
       before do
         request.env['HTTP_IF_MODIFIED_SINCE'] = (Time.now + 10.minutes).httpdate
-        get :show, id: image.id, size: '100x100', format: :png
+        get :show, digested(:show, id: image.id, size: '100x100', format: :png)
       end
 
       it "should respond with 304 not modified" do
@@ -44,7 +79,7 @@ describe ImagesController, type: :controller do
     context "with ETag header" do
       before do
         request.env['HTTP_IF_MODIFIED_SINCE'] = (Time.now + 10.minutes).httpdate
-        get :show, id: image.id, size: '100x100', format: :png
+        get :show, digested(:show, id: image.id, size: '100x100', format: :png)
       end
 
       it "should respond with 304 not modified" do
@@ -53,7 +88,7 @@ describe ImagesController, type: :controller do
     end
 
     context "with an existing record" do
-      before { get :show, id: image.id, size: '100x100', format: :png }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :png) }
 
       it "should respond with success" do
         expect(response).to have_http_status(:success)
@@ -71,7 +106,7 @@ describe ImagesController, type: :controller do
     end
 
     context "as an image format" do
-      before { get :show, id: image.id, size: '100x100', format: :png }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :png) }
 
       it "should respond with success" do
         expect(response).to have_http_status(:success)
@@ -87,7 +122,7 @@ describe ImagesController, type: :controller do
     end
 
     context "as GIF format" do
-      before { get :show, id: image.id, size: '100x100', format: :gif }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :gif) }
 
       it "should set the content type" do
         expect(response.content_type).to eq("image/gif")
@@ -99,7 +134,7 @@ describe ImagesController, type: :controller do
     end
 
     context "as JPEG format" do
-      before { get :show, id: image.id, size: '100x100', format: :jpeg }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :jpeg) }
 
       it "should set the content type" do
         expect(response.content_type).to eq("image/jpeg")
@@ -111,7 +146,7 @@ describe ImagesController, type: :controller do
     end
 
     context "as JPG format" do
-      before { get :show, id: image.id, size: '100x100', format: :jpg }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :jpg) }
 
       it "should set the content type" do
         expect(response.content_type).to eq("image/jpeg")
@@ -123,7 +158,7 @@ describe ImagesController, type: :controller do
     end
 
     context "as PNG format" do
-      before { get :show, id: image.id, size: '100x100', format: :png }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :png) }
 
       it "should set the content type" do
         expect(response.content_type).to eq("image/png")
@@ -135,7 +170,7 @@ describe ImagesController, type: :controller do
     end
 
     context "as TIFF format" do
-      before { get :show, id: image.id, size: '100x100', format: :tiff }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :tiff) }
 
       it "should set the content type" do
         expect(response.content_type).to eq("image/tiff")
@@ -150,12 +185,14 @@ describe ImagesController, type: :controller do
   describe "GET uncropped" do
     context "with a nonexistant record" do
       it "should raise an error" do
-        expect { get :uncropped, id: 1 }.to raise_error(ActiveRecord::RecordNotFound)
+        expect {
+          get :uncropped, digested(:uncropped, id: 1, size: '100x100')
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
     context "with an existing record" do
-      before { get :uncropped, id: image.id, size: '100x100', format: :png }
+      before { get :uncropped, digested(:uncropped, id: image.id, size: '100x100', format: :png) }
 
       it "should respond with success" do
         expect(response).to have_http_status(:success)
@@ -181,12 +218,12 @@ describe ImagesController, type: :controller do
   describe "GET original" do
     context "with a nonexistant record" do
       it "should raise an error" do
-        expect { get :original, id: 1 }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { get :original, digested(:original, id: 1) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
     context "with an existing record" do
-      before { get :original, id: image.id, format: :png }
+      before { get :original, digested(:original, id: image.id, format: :png) }
 
       it "should respond with success" do
         expect(response).to have_http_status(:success)
