@@ -177,4 +177,35 @@ describe ImagesController, type: :controller do
       end
     end
   end
+
+  describe "GET original" do
+    context "with a nonexistant record" do
+      it "should raise an error" do
+        expect { get :original, id: 1 }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "with an existing record" do
+      before { get :original, id: image.id, format: :png }
+
+      it "should respond with success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should find the record" do
+        expect(assigns(:record)).to eq(image)
+      end
+
+      it "should set the caching headers" do
+        expect(response.headers['Cache-Control']).to eq("max-age=2592000, public")
+        expect(response.headers['Last-Modified']).to be_a(String)
+        expect(response.headers['ETag']).to be_a(String)
+      end
+
+      it 'should return the original PNG image' do
+        expect(metadata.format).to eq('PNG')
+        expect(metadata.dimensions).to eq(Vector2d.new(320, 200))
+      end
+    end
+  end
 end

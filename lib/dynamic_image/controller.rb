@@ -25,6 +25,20 @@ module DynamicImage
       )
     end
 
+    def original
+      if stale?(@record)
+        respond_with(@record) do |format|
+          format.any(:gif, :jpeg, :png, :tiff) do
+            send_data(
+              @record.data,
+              content_type: @record.content_type,
+              disposition:  'inline'
+            )
+          end
+        end
+      end
+    end
+
     private
 
     def cache_expiration_header
