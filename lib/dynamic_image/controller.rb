@@ -11,7 +11,7 @@ module DynamicImage
     end
 
     def show
-      render_image DynamicImage::ProcessedImage.new(@record, requested_format)
+      render_image DynamicImage::ProcessedImage.new(@record, format: requested_format)
     end
 
     private

@@ -2,9 +2,9 @@
 
 module DynamicImage
   class ProcessedImage
-    def initialize(record, format=nil)
+    def initialize(record, options={})
       @record = record
-      @format = format.to_s.upcase if format
+      @format = options[:format].to_s.upcase if options[:format]
       @format = "JPEG" if @format == "JPG"
     end
 

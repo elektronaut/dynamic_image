@@ -23,22 +23,22 @@ describe DynamicImage::ProcessedImage do
     subject { processed.content_type }
 
     context "when format is GIF" do
-      let(:processed) { DynamicImage::ProcessedImage.new(record, :gif) }
+      let(:processed) { DynamicImage::ProcessedImage.new(record, format: :gif) }
       it { is_expected.to eq('image/gif') }
     end
 
     context "when format is JPEG" do
-      let(:processed) { DynamicImage::ProcessedImage.new(record, :jpg) }
+      let(:processed) { DynamicImage::ProcessedImage.new(record, format: :jpg) }
       it { is_expected.to eq('image/jpeg') }
     end
 
     context "when format is PNG" do
-      let(:processed) { DynamicImage::ProcessedImage.new(record, :png) }
+      let(:processed) { DynamicImage::ProcessedImage.new(record, format: :png) }
       it { is_expected.to eq('image/png') }
     end
 
     context "when format is TIFF" do
-      let(:processed) { DynamicImage::ProcessedImage.new(record, :tiff) }
+      let(:processed) { DynamicImage::ProcessedImage.new(record, format: :tiff) }
       it { is_expected.to eq('image/tiff') }
     end
   end
@@ -105,23 +105,23 @@ describe DynamicImage::ProcessedImage do
       end
 
       context "converting PNG to GIF" do
-        let(:processed) { DynamicImage::ProcessedImage.new(record, :gif) }
+        let(:processed) { DynamicImage::ProcessedImage.new(record, format: :gif) }
         it { is_expected.to eq('image/gif') }
       end
 
       context "converting PNG to JPEG" do
-        let(:processed) { DynamicImage::ProcessedImage.new(record, :jpeg) }
+        let(:processed) { DynamicImage::ProcessedImage.new(record, format: :jpeg) }
         it { is_expected.to eq('image/jpeg') }
       end
 
       context "converting JPEG to PNG" do
         let(:image) { jpeg_image }
-        let(:processed) { DynamicImage::ProcessedImage.new(record, :png) }
+        let(:processed) { DynamicImage::ProcessedImage.new(record, format: :png) }
         it { is_expected.to eq('image/png') }
       end
 
       context "converting PNG to TIFF" do
-        let(:processed) { DynamicImage::ProcessedImage.new(record, :tiff) }
+        let(:processed) { DynamicImage::ProcessedImage.new(record, format: :tiff) }
         it { is_expected.to eq('image/tiff') }
       end
     end
