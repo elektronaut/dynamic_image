@@ -1,11 +1,25 @@
 require 'spec_helper'
 
 describe DynamicImage::Model do
+  storage_root = Rails.root.join('tmp', 'spec')
+
   let(:file) { File.open(File.expand_path("../../support/fixtures/image.png", __FILE__)) }
   let(:content_type) { "image/png" }
   let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
 
   let(:image) { Image.new }
+
+  before(:all) do
+    Shrouded::Storage.layers << Shrouded::Layer.new(Fog::Storage.new({provider: 'Local', local_root: storage_root}))
+  end
+
+  after do
+    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
+  end
+
+  after(:all) do
+    Shrouded::Storage.layers.clear!
+  end
 
   describe ".cmyk?" do
     subject { image.cmyk? }
@@ -47,6 +61,13 @@ describe DynamicImage::Model do
       let(:image) { Image.new(colorspace: "cmyk") }
       it { is_expected.to be false }
     end
+  end
+
+  describe ".to_param" do
+    let(:timestamp) { DateTime.new(2014, 6, 18, 12, 0) }
+    subject { image.to_param }
+    let(:image) { Image.create(file: uploaded_file, updated_at: timestamp) }
+    it { is_expected.to eq("#{image.id}-20140618120000000000000") }
   end
 
   describe "metadata parsing" do

@@ -26,6 +26,10 @@ module DynamicImage
       colorspace == "rgb"
     end
 
+    def to_param
+      [id, updated_at.utc.to_s(cache_timestamp_format)].join('-')
+    end
+
     private
 
     def read_image_metadata
