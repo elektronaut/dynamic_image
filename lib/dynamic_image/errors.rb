@@ -4,5 +4,6 @@ module DynamicImage
   module Errors
     class Error < StandardError; end
     class InvalidImageError < DynamicImage::Errors::Error; end
+    class InvalidSignature < DynamicImage::Errors::Error; end
   end
 end
