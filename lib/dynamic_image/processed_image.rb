@@ -9,11 +9,19 @@ module DynamicImage
     end
 
     # Returns the content type.
+    #
+    #   image = Image.find(params[:id])
+    #   DynamicImage::ProcessedImage.new(image).content_type        # => 'image/png'
+    #   DynamicImage::ProcessedImage.new(image, :jpeg).content_type # => 'image/jpeg'
     def content_type
       "image/#{format}".downcase
     end
 
     # Crops and resizes the image. Normalization is performed as well.
+    #
+    #   image = Image.find(params[:id])
+    #   processed = DynamicImage::ProcessedImage.new(image)
+    #   image_data = processed.cropped_and_resized(Vector2d.new(200, 200))
     #
     # Returns a binary string.
     def cropped_and_resized(size)
@@ -27,6 +35,10 @@ module DynamicImage
     #
     # EXIF rotation is applied, CMYK images are converted to sRGB,
     # and metadata is stripped. Format conversion occurs if necessary.
+    #
+    #   image = Image.find(params[:id])
+    #   processed = DynamicImage::ProcessedImage.new(image, :jpeg)
+    #   jpg_data = processed.normalized
     #
     # Returns a binary string.
     def normalized(&block)

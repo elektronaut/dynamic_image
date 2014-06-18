@@ -10,6 +10,12 @@ module DynamicImage
     # to match the image size, since DynamicImage performs
     # cropping before resizing.
     #
+    #   image = Image.find(params[:id]) # 320x200 image
+    #   sizing = DynamicImage::ImageSizing.new(image)
+    #
+    #   sizing.crop_geometry(Vector2d(100, 100))
+    #   # => [Vector2d(200, 200), Vector2d(60, 0)]
+    #
     # Returns a tuple with crop size and crop start vectors.
     def crop_geometry(ratio_vector)
       # Maximize the crop area to fit the image size
@@ -25,6 +31,11 @@ module DynamicImage
     end
 
     # Returns crop geometry as an ImageMagick compatible string.
+    #
+    #   image = Image.find(params[:id]) # 320x200 image
+    #   sizing = DynamicImage::ImageSizing.new(image)
+    #
+    #   sizing.crop_geometry(Vector2d(100, 100)) # => "200x200+60+0"
     def crop_geometry_string(ratio_vector)
       crop_size, start = crop_geometry(ratio_vector)
       crop_size.floor.to_s + "+#{start.x.to_i}+#{start.y.to_i}"
