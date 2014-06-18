@@ -8,10 +8,14 @@ module DynamicImage
       @format = "JPEG" if @format == "JPG"
     end
 
+    # Returns the content type.
     def content_type
       "image/#{format}".downcase
     end
 
+    # Crops and resizes the image. Normalization is performed as well.
+    #
+    # Returns a binary string.
     def cropped_and_resized(size)
       normalized do |image|
         image.crop image_sizing.crop_geometry_string(size)
@@ -19,6 +23,12 @@ module DynamicImage
       end
     end
 
+    # Normalizes the image.
+    #
+    # EXIF rotation is applied, CMYK images are converted to sRGB,
+    # and metadata is stripped. Format conversion occurs if necessary.
+    #
+    # Returns a binary string.
     def normalized(&block)
       require_valid_image!
       process_data do |image|
