@@ -31,7 +31,7 @@ describe ImagesController, type: :controller do
     end
 
     context "with an existing record" do
-      before { get :show, id: image.id, size: '100x100' }
+      before { get :show, id: image.id, size: '100x100', format: :png }
       it "should respond with success" do
         expect(response).to have_http_status(:success)
       end

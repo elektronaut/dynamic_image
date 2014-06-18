@@ -6,13 +6,12 @@ module DynamicImage
 
     included do
       before_action :find_record, only: [:show]
-      respond_to :html, :gif, :jpeg, :png, :tiff
+      respond_to :gif, :jpeg, :png, :tiff
     end
 
     def show
       @size = Vector2d.parse(params[:size])
       respond_with(@record) do |format|
-        format.html { render text: "OK" }
         format.any(:gif, :jpeg, :png, :tiff) do
           send_data(
             processed_image.cropped_and_resized(@size),
