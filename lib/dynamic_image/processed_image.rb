@@ -100,7 +100,7 @@ module DynamicImage
 
     def require_valid_image!
       unless record.valid?
-        raise DynamicImage::Errors::InvalidImageError
+        raise DynamicImage::Errors::InvalidImage
       end
     end
   end

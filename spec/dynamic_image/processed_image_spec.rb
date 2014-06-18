@@ -58,7 +58,7 @@ describe DynamicImage::ProcessedImage do
     context "with invalid data" do
       let(:record) { Image.new(data: "foo") }
       it "should raise an error" do
-        expect { normalized }.to raise_error(DynamicImage::Errors::InvalidImageError)
+        expect { normalized }.to raise_error(DynamicImage::Errors::InvalidImage)
       end
     end
 
