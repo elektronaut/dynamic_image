@@ -11,18 +11,7 @@ module DynamicImage
     end
 
     def show
-      @size = Vector2d.parse(params[:size])
-      if stale?(@record)
-        respond_with(@record) do |format|
-          format.any(:gif, :jpeg, :png, :tiff) do
-            send_data(
-              processed_image.cropped_and_resized(@size),
-              content_type: processed_image.content_type,
-              disposition:  'inline'
-            )
-          end
-        end
-      end
+      render_image DynamicImage::ProcessedImage.new(@record, requested_format)
     end
 
     private
@@ -35,13 +24,26 @@ module DynamicImage
       @record = model.find(params[:id])
     end
 
-    def processed_image
-      @processed_image ||= DynamicImage::ProcessedImage.new(@record, requested_format)
+    def render_image(processed_image)
+      if stale?(@record)
+        respond_with(@record) do |format|
+          format.any(:gif, :jpeg, :png, :tiff) do
+            send_data(
+              processed_image.cropped_and_resized(requested_size),
+              content_type: processed_image.content_type,
+              disposition:  'inline'
+            )
+          end
+        end
+      end
     end
 
     def requested_format
       params[:format]
     end
 
+    def requested_size
+      Vector2d.parse(params[:size])
+    end
   end
 end
