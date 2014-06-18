@@ -3,9 +3,10 @@
 module DynamicImage
   class ProcessedImage
     def initialize(record, options={})
-      @record = record
-      @format = options[:format].to_s.upcase if options[:format]
-      @format = "JPEG" if @format == "JPG"
+      @record    = record
+      @uncropped = options[:uncropped] ? true : false
+      @format    = options[:format].to_s.upcase if options[:format]
+      @format    = "JPEG" if @format == "JPG"
     end
 
     # Returns the content type.
@@ -61,7 +62,7 @@ module DynamicImage
     end
 
     def image_sizing
-      @image_sizing ||= DynamicImage::ImageSizing.new(record)
+      @image_sizing ||= DynamicImage::ImageSizing.new(record, uncropped: @uncropped)
     end
 
     def needs_colorspace_conversion?

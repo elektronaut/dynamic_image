@@ -5,13 +5,24 @@ module DynamicImage
     extend ActiveSupport::Concern
 
     included do
-      before_action :find_record, only: [:show]
-      after_action :cache_expiration_header, only: [:show]
+      before_action :find_record
+      after_action :cache_expiration_header
       respond_to :gif, :jpeg, :png, :tiff
     end
 
     def show
-      render_image DynamicImage::ProcessedImage.new(@record, format: requested_format)
+      render_image DynamicImage::ProcessedImage.new(
+        @record,
+        format: requested_format
+      )
+    end
+
+    def uncropped
+      render_image DynamicImage::ProcessedImage.new(
+        @record,
+        format: requested_format,
+        uncropped: true
+      )
     end
 
     private

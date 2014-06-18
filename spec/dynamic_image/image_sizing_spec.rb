@@ -73,6 +73,12 @@ describe DynamicImage::ImageSizing do
         let(:crop_size) { vector(200, 200) }
         it { is_expected.to eq([vector(200, 200), vector(130, 10)]) }
       end
+
+      context "with precropping disabled" do
+        let(:sizing) { DynamicImage::ImageSizing.new(record, uncropped: true) }
+        let(:crop_size) { vector(200, 200) }
+        it { is_expected.to eq([vector(401, 401), vector(60, 0)]) }
+      end
     end
   end
 end

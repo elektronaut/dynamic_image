@@ -9,6 +9,8 @@ describe ImagesController, type: :controller do
 
   let(:image) { Image.create(file: uploaded_file) }
 
+  let(:metadata) { DynamicImage::Metadata.new(response.body) }
+
   before(:all) do
     Shrouded::Storage.layers << Shrouded::Layer.new(Fog::Storage.new({provider: 'Local', local_root: storage_root}))
   end
@@ -22,8 +24,6 @@ describe ImagesController, type: :controller do
   end
 
   describe "GET show" do
-    let(:metadata) { DynamicImage::Metadata.new(response.body) }
-
     context "with a nonexistant record" do
       it "should raise an error" do
         expect { get :show, id: 1 }.to raise_error(ActiveRecord::RecordNotFound)
@@ -143,6 +143,37 @@ describe ImagesController, type: :controller do
 
       it 'should return a TIFF image' do
         expect(metadata.format).to eq('TIFF')
+      end
+    end
+  end
+
+  describe "GET uncropped" do
+    context "with a nonexistant record" do
+      it "should raise an error" do
+        expect { get :uncropped, id: 1 }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context "with an existing record" do
+      before { get :uncropped, id: image.id, size: '100x100', format: :png }
+
+      it "should respond with success" do
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should find the record" do
+        expect(assigns(:record)).to eq(image)
+      end
+
+      it "should set the caching headers" do
+        expect(response.headers['Cache-Control']).to eq("max-age=2592000, public")
+        expect(response.headers['Last-Modified']).to be_a(String)
+        expect(response.headers['ETag']).to be_a(String)
+      end
+
+      it 'should return a PNG image' do
+        expect(metadata.format).to eq('PNG')
+        expect(metadata.dimensions).to eq(Vector2d.new(100, 100))
       end
     end
   end
