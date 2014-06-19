@@ -33,18 +33,10 @@ describe ImagesController, type: :controller do
   end
 
   describe "signed params verification" do
-    context "without a digest" do
-      it "should raise an error" do
-        expect {
-          get :show, id: 1, size: '100x100'
-        }.to raise_error(DynamicImage::Errors::InvalidSignature)
-      end
-    end
-
     context "with an invalid digest" do
       it "should raise an error" do
         expect {
-          get :show, id: 1, size: '100x101', digest: digest('show-1-100x100')
+          get :show, id: 1, size: '100x101', digest: digest('show-1-100x100'), format: :png
         }.to raise_error(DynamicImage::Errors::InvalidSignature)
       end
     end
@@ -52,7 +44,7 @@ describe ImagesController, type: :controller do
     context "with a missing parameter" do
       it "should raise an error" do
         expect {
-          get :show, id: 1, digest: digest('show-1-100x100')
+          get :show, id: 1, digest: digest('show-1-100x100'), format: :png
         }.to raise_error(ActionController::ParameterMissing)
       end
     end

@@ -12,6 +12,7 @@ require 'dynamic_image/metadata'
 require 'dynamic_image/model'
 require 'dynamic_image/processed_image'
 require 'dynamic_image/railtie'
+require 'dynamic_image/routing'
 
 module DynamicImage
   cattr_accessor :digest_verifier
