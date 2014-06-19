@@ -57,6 +57,7 @@ module DynamicImage
 
     def read_metadata
       image = MiniMagick::Image.read(@data)
+      image.auto_orient
       metadata = {
         colorspace: image[:colorspace],
         dimensions: image[:dimensions],
