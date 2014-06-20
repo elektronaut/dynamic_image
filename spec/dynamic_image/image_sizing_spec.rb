@@ -81,4 +81,109 @@ describe DynamicImage::ImageSizing do
       end
     end
   end
+
+  describe "#fit" do
+    let(:record) { Image.new(real_width: 320, real_height: 200) }
+    let(:options) { {} }
+    let(:size) { vector(100, 100) }
+    subject { sizing.fit(size, options) }
+
+    context "with string argument" do
+      context "with both dimensions" do
+        let(:size) { "100x100" }
+        it { is_expected.to eq(vector(100, 62.5)) }
+      end
+
+      context "with only width" do
+        let(:size) { "100x" }
+        it { is_expected.to eq(vector(100, 62.5)) }
+      end
+
+      context "with only height" do
+        let(:size) { "x100" }
+        it { is_expected.to eq(vector(160, 100)) }
+      end
+    end
+
+    context "with no options" do
+      context "when fit_size is smaller" do
+        it { is_expected.to eq(vector(100, 62.5)) }
+      end
+
+      context "when fit_size is larger" do
+        let(:size) { vector(500, 500) }
+        it { is_expected.to eq(vector(320, 200)) }
+      end
+    end
+
+    context "with crop: true" do
+      let(:options) { { crop: true } }
+
+      context "when fit_size is smaller" do
+        it { is_expected.to eq(vector(100, 100)) }
+      end
+
+      context "with unspecified width" do
+        let(:size) { vector(0, 100) }
+        it "should raise an error" do
+          expect { subject }.to raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        end
+      end
+
+      context "with unspecified height" do
+        let(:size) { vector(100, 0) }
+        it "should raise an error" do
+          expect { subject }.to raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        end
+      end
+
+      context "when fit_size is larger" do
+        let(:size) { vector(500, 500) }
+        it { is_expected.to eq(vector(200, 200)) }
+      end
+    end
+
+    context "with upscale: true" do
+      let(:options) { { upscale: true } }
+
+      context "when fit_size is smaller" do
+        it { is_expected.to eq(vector(100, 62.5)) }
+      end
+
+      context "with only width" do
+        let(:size) { vector(400, 0) }
+        it { is_expected.to eq(vector(400, 250)) }
+      end
+
+      context "with only height" do
+        let(:size) { vector(0, 300) }
+        it { is_expected.to eq(vector(480, 300)) }
+      end
+
+      context "when fit_size is larger" do
+        let(:size) { vector(500, 500) }
+        it { is_expected.to eq(vector(500, 312.5)) }
+      end
+    end
+
+    context "with crop: true, upscale: true" do
+      let(:options) { { crop: true, upscale: true } }
+      let(:size) { vector(500, 520) }
+      it { is_expected.to eq(vector(500, 520)) }
+    end
+
+    context "with a cropped image" do
+      let(:record) { Image.new(real_width: 520, real_height: 500, crop_width: 320, crop_height: 200, crop_start_x: 10, crop_start_y: 10) }
+      let(:size) { vector(1000, 1000) }
+
+      context "and normal sizing" do
+        it { is_expected.to eq(vector(320, 200)) }
+      end
+
+      context "and uncropped sizing" do
+        let(:sizing) { DynamicImage::ImageSizing.new(record, uncropped: true) }
+        it { is_expected.to eq(vector(520, 500)) }
+      end
+    end
+  end
 end

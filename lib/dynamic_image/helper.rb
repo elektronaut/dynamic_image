@@ -14,7 +14,7 @@ module DynamicImage
 
     def dynamic_image_url(record_or_array, options={})
       record = extract_record(record_or_array)
-      dynamic_image_sizing!(record, options)
+      options[:size] = fit_size!(record, options)
 
       # Calculate size
       options = {
@@ -70,35 +70,16 @@ module DynamicImage
       DynamicImage.digest_verifier.generate(key)
     end
 
-    def extract_sizing_options(options)
-      size_options = options.extract!(:size, :crop, :upscale)
-      options[:size] = nil
-      if size_options[:size]
-        [sizing_vector(size_options[:size]), size_options]
+    def fit_size!(record, options)
+      size_opts = options.extract!(:size, :crop, :upscale)
+      if size_opts[:size]
+        DynamicImage::ImageSizing.new(
+          record,
+          uncropped: (options[:action].try(:to_s) == "uncropped")
+        ).fit(size_opts[:size], size_opts).floor.to_s
       else
-        [nil, size_options]
+        nil
       end
-    end
-
-    def dynamic_image_sizing!(record, options)
-      size, size_options = extract_sizing_options(options)
-      if size
-        if size_options[:crop] && (size.x == 0 || size.y == 0)
-          raise DynamicImage::Errors::InvalidSizeOptions,
-                'both width and height must be set when cropping'
-        end
-
-        size = record.size.fit(size)     unless size_options[:crop]
-        size = record.size.contain(size) unless size_options[:upscale]
-
-        options[:size] = size.floor.to_s
-      end
-      options
-    end
-
-    def sizing_vector(str)
-      x, y = str.match(/(\d*)x(\d*)/)[1,2].map(&:to_i)
-      Vector2d.new(x, y)
     end
   end
 end
