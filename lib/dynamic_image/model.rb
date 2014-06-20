@@ -26,6 +26,14 @@ module DynamicImage
       colorspace == "rgb"
     end
 
+    def safe_content_type
+      if safe_content_types.include?(content_type)
+        content_type
+      else
+        'image/jpeg'
+      end
+    end
+
     def to_param
       [id, updated_at.utc.to_s(cache_timestamp_format)].join('-')
     end
@@ -48,6 +56,14 @@ module DynamicImage
 
     def valid_image?
       @valid_image ? true : false
+    end
+
+    def safe_content_types
+      %w{
+        image/png
+        image/gif
+        image/jpeg
+      }
     end
   end
 end

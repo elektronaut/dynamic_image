@@ -20,7 +20,7 @@ module DynamicImage
       options = {
         routing_type: :url,
         action: nil,
-        format: default_format_for_image(record),
+        format: default_format_for_image(record)
       }.merge(options)
       options[:digest] = dynamic_image_digest(record, options[:action], options[:size])
       polymorphic_url(record_or_array, options)
@@ -53,32 +53,21 @@ module DynamicImage
 
     private
 
-    def allowed_dynamic_image_url_options
-      [
-        :format, :only_path, :protocol, :host, :subdomain, :domain,
-        :tld_length, :port, :anchor, :trailing_slash, :script_name,
-        :action, :routing_type
-      ]
-    end
+    # def allowed_dynamic_image_url_options
+    #   [
+    #     :format, :only_path, :protocol, :host, :subdomain, :domain,
+    #     :tld_length, :port, :anchor, :trailing_slash, :script_name,
+    #     :action, :routing_type
+    #   ]
+    # end
 
     def default_format_for_image(record)
-      case record.content_type
-      when 'image/png'
-        'png'
-      when 'image/gif'
-        'gif'
-      else
-        'jpg'
-      end
+      Mime::Type.lookup(record.safe_content_type).to_sym
     end
 
     def dynamic_image_digest(record, action, size=nil)
       key = [action || 'show', record.id, size].compact.join('-')
       DynamicImage.digest_verifier.generate(key)
-    end
-
-    def dynamic_image_size(record, options={})
-      options[:size] ||= record.size
     end
 
     def extract_sizing_options(options)

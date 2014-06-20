@@ -56,6 +56,30 @@ describe DynamicImage::Model do
     it { is_expected.to eq("#{image.id}-20140618120000000000000") }
   end
 
+  describe ".web_safe_content_type" do
+    subject { image.safe_content_type }
+
+    context "when image is GIF" do
+      let(:image) { Image.new(content_type: 'image/gif') }
+      it { is_expected.to eq('image/gif') }
+    end
+
+    context "when image is JPEG" do
+      let(:image) { Image.new(content_type: 'image/jpeg') }
+      it { is_expected.to eq('image/jpeg') }
+    end
+
+    context "when image is PNG" do
+      let(:image) { Image.new(content_type: 'image/png') }
+      it { is_expected.to eq('image/png') }
+    end
+
+    context "when image is TIFF" do
+      let(:image) { Image.new(content_type: 'image/tiff') }
+      it { is_expected.to eq('image/jpeg') }
+    end
+  end
+
   describe "metadata parsing" do
     before { image.valid? }
     let(:image) { Image.new(file: uploaded_file) }
