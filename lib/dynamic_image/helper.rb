@@ -26,30 +26,29 @@ module DynamicImage
       polymorphic_url(record_or_array, options)
     end
 
-    # Not sure if these are needed
-    # def uncropped_dynamic_image_path(record_or_array, options={})
-    #   dynamic_image_path(record_or_array, { action: :uncropped }.merge(options))
-    # end
-
-    # def uncropped_dynamic_image_tag(record_or_array, options={})
-    #   dynamic_image_tag(record_or_array, { action: :uncropped }.merge(options))
-    # end
-
-    # def uncropped_dynamic_image_url(record_or_array, options={})
-    #   dynamic_image_url(record_or_array, { action: :uncropped }.merge(options))
-    # end
-
-    # def original_dynamic_image_path(record_or_array, options={})
-    #   dynamic_image_path(record_or_array, { action: :original }.merge(options))
-    # end
+    def original_dynamic_image_path(record_or_array, options={})
+      dynamic_image_path(record_or_array, { action: :original }.merge(options))
+    end
 
     # def original_dynamic_image_tag(record_or_array, options={})
     #   dynamic_image_tag(record_or_array, { action: :original }.merge(options))
     # end
 
-    # def original_dynamic_image_url(record_or_array, options={})
-    #   dynamic_image_url(record_or_array, { action: :original }.merge(options))
+    def original_dynamic_image_url(record_or_array, options={})
+      dynamic_image_url(record_or_array, { action: :original }.merge(options))
+    end
+
+    def uncropped_dynamic_image_path(record_or_array, options={})
+      dynamic_image_path(record_or_array, { action: :uncropped }.merge(options))
+    end
+
+    # def uncropped_dynamic_image_tag(record_or_array, options={})
+    #   dynamic_image_tag(record_or_array, { action: :uncropped }.merge(options))
     # end
+
+    def uncropped_dynamic_image_url(record_or_array, options={})
+      dynamic_image_url(record_or_array, { action: :uncropped }.merge(options))
+    end
 
     private
 

@@ -37,20 +37,6 @@ describe DynamicImage::Helper, type: :helper do
   describe "#dynamic_image_url" do
     subject { helper.dynamic_image_url(image, options) }
 
-    context "with uncropped action" do
-      subject { helper.dynamic_image_url(image, options) }
-      let(:options) { { size: '100x100', action: :uncropped } }
-      let(:digest) { generate_digest("uncropped-#{image.id}-100x62") }
-      it { is_expected.to eq("#{host}/images/#{digest}/100x62/#{image.to_param}/uncropped.png") }
-    end
-
-    context "with original action" do
-      subject { helper.dynamic_image_url(image, options) }
-      let(:options) { { action: :original } }
-      let(:digest) { generate_digest("original-#{image.id}") }
-      it { is_expected.to eq("#{host}/images/#{digest}/#{image.to_param}/original.png") }
-    end
-
     context "with format" do
       let(:options) { { size: '100x100', format: :jpg } }
       let(:digest) { generate_digest("show-#{image.id}-100x62") }
@@ -74,5 +60,33 @@ describe DynamicImage::Helper, type: :helper do
       let(:digest) { generate_digest("show-#{image.id}-500x312") }
       it { is_expected.to eq("#{host}/images/#{digest}/500x312/#{image.to_param}.png") }
     end
+  end
+
+  describe "#original_dynamic_image_path" do
+    let(:options) { {} }
+    let(:digest) { generate_digest("original-#{image.id}") }
+    subject { helper.original_dynamic_image_path(image, options) }
+    it { is_expected.to eq("/images/#{digest}/#{image.to_param}/original.png") }
+  end
+
+  describe "#original_dynamic_image_url" do
+    let(:options) { {} }
+    let(:digest) { generate_digest("original-#{image.id}") }
+    subject { helper.original_dynamic_image_url(image, options) }
+    it { is_expected.to eq("#{host}/images/#{digest}/#{image.to_param}/original.png") }
+  end
+
+  describe "#uncropped_dynamic_image_path" do
+    let(:options) { { size: '100x100' } }
+    let(:digest) { generate_digest("uncropped-#{image.id}-100x62") }
+    subject { helper.uncropped_dynamic_image_path(image, options) }
+    it { is_expected.to eq("/images/#{digest}/100x62/#{image.to_param}/uncropped.png") }
+  end
+
+  describe "#uncropped_dynamic_image_url" do
+    let(:options) { { size: '100x100' } }
+    let(:digest) { generate_digest("uncropped-#{image.id}-100x62") }
+    subject { helper.uncropped_dynamic_image_url(image, options) }
+    it { is_expected.to eq("#{host}/images/#{digest}/100x62/#{image.to_param}/uncropped.png") }
   end
 end
