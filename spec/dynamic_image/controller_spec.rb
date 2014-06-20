@@ -80,7 +80,7 @@ describe ImagesController, type: :controller do
     end
 
     context "with an existing record" do
-      before { get :show, digested(:show, id: image.id, size: '100x100', format: :png) }
+      before { get :show, digested(:show, id: image.id, size: '100x100', format: :png).merge(id: image.to_param) }
 
       it "should respond with success" do
         expect(response).to have_http_status(:success)

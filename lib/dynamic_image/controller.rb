@@ -85,7 +85,9 @@ module DynamicImage
     end
 
     def verify_signed_params
-      key = signed_params.map { |k| params.require(k) }.join('-')
+      key = signed_params.map { |k|
+        k == :id ? params.require(k).to_i : params.require(k)
+      }.join('-')
       DynamicImage.digest_verifier.verify(key, params[:digest])
     end
   end
