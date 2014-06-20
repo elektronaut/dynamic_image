@@ -2,6 +2,11 @@
 
 module DynamicImage
   module Model
+    # = DynamicImage Model Validations
+    #
+    # Validates that all necessary attributes are valid. All of these are
+    # managed by +DynamicImage::Model+, so this is mostly for enforcing
+    # integrity.
     module Validations
       extend ActiveSupport::Concern
       included do

@@ -1,6 +1,12 @@
 # encoding: utf-8
 
 module DynamicImage
+  # = DynamicImage Controller
+  #
+  # Generating images is rather expensive, so all requests must be
+  # signed with a HMAC digest in order to avoid denial of service attacks.
+  # The methods in +DynamicImage::Helper+ handles this transparently.
+  # As a bonus, this also prevents unauthorized URL enumeration.
   module Controller
     extend ActiveSupport::Concern
 
@@ -11,14 +17,17 @@ module DynamicImage
       respond_to :gif, :jpeg, :png, :tiff
     end
 
+    # Renders the image.
     def show
       render_image(format: requested_format)
     end
 
+    # Same as +show+, but renders the image without any pre-cropping applied.
     def uncropped
       render_image(format: requested_format, uncropped: true)
     end
 
+    # Renders the original image data, without any processing.
     def original
       if stale?(@record)
         respond_with(@record) do |format|

@@ -4,6 +4,29 @@ require 'dynamic_image/model/dimensions'
 require 'dynamic_image/model/validations'
 
 module DynamicImage
+  # = DynamicImage Model
+  #
+  # ActiveModel extension for the model holding image data. It assumes your
+  # database table has at least the following attributes:
+  #
+  #   create_table :images do |t|
+  #     t.string  :content_hash, null: false
+  #     t.string  :content_type, null: false
+  #     t.integer :content_length, null: false
+  #     t.string  :filename, null: false
+  #     t.string  :colorspace, null: false
+  #     t.integer :real_width, :real_height, null: false
+  #     t.integer :crop_width, :crop_height
+  #     t.integer :crop_start_x, :crop_start_y
+  #     t.integer :crop_gravity_x, :crop_gravity_y
+  #     t.timestamps
+  #   end
+  #
+  # To use it, simply include it in your model:
+  #
+  #   class Image < ActiveRecord::Base
+  #     include DynamicImage::Model
+  #   end
   module Model
     extend ActiveSupport::Concern
     include Shrouded::Model
@@ -14,18 +37,23 @@ module DynamicImage
       before_validation :read_image_metadata, if: :data_changed?
     end
 
+    # Returns true if the image is in the CMYK colorspace
     def cmyk?
       colorspace == "cmyk"
     end
 
+    # Returns true if the image is in the grayscale colorspace
     def gray?
       colorspace == "gray"
     end
 
+    # Returns true if the image is in the RGB colorspace
     def rgb?
       colorspace == "rgb"
     end
 
+    # Finds a web safe content type. GIF, JPEG and PNG images are allowed,
+    # any other formats should be converted to JPEG.
     def safe_content_type
       if safe_content_types.include?(content_type)
         content_type
@@ -34,6 +62,8 @@ module DynamicImage
       end
     end
 
+    # Includes a timestamp fingerprint in the URL param, so
+    # that rendered images can be cached indefinitely.
     def to_param
       [id, updated_at.utc.to_s(cache_timestamp_format)].join('-')
     end

@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 module DynamicImage
+  # = DynamicImage Image Sizing
+  #
+  # Calculates cropping and fitting for image sizes.
   class ImageSizing
     def initialize(record, options={})
       @record = record
