@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140613001619) do
+ActiveRecord::Schema.define(version: 20140620235423) do
 
   create_table "images", force: true do |t|
     t.string   "content_hash",   null: false
@@ -27,6 +27,12 @@ ActiveRecord::Schema.define(version: 20140613001619) do
     t.integer  "crop_start_y"
     t.integer  "crop_gravity_x"
     t.integer  "crop_gravity_y"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "users", force: true do |t|
+    t.integer  "avatar_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
