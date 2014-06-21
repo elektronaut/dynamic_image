@@ -9,6 +9,10 @@ module DynamicImage
         secret = app.key_generator.generate_key('dynamic_image')
         DynamicImage.digest_verifier = DynamicImage::DigestVerifier.new(secret)
       end
+
+      ActiveSupport.on_load(:active_record) do
+        send :include, DynamicImage::BelongsTo
+      end
     end
   end
 end
