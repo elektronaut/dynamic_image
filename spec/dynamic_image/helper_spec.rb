@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe DynamicImage::Helper, type: :helper do
-  storage_root = Rails.root.join('tmp', 'spec')
-
   def generate_digest(str)
     DynamicImage.digest_verifier.generate(str)
   end
@@ -14,18 +12,6 @@ describe DynamicImage::Helper, type: :helper do
   let(:image) { Image.create(file: uploaded_file, filename: 'my-uploaded-file.png') }
 
   let(:host) { "http://test.host" }
-
-  before(:all) do
-    Shrouded::Storage.layers << Shrouded::Layer.new(Fog::Storage.new({provider: 'Local', local_root: storage_root}))
-  end
-
-  after do
-    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
-  end
-
-  after(:all) do
-    Shrouded::Storage.layers.clear!
-  end
 
   describe "#dynamic_image_path" do
     subject { helper.dynamic_image_path(image, options) }

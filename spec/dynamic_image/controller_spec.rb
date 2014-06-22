@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe ImagesController, type: :controller do
-  storage_root = Rails.root.join('tmp', 'spec')
-
   def digest(str)
     DynamicImage.digest_verifier.generate(str)
   end
@@ -19,18 +17,6 @@ describe ImagesController, type: :controller do
   let(:image) { Image.create(file: uploaded_file) }
 
   let(:metadata) { DynamicImage::Metadata.new(response.body) }
-
-  before(:all) do
-    Shrouded::Storage.layers << Shrouded::Layer.new(Fog::Storage.new({provider: 'Local', local_root: storage_root}))
-  end
-
-  after do
-    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
-  end
-
-  after(:all) do
-    Shrouded::Storage.layers.clear!
-  end
 
   describe "signed params verification" do
     context "with an invalid digest" do

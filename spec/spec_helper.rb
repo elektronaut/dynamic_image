@@ -40,4 +40,10 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = "random"
+
+  # Clean the Shrouded storage after each example
+  config.after(:each) do
+    storage_root = Rails.root.join('db', 'shrouded', 'test')
+    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
+  end
 end
