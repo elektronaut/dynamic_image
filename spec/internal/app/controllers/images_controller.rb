@@ -1,4 +1,4 @@
-class ImagesController < ActionController::Base
+class ImagesController < ApplicationController
   include DynamicImage::Controller
 
   private

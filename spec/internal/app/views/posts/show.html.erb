@@ -1,0 +1,20 @@
+<h2>
+  <%= @post.name %>
+</h2>
+
+<% if @post.image %>
+  <%= dynamic_image_tag @post.image, size: '400x400', crop: true %>
+<% end %>
+
+<p>
+  <%= @post.image.filename %>
+  (<%= number_to_human_size @post.image.content_length %>)
+  &ndash;
+  <%= link_to "See original", original_dynamic_image_path(@post.image) %>
+</p>
+
+<p>
+  <%= link_to "Edit post", edit_post_path(@post) %><br>
+  <%= link_to "Delete post", post_path(@post), method: :delete %><br>
+  <%= link_to "Back to index", posts_path %>
+</p>

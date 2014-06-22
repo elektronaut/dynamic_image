@@ -1,0 +1,18 @@
+<p>
+  <%= link_to "New post", new_post_path %>
+</p>
+
+<% if @posts.any? %>
+  <% @posts.each do |post| %>
+    <article>
+      <h2>
+        <%= link_to post.name, post %>
+      </h2>
+      <%= link_to dynamic_image_tag(post.image, size: '100x'), post %>
+    </article>
+  <% end %>
+<% else %>
+  <p>
+    No posts have been added yet.
+  </p>
+<% end %>

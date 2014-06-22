@@ -1,0 +1,17 @@
+<p>
+  <%= f.label :name %>
+  <%= f.text_field :name %>
+</p>
+
+<p>
+  <%= f.fields_for :image_attributes do |image_attributes| %>
+    <%= image_attributes.label :file %>
+    <%= image_attributes.file_field :file %>
+  <% end %>
+</p>
+
+<p>
+  <button type="submit">
+    Save
+  </button>
+</p>
