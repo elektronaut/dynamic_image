@@ -2,10 +2,6 @@ source "https://rubygems.org"
 
 gemspec
 
-# TODO: Remove when Shrouded is released
-gem 'shrouded', git: 'https://github.com/elektronaut/shrouded.git', require: false
-#gem 'shrouded', path: '~/Dev/gems/shrouded'
-
 # TODO: Remove this line when the activemodel-globalid gem
 # is updated with the railtie loading fix.
 gem 'activemodel-globalid', git: 'https://github.com/rails/activemodel-globalid.git', require: false
