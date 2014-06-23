@@ -1,7 +1,14 @@
 # encoding: utf-8
 
 module DynamicImage
+  # = DynamicImage Routing
+  #
+  # Extends +ActionDispatch::Routing::Mapper+ and provides a shortcut for
+  # defining routes for +DynamicImage::Controller+.
   module Routing
+    # Declares an image resource.
+    #
+    #   image_resources :avatars
     def image_resources(resource_name, options={})
       options = {
         path:        "#{resource_name}/:digest(/:size)",

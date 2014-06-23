@@ -1,6 +1,10 @@
 # encoding: utf-8
 
 module DynamicImage
+  # = DynamicImage Processed Image
+  #
+  # Handles all processing of images. Takes an instance of
+  # +DynamicImage::Model+ as argument.
   class ProcessedImage
     def initialize(record, options={})
       @record    = record
@@ -9,18 +13,23 @@ module DynamicImage
       @format    = "JPEG" if @format == "JPG"
     end
 
-    # Returns the content type.
+    # Returns the content type of the processed image.
+    #
+    # ==== Example
     #
     #   image = Image.find(params[:id])
-    #   DynamicImage::ProcessedImage.new(image).content_type        # => 'image/png'
-    #   DynamicImage::ProcessedImage.new(image, :jpeg).content_type # => 'image/jpeg'
+    #   DynamicImage::ProcessedImage.new(image).content_type
+    #   # => 'image/png'
+    #   DynamicImage::ProcessedImage.new(image, :jpeg).content_type
+    #   # => 'image/jpeg'
     def content_type
       "image/#{format}".downcase
     end
 
     # Crops and resizes the image. Normalization is performed as well.
     #
-    #   image = Image.find(params[:id])
+    # ==== Example
+    #
     #   processed = DynamicImage::ProcessedImage.new(image)
     #   image_data = processed.cropped_and_resized(Vector2d.new(200, 200))
     #
@@ -34,10 +43,13 @@ module DynamicImage
 
     # Normalizes the image.
     #
-    # EXIF rotation is applied, CMYK images are converted to sRGB,
-    # and metadata is stripped. Format conversion occurs if necessary.
+    # * Applies EXIF rotation
+    # * CMYK images are converted to sRGB
+    # * Strips metadata
+    # * Performs format conversion if the requested format is different
     #
-    #   image = Image.find(params[:id])
+    # ==== Example
+    #
     #   processed = DynamicImage::ProcessedImage.new(image, :jpeg)
     #   jpg_data = processed.normalized
     #

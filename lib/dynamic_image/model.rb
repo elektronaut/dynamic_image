@@ -10,12 +10,12 @@ module DynamicImage
   # database table has at least the following attributes:
   #
   #   create_table :images do |t|
-  #     t.string  :content_hash, null: false
-  #     t.string  :content_type, null: false
-  #     t.integer :content_length, null: false
-  #     t.string  :filename, null: false
-  #     t.string  :colorspace, null: false
-  #     t.integer :real_width, :real_height, null: false
+  #     t.string  :content_hash
+  #     t.string  :content_type
+  #     t.integer :content_length
+  #     t.string  :filename
+  #     t.string  :colorspace
+  #     t.integer :real_width, :real_height
   #     t.integer :crop_width, :crop_height
   #     t.integer :crop_start_x, :crop_start_y
   #     t.integer :crop_gravity_x, :crop_gravity_y
@@ -27,6 +27,20 @@ module DynamicImage
   #   class Image < ActiveRecord::Base
   #     include DynamicImage::Model
   #   end
+  #
+  # == Usage
+  #
+  # To save an image, simply assign to the +file+ attribute.
+  #
+  #   image = Image.create(file: params.permit(:file))
+  #
+  # This will automatically parse and validate the image when your record is
+  # saved.
+  #
+  # To read back the image data, access the +data+ attribute. This will lazily
+  # load the data from the store.
+  #
+  #   data = image.data
   module Model
     extend ActiveSupport::Concern
     include Shrouded::Model
