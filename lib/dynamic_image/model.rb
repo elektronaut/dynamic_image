@@ -41,6 +41,23 @@ module DynamicImage
   # load the data from the store.
   #
   #   data = image.data
+  #
+  # == Cropping
+  #
+  # Images can be pre-cropped by setting +crop_width+, +crop_height+,
+  # +crop_start_x+ and +crop_start_y+. The crop dimensions cannot exceed the
+  # image size.
+  #
+  #   image.update(
+  #     crop_start_x: 15, crop_start_y: 20,
+  #     crop_width: 300, crop_height: 200
+  #   )
+  #   image.size # => Vector2d(300, 200)
+  #
+  # By default, images will be cropped from the center. You can control this
+  # by setting +crop_gravity_x+ and +crop_gravity_y+. DynamicImage will make
+  # sure the pixel referred to by these coordinates are present in the cropped
+  # image, and as close to the center as possible without zooming in.
   module Model
     extend ActiveSupport::Concern
     include Shrouded::Model
