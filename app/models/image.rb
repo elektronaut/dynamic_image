@@ -4,7 +4,7 @@ class Image < ActiveRecord::Base
   binary_storage :data, :sha1_hash
 
   validates_format_of :content_type,
-                      :with => /^image/,
+                      :with => /\Aimage/,
                     :message => "you can only upload pictures"
 
   attr_accessor :filterset, :data_checked, :skip_maxsize
