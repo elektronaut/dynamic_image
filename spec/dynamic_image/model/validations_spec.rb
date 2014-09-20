@@ -181,11 +181,6 @@ describe DynamicImage::Model::Validations do
       it { is_expected.to include("can't be blank") }
     end
 
-    context "when zero" do
-      let(:image) { Image.new(crop_start_x: 0) }
-      it { is_expected.to include("must be greater than 0") }
-    end
-
     context "when non-zero" do
       let(:image) { Image.new(crop_start_x: 2048) }
       it { is_expected.to eq([]) }
@@ -202,11 +197,6 @@ describe DynamicImage::Model::Validations do
     context "when crop_start_x is set" do
       let(:image) { Image.new(crop_start_x: 100) }
       it { is_expected.to include("can't be blank") }
-    end
-
-    context "when zero" do
-      let(:image) { Image.new(crop_start_y: 0) }
-      it { is_expected.to include("must be greater than 0") }
     end
 
     context "when non-zero" do

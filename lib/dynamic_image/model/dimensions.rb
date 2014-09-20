@@ -54,7 +54,7 @@ module DynamicImage
 
       # Returns true if crop start has been set.
       def crop_start?
-        crop_start_x? && crop_start_y?
+        crop_start_x.present? && crop_start_y.present?
       end
 
       # Returns true if the image is cropped.
