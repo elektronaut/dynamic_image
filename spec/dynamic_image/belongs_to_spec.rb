@@ -8,16 +8,8 @@ describe DynamicImage::BelongsTo do
   let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
   let(:image) { Image.create(file: uploaded_file) }
 
-  before(:all) do
-    Shrouded::Storage.layers << Shrouded::Layer.new(Fog::Storage.new({provider: 'Local', local_root: storage_root}))
-  end
-
   after do
     FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
-  end
-
-  after(:all) do
-    Shrouded::Storage.layers.clear!
   end
 
   describe "assignment" do
