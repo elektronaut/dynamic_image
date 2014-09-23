@@ -9,8 +9,8 @@ GIT
 PATH
   remote: .
   specs:
-    dynamic_image (2.0.0.rc1)
-      mini_magick (~> 3.7.0)
+    dynamic_image (2.0.0.rc2)
+      mini_magick (~> 3.8.1)
       rails (~> 4.1.0)
       shrouded (~> 0.9.0)
       vector2d (~> 2.0, >= 2.0.2)
@@ -60,7 +60,7 @@ GEM
     diff-lcs (1.2.5)
     docile (1.1.4)
     erubis (2.7.0)
-    excon (0.37.0)
+    excon (0.39.5)
     ffi (1.9.3)
     fog (1.22.1)
       fog-brightbox
@@ -68,12 +68,13 @@ GEM
       fog-json
       ipaddress (~> 0.5)
       nokogiri (~> 1.5, >= 1.5.11)
-    fog-brightbox (0.0.2)
-      fog-core
+    fog-brightbox (0.5.1)
+      fog-core (~> 1.22)
       fog-json
-    fog-core (1.22.0)
+      inflecto
+    fog-core (1.24.0)
       builder
-      excon (~> 0.33)
+      excon (~> 0.38)
       formatador (~> 0.2)
       mime-types
       net-scp (~> 1.1)
@@ -92,6 +93,7 @@ GEM
       rspec (>= 2.14, < 4.0)
     hike (1.2.3)
     i18n (0.6.9)
+    inflecto (0.0.2)
     interception (0.5)
     ipaddress (0.8.0)
     jquery-rails (3.1.0)
@@ -108,7 +110,7 @@ GEM
       treetop (~> 1.4.8)
     method_source (0.8.2)
     mime-types (1.25.1)
-    mini_magick (3.7.0)
+    mini_magick (3.8.1)
       subexec (~> 0.2.1)
     mini_portile (0.6.0)
     minitest (5.3.5)
@@ -116,7 +118,7 @@ GEM
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (2.9.1)
-    nokogiri (1.6.2.1)
+    nokogiri (1.6.3.1)
       mini_portile (= 0.6.0)
     polyglot (0.3.5)
     pry (0.10.0)
@@ -201,7 +203,7 @@ GEM
       polyglot (>= 0.3.1)
     tzinfo (1.2.1)
       thread_safe (~> 0.1)
-    vector2d (2.0.2)
+    vector2d (2.1.0)
 
 PLATFORMS
   ruby
