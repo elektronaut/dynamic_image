@@ -10,15 +10,15 @@ Add the gem to your Gemfile and run `bundle install`.
 gem "dynamic_image"
 ```
 
-Run the `shrouded:install` generator to set up your storage.
+Run the `dis:install` generator to set up your storage.
 
 ```sh
-bin/rails generate shrouded:install
+bin/rails generate dis:install
 ```
 
 You can edit the generated initializer to configure your storage, by default it
-will store files in `db/shrouded`. See the
-[Shrouded](https://github.com/elektronaut/shrouded) documentation for more
+will store files in `db/dis`. See the
+[Dis](https://github.com/elektronaut/dis) documentation for more
 information.
 
 ## Creating your resource

@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'mini_magick'
-require 'shrouded'
+require 'dis'
 require 'vector2d'
 
 require 'dynamic_image/belongs_to'

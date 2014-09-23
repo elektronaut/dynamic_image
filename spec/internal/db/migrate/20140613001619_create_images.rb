@@ -1,7 +1,7 @@
 class CreateImages < ActiveRecord::Migration
   def change
     create_table :images do |t|
-      # Shrouded attributes
+      # Dis attributes
       t.string  :content_hash, null: false
       t.string  :content_type, null: false
       t.integer :content_length, null: false

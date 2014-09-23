@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "~> 4.1.0"
   s.add_dependency "vector2d", "~> 2.0", ">= 2.0.2"
   s.add_dependency "mini_magick", "~> 3.8.1"
-  s.add_dependency "shrouded", "~> 0.9.0"
+  s.add_dependency "dis", "~> 0.9.0"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails", "~> 3.0.0"

@@ -3,7 +3,7 @@ log/*.log
 pkg/
 spec/internal/db/*.sqlite3
 spec/internal/db/*.sqlite3-journal
-spec/internal/db/shrouded/
+spec/internal/db/dis/
 spec/internal/log/*.log
 spec/internal/tmp/
 spec/internal/.sass-cache

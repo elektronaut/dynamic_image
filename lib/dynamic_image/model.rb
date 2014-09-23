@@ -60,7 +60,7 @@ module DynamicImage
   # image, and as close to the center as possible without zooming in.
   module Model
     extend ActiveSupport::Concern
-    include Shrouded::Model
+    include Dis::Model
     include DynamicImage::Model::Dimensions
     include DynamicImage::Model::Validations
 

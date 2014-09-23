@@ -1,13 +1,13 @@
 # Be sure to restart your server when you modify this file.
 
-# Creates a local storage layer in db/shrouded:
-Shrouded::Storage.layers << Shrouded::Layer.new(
-  Fog::Storage.new({ provider: 'Local', local_root: Rails.root.join('db', 'shrouded') }),
+# Creates a local storage layer in db/dis:
+Dis::Storage.layers << Dis::Layer.new(
+  Fog::Storage.new({ provider: 'Local', local_root: Rails.root.join('db', 'dis') }),
   path: Rails.env
 )
 
 # You can also add cloud storage.
-# Shrouded::Storage.layers << Shrouded::Layer.new(
+# Dis::Storage.layers << Dis::Layer.new(
 #   Fog::Storage.new({
 #     provider:              'AWS',
 #     aws_access_key_id:     AWS_ACCESS_KEY_ID,
