@@ -38,6 +38,9 @@ module DynamicImage
       normalized do |image|
         image.crop image_sizing.crop_geometry_string(size)
         image.resize size
+        if content_type == 'image/gif'
+          image.coalesce
+        end
       end
     end
 

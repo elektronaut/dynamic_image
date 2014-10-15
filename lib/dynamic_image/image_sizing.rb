@@ -46,7 +46,7 @@ module DynamicImage
     #   sizing.crop_geometry(Vector2d(100, 100)) # => "200x200+60+0"
     def crop_geometry_string(ratio_vector)
       crop_size, start = crop_geometry(ratio_vector)
-      crop_size.floor.to_s + "+#{start.x.to_i}+#{start.y.to_i}"
+      crop_size.floor.to_s + "+#{start.x.to_i}+#{start.y.to_i}!"
     end
 
     # Adjusts +fit_size+ to fit the image dimensions.

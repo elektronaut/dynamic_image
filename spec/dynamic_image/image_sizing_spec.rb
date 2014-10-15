@@ -12,7 +12,7 @@ describe DynamicImage::ImageSizing do
     let(:record) { Image.new(real_width: 320, real_height: 200) }
     let(:crop_size) { vector(200, 200) }
     subject { sizing.crop_geometry_string(crop_size) }
-    it { is_expected.to eq("200x200+60+0") }
+    it { is_expected.to eq("200x200+60+0!") }
   end
 
   describe "#crop_geometry" do
