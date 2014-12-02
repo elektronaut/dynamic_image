@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <title>
+      <%= @record.filename %>
+    </title>
+    <style type="text/css">
+      body {
+        background: #fff;
+        color: #1a1a1a;
+        border: 0px;
+        margin: 0px;
+        padding: 30px;
+        font-family: Helvetica, Arial, sans-serif;
+        font-size: 15px;
+      }
+      h1 {
+        font-size: 36px;
+      }
+      .buttons {
+        margin-bottom: 20px;
+      }
+      .buttons a,
+      .buttons a:visited {
+        text-decoration: none;
+        display: inline-block;
+        color: #fff;
+        background: #333;
+        line-height: 28px;
+        padding: 0px 8px;
+      }
+      .buttons a:hover,
+      .buttons a:focus {
+        background: #111;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      th, td {
+        text-align: left;
+        border: 1px solid #ccc;
+        padding: 4px 20px 4px 4px;
+      }
+      figure {
+        margin: 0px;
+        padding: 0px;
+        margin-bottom: 20px;
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <h1>
+      <%= @record.filename %>
+      (<%= requested_size.to_i_vector.to_s %>)
+    </h1>
+    <figure class="image">
+      <% if options[:cropped] %>
+        <%= uncropped_dynamic_image_tag(@record, size: requested_size) %>
+      <% else %>
+        <%= dynamic_image_tag(@record, size: requested_size, crop: true) %>
+      <% end %>
+    </figure>
+
+    <div class="buttons">
+      <%= link_to("#{requested_size.to_i_vector}",
+                  dynamic_image_path(@record,
+                                     size: requested_size,
+                                     crop: true)) %>
+      <%= link_to("#{requested_size.to_i_vector} (uncropped)",
+                  uncropped_dynamic_image_path(@record,
+                                               size: requested_size,
+                                               crop: true)) %>
+      <%= link_to "Original", original_dynamic_image_path(@record, format: 'html') %>
+    </div>
+
+    <table class="metadata">
+      <tr>
+        <th>
+          Content-Type
+        </th>
+        <td>
+          <%= @record.content_type %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Colorspace
+        </th>
+        <td>
+          <%= @record.colorspace %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Original Filesize
+        </th>
+        <td>
+          <%= number_to_human_size(@record.content_length) %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Cropped size
+        </th>
+        <td>
+          <%= @record.size.to_s %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Original size
+        </th>
+        <td>
+          <%= @record.real_size.to_s %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Created at
+        </th>
+        <td>
+          <%= @record.created_at %>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Updated at
+        </th>
+        <td>
+          <%= @record.updated_at %>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

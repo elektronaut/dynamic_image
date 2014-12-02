@@ -14,7 +14,8 @@ module DynamicImage
       before_action :verify_signed_params
       before_action :find_record
       after_action :cache_expiration_header
-      respond_to :gif, :jpeg, :png, :tiff
+      respond_to :html, :gif, :jpeg, :png, :tiff
+      helper_method :requested_size
     end
 
     # Renders the image.
@@ -42,6 +43,10 @@ module DynamicImage
       end
     end
 
+    def requested_size
+      Vector2d.parse(params[:size])
+    end
+
     private
 
     def cache_expiration_header
@@ -56,6 +61,10 @@ module DynamicImage
       processed_image = DynamicImage::ProcessedImage.new(@record, options)
       if stale?(@record)
         respond_with(@record) do |format|
+          format.html do
+            render(file: File.join(File.dirname(__FILE__), 'templates/show'),
+                   layout: false, locals: {options: options})
+          end
           format.any(:gif, :jpeg, :png, :tiff) do
             send_data(
               processed_image.cropped_and_resized(requested_size),
@@ -69,10 +78,6 @@ module DynamicImage
 
     def requested_format
       params[:format]
-    end
-
-    def requested_size
-      Vector2d.parse(params[:size])
     end
 
     def signed_params
