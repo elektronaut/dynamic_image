@@ -9,7 +9,7 @@ GIT
 PATH
   remote: .
   specs:
-    dynamic_image (2.0.0.beta3)
+    dynamic_image (2.0.0.beta4)
       dis (~> 0.9.0)
       mini_magick (~> 3.8.1)
       rails (~> 4.1.0)
