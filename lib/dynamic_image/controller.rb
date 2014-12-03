@@ -43,6 +43,7 @@ module DynamicImage
       end
     end
 
+    # Returns the requested size as a vector.
     def requested_size
       Vector2d.parse(params[:size])
     end

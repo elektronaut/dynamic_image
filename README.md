@@ -48,33 +48,33 @@ that the generated URLs are properly signed and timestamped.
 To display the image at it's original size, use `dynamic_image_tag` without
 any options.
 
-```html
+```erb
 <%= dynamic_image_tag image %>
 ```
 
 To resize it, specify a max size. This will scale the image down to fit, but
 no cropping will occur.
 
-```html
+```erb
 <%= dynamic_image_tag image, size: '400x400' %>
 ```
 
 Setting `crop: true` will crop the image to the exact size.
 
-```html
+```erb
 <%= dynamic_image_tag image, size: '400x400', crop: true %>
 ```
 
 Omitting either dimension will render the image at an exact width or height.
 
-```html
+```erb
 <%= dynamic_image_tag image, size: '400x' %>
 ```
 
 `dynamic_image_path` and `dynamic_image_url` act pretty much like regular URL
 helpers.
 
-```html
+```erb
 <%= link_to "See image", dynamic_image_path(image) %>
 ```
 
