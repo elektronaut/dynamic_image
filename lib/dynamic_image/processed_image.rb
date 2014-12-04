@@ -38,9 +38,6 @@ module DynamicImage
       normalized do |image|
         image.crop image_sizing.crop_geometry_string(size)
         image.resize size
-        if content_type == 'image/gif'
-          image.coalesce
-        end
       end
     end
 
@@ -61,16 +58,24 @@ module DynamicImage
       require_valid_image!
       process_data do |image|
         image.combine_options do |combined|
-          image.auto_orient
-          image.colorspace('sRGB') if needs_colorspace_conversion?
+          combined.auto_orient
+          combined.colorspace('sRGB') if needs_colorspace_conversion?
           yield(combined) if block_given?
-          image.strip
+          combined.strip
         end
         image.format(format) if needs_format_conversion?
       end
     end
 
     private
+
+    def coalesced(image)
+      if content_type == 'image/gif'
+        image.coalesce
+        image = MiniMagick::Image.read(image.to_blob)
+      end
+      image
+    end
 
     def format
       @format || record_format
@@ -89,7 +94,7 @@ module DynamicImage
     end
 
     def process_data(&block)
-      image = MiniMagick::Image.read(record.data)
+      image = coalesced(MiniMagick::Image.read(record.data))
       yield(image)
       result = image.to_blob
       image.destroy!
