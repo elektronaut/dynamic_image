@@ -46,6 +46,7 @@ module DynamicImage
     # * Applies EXIF rotation
     # * CMYK images are converted to sRGB
     # * Strips metadata
+    # * Optimizes GIFs
     # * Performs format conversion if the requested format is different
     #
     # ==== Example
@@ -61,7 +62,7 @@ module DynamicImage
           combined.auto_orient
           combined.colorspace('sRGB') if needs_colorspace_conversion?
           yield(combined) if block_given?
-          combined.strip
+          optimize(combined)
         end
         image.format(format) if needs_format_conversion?
       end
@@ -70,7 +71,7 @@ module DynamicImage
     private
 
     def coalesced(image)
-      if content_type == 'image/gif'
+      if gif?
         image.coalesce
         image = MiniMagick::Image.read(image.to_blob)
       end
@@ -79,6 +80,10 @@ module DynamicImage
 
     def format
       @format || record_format
+    end
+
+    def gif?
+      content_type == 'image/gif'
     end
 
     def image_sizing
@@ -91,6 +96,13 @@ module DynamicImage
 
     def needs_format_conversion?
       format != record_format
+    end
+
+    def optimize(image)
+      if gif?
+        image.layers 'optimize'
+      end
+      image.strip
     end
 
     def process_data(&block)
