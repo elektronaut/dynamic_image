@@ -1,6 +1,33 @@
 # DynamicImage [![Build Status](https://travis-ci.org/elektronaut/dynamic_image.png)](https://travis-ci.org/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image.png)](https://codeclimate.com/github/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/coverage.png)](https://codeclimate.com/github/elektronaut/dynamic_image)
 
-Requires Rails 4.1+ and Ruby 1.9.3+.
+Need to handle image uploads in your Rails app?
+Give DynamicImage a try.
+
+Rather than creating a pre-defined set of images when a file is
+uploaded, DynamicImage stores the original file and generates images
+on demand. It handles cropping, resizing, format and colorspace
+conversion.
+
+Supported formats at the moment are JPEG, PNG, GIF and TIFF. The
+latter will automatically be converted to JPG. CMYK images will be
+converted to RGB, and RGB images will be converted to the sRGB
+colorspace for consistent appearance in all browsers.
+
+DynamicImage is built on [Dis](https://github.com/elektronaut/dis)
+and [MiniMagick](https://github.com/minimagick/minimagick).
+
+All URLs are signed with a HMAC to protect against denial of service
+and enumeration attacks.
+
+## Requirements
+
+* Rails 4.2
+* Ruby 1.9.3+
+* ImageMagick command line tools
+
+## Documentation
+
+[Documentation is available on RubyDoc.info](http://rdoc.info/gems/dynamic_image)
 
 ## Installation
 
@@ -40,6 +67,15 @@ declaration.
 image_resources :images, path: "dynamic_images/:digest(/:size)"
 ```
 
+## Storing an image
+
+To save an image, simply assign the file attribute to your uploaded file.
+
+```ruby
+image_params = params.require(:image).permit(:file)
+Image.create(image_params)
+```
+
 ## Rendering images in your views
 
 You should use the provided helpers for displaying images, this will ensure
@@ -77,6 +113,22 @@ helpers.
 ```erb
 <%= link_to "See image", dynamic_image_path(image) %>
 ```
+
+## Caching
+
+Generating images on the fly is expensive. This is less of a problem
+in development mode, as DynamicImage respects the If-Modified-Since
+header. In production, you should absolutely cache the results.
+
+DynamicImage doesn't do any caching on it's own, but it is designed to
+play well with others. Here's a few options:
+
+* [CloudFlare](https://www.cloudflare.com)
+* [Rack::Cache](http://rtomayko.github.io/rack-cache/)
+* [actionpack-page_caching](https://github.com/rails/actionpack-page_caching)
+
+It's perfectly safe to cache images indefinitely. The URL is
+timestamped, and will change if the object changes.
 
 ## License
 
