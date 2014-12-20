@@ -14,7 +14,6 @@ module DynamicImage
       before_action :verify_signed_params
       before_action :find_record
       after_action :cache_expiration_header
-      respond_to :html, :gif, :jpeg, :png, :tiff
       helper_method :requested_size
     end
 
@@ -31,7 +30,7 @@ module DynamicImage
     # Renders the original image data, without any processing.
     def original
       if stale?(@record)
-        respond_with(@record) do |format|
+        respond_to do |format|
           format.any(:gif, :jpeg, :png, :tiff) do
             send_data(
               @record.data,
@@ -61,7 +60,7 @@ module DynamicImage
     def render_image(options)
       processed_image = DynamicImage::ProcessedImage.new(@record, options)
       if stale?(@record)
-        respond_with(@record) do |format|
+        respond_to do |format|
           format.html do
             render(file: File.join(File.dirname(__FILE__), 'templates/show'),
                    layout: false, locals: {options: options})
