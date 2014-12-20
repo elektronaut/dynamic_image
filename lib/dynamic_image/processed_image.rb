@@ -10,7 +10,7 @@ module DynamicImage
       @record    = record
       @uncropped = options[:uncropped] ? true : false
       @format    = options[:format].to_s.upcase if options[:format]
-      @format    = "JPEG" if @format == "JPG"
+      @format    = "JPEG" if defined?(@format) && @format == "JPG"
     end
 
     # Returns the content type of the processed image.
@@ -79,7 +79,7 @@ module DynamicImage
     end
 
     def format
-      @format || record_format
+      @format ||= record_format
     end
 
     def gif?

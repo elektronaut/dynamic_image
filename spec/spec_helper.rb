@@ -44,6 +44,6 @@ RSpec.configure do |config|
   # Clean the Dis storage after each example
   config.after(:each) do
     storage_root = Rails.root.join('db', 'dis', 'test')
-    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
+    FileUtils.rm_rf(storage_root) if File.exist?(storage_root)
   end
 end

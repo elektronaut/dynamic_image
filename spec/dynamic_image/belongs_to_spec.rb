@@ -9,7 +9,7 @@ describe DynamicImage::BelongsTo do
   let(:image) { Image.create(file: uploaded_file) }
 
   after do
-    FileUtils.rm_rf(storage_root) if File.exists?(storage_root)
+    FileUtils.rm_rf(storage_root) if File.exist?(storage_root)
   end
 
   describe "assignment" do
