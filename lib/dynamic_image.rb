@@ -3,6 +3,7 @@
 require 'mini_magick'
 require 'dis'
 require 'vector2d'
+require 'responders'
 
 require 'dynamic_image/belongs_to'
 require 'dynamic_image/controller'
