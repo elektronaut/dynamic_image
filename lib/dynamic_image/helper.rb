@@ -30,7 +30,7 @@ module DynamicImage
     #   dynamic_image_tag(image, size: "100x100", alt="Avatar")
     #   # => <img alt="Avatar" height="62" src="..." width="100" />
     def dynamic_image_tag(record_or_array, options={})
-      record = extract_record(record_or_array)
+      record = extract_dynamic_image_record(record_or_array)
       options = {
         alt: image_alt(record.filename)
       }.merge(options)
@@ -130,7 +130,7 @@ module DynamicImage
     end
 
     def dynamic_image_url_with_size(record_or_array, size=nil, options={})
-      record = extract_record(record_or_array)
+      record = extract_dynamic_image_record(record_or_array)
       options = {
         routing_type: :url,
         action: nil,
@@ -141,8 +141,17 @@ module DynamicImage
       polymorphic_url(record_or_array, options)
     end
 
+    def extract_dynamic_image_record(record_or_array)
+      case record_or_array
+      when Array
+        record_or_array.last
+      else
+        record_or_array
+      end
+    end
+
     def fit_size!(record_or_array, options)
-      record = extract_record(record_or_array)
+      record = extract_dynamic_image_record(record_or_array)
       action = options[:action].try(:to_s)
       size_opts = options.extract!(:size, :crop, :upscale)
 
