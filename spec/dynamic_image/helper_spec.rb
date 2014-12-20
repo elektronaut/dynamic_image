@@ -81,16 +81,16 @@ describe DynamicImage::Helper, type: :helper do
 
   describe "#original_dynamic_image_path" do
     let(:options) { {} }
-    let(:digest) { generate_digest("original-#{image.id}") }
+    let(:digest) { generate_digest("original-#{image.id}-320x200") }
     subject { helper.original_dynamic_image_path(image, options) }
-    it { is_expected.to eq("/images/#{digest}/#{image.to_param}/original.png") }
+    it { is_expected.to eq("/images/#{digest}/320x200/#{image.to_param}/original.png") }
   end
 
   describe "#original_dynamic_image_url" do
     let(:options) { {} }
-    let(:digest) { generate_digest("original-#{image.id}") }
+    let(:digest) { generate_digest("original-#{image.id}-320x200") }
     subject { helper.original_dynamic_image_url(image, options) }
-    it { is_expected.to eq("#{host}/images/#{digest}/#{image.to_param}/original.png") }
+    it { is_expected.to eq("#{host}/images/#{digest}/320x200/#{image.to_param}/original.png") }
   end
 
   describe "#uncropped_dynamic_image_path" do

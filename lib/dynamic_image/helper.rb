@@ -160,10 +160,10 @@ module DynamicImage
           record,
           uncropped: (action == "uncropped")
         ).fit(size_opts[:size], size_opts).floor.to_s
-      elsif action != "original"
-        record.size.floor.to_s
+      elsif action == "original"
+        record.real_size.floor.to_s
       else
-        nil
+        record.size.floor.to_s
       end
     end
   end
