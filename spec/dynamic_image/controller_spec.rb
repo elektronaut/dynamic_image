@@ -196,12 +196,12 @@ describe ImagesController, type: :controller do
   describe "GET original" do
     context "with a nonexistant record" do
       it "should raise an error" do
-        expect { get :original, digested(:original, id: 1) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { get :original, digested(:original, id: 1, size: "320x200") }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
     context "with an existing record" do
-      before { get :original, digested(:original, id: image.id, format: :png) }
+      before { get :original, digested(:original, id: image.id, size: "320x200", format: :png) }
 
       it "should respond with success" do
         expect(response).to have_http_status(:success)

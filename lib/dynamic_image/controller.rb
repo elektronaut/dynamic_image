@@ -80,17 +80,8 @@ module DynamicImage
       params[:format]
     end
 
-    def signed_params
-      case request[:action]
-      when "show", "uncropped"
-        [:action, :id, :size]
-      else
-        [:action, :id]
-      end
-    end
-
     def verify_signed_params
-      key = signed_params.map { |k|
+      key = [:action, :id, :size].map { |k|
         k == :id ? params.require(k).to_i : params.require(k)
       }.join('-')
       DynamicImage.digest_verifier.verify(key, params[:digest])

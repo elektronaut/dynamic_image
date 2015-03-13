@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20140622183348) do
 
-  create_table "images", force: true do |t|
+  create_table "images", force: :cascade do |t|
     t.string   "content_hash",   null: false
     t.string   "content_type",   null: false
     t.integer  "content_length", null: false
@@ -31,14 +31,14 @@ ActiveRecord::Schema.define(version: 20140622183348) do
     t.datetime "updated_at"
   end
 
-  create_table "posts", force: true do |t|
+  create_table "posts", force: :cascade do |t|
     t.string   "name"
     t.integer  "image_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.integer  "avatar_id"
     t.datetime "created_at"
     t.datetime "updated_at"
