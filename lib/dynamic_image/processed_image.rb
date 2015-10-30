@@ -36,8 +36,10 @@ module DynamicImage
     # Returns a binary string.
     def cropped_and_resized(size)
       normalized do |image|
-        image.crop image_sizing.crop_geometry_string(size)
-        image.resize size
+        if record.cropped? || size != record.size
+          image.crop(image_sizing.crop_geometry_string(size))
+          image.resize(size)
+        end
       end
     end
 
