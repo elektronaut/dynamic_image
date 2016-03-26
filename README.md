@@ -34,7 +34,7 @@ and enumeration attacks.
 Add the gem to your Gemfile and run `bundle install`.
 
 ```ruby
-gem "dynamic_image"
+gem "dynamic_image", "~> 2.0.0"
 ```
 
 Run the `dis:install` generator to set up your storage.
@@ -92,19 +92,19 @@ To resize it, specify a max size. This will scale the image down to fit, but
 no cropping will occur.
 
 ```erb
-<%= dynamic_image_tag(image, size: '400x400') %>
+<%= dynamic_image_tag(image, size: "400x400") %>
 ```
 
 Setting `crop: true` will crop the image to the exact size.
 
 ```erb
-<%= dynamic_image_tag(image, size: '400x400', crop: true) %>
+<%= dynamic_image_tag(image, size: "400x400", crop: true) %>
 ```
 
 Omitting either dimension will render the image at an exact width or height.
 
 ```erb
-<%= dynamic_image_tag(image, size: '400x') %>
+<%= dynamic_image_tag(image, size: "400x") %>
 ```
 
 `dynamic_image_path` and `dynamic_image_url` act pretty much like regular URL
@@ -132,7 +132,7 @@ timestamped, and will change if the object changes.
 
 ## License
 
-Copyright 2006-2014 Inge Jørgensen
+Copyright 2006-2016 Inge Jørgensen
 
 DynamicImage is released under the
 [MIT License](http://www.opensource.org/licenses/MIT).
