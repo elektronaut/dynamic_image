@@ -1,4 +1,4 @@
-# DynamicImage [![Build Status](https://travis-ci.org/elektronaut/dynamic_image.png)](https://travis-ci.org/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image.png)](https://codeclimate.com/github/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/coverage.png)](https://codeclimate.com/github/elektronaut/dynamic_image)
+# DynamicImage [![Build Status](https://travis-ci.org/elektronaut/dynamic_image.svg?branch=master)](https://travis-ci.org/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/badges/gpa.svg)](https://codeclimate.com/github/elektronaut/dynamic_image) [![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/badges/coverage.svg)](https://codeclimate.com/github/elektronaut/dynamic_image) [![Dependency Status](https://gemnasium.com/elektronaut/dynamic_image.svg)](https://gemnasium.com/elektronaut/dynamic_image)
 
 Need to handle image uploads in your Rails app?
 Give DynamicImage a try.
