@@ -52,7 +52,7 @@ module DynamicImage
 
     # Returns true if the image is valid.
     def valid?
-      @data && metadata != :invalid
+      @data && reader.valid_header? && metadata != :invalid
     end
 
     private
@@ -62,13 +62,17 @@ module DynamicImage
     end
 
     def read_image
-      image = MiniMagick::Image.read(@data)
+      image = reader.read
       image.auto_orient
       result = yield image
       image.destroy!
       result
     rescue MiniMagick::Invalid
       :invalid
+    end
+
+    def reader
+      @reader ||= DynamicImage::ImageReader.new(@data)
     end
 
     def read_metadata

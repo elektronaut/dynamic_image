@@ -75,7 +75,7 @@ module DynamicImage
     def coalesced(image)
       if gif?
         image.coalesce
-        image = MiniMagick::Image.read(image.to_blob)
+        image = DynamicImage::ImageReader.new(image.to_blob).read
       end
       image
     end
@@ -107,7 +107,7 @@ module DynamicImage
     end
 
     def process_data
-      image = coalesced(MiniMagick::Image.read(record.data))
+      image = coalesced(DynamicImage::ImageReader.new(record.data).read)
       yield(image)
       result = image.to_blob
       image.destroy!
