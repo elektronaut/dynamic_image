@@ -1,13 +1,13 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 gemspec
 
 gem 'jquery-rails'
 
 group :development, :test do
-  gem "pry"
-  gem "pry-stack_explorer"
-  gem "pry-rescue"
+  gem 'pry'
+  gem 'pry-stack_explorer'
+  gem 'pry-rescue'
 end
 
 group :test do

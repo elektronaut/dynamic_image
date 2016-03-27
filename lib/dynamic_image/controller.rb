@@ -29,15 +29,14 @@ module DynamicImage
 
     # Renders the original image data, without any processing.
     def original
-      if stale?(@record)
-        respond_to do |format|
-          format.any(:gif, :jpeg, :png, :tiff) do
-            send_data(
-              @record.data,
-              content_type: @record.content_type,
-              disposition:  'inline'
-            )
-          end
+      return unless stale?(@record)
+      respond_to do |format|
+        format.any(:gif, :jpeg, :png, :tiff) do
+          send_data(
+            @record.data,
+            content_type: @record.content_type,
+            disposition:  'inline'
+          )
         end
       end
     end
@@ -58,20 +57,14 @@ module DynamicImage
     end
 
     def render_image(options)
-      processed_image = DynamicImage::ProcessedImage.new(@record, options)
-      if stale?(@record)
-        respond_to do |format|
-          format.html do
-            render(file: File.join(File.dirname(__FILE__), 'templates/show'),
-                   layout: false, locals: {options: options})
-          end
-          format.any(:gif, :jpeg, :png, :tiff) do
-            send_data(
-              processed_image.cropped_and_resized(requested_size),
-              content_type: processed_image.content_type,
-              disposition:  'inline'
-            )
-          end
+      return unless stale?(@record)
+      respond_to do |format|
+        format.html do
+          render(file: File.join(File.dirname(__FILE__), 'templates/show'),
+                 layout: false, locals: { options: options })
+        end
+        format.any(:gif, :jpeg, :png, :tiff) do
+          send_image(DynamicImage::ProcessedImage.new(@record, options))
         end
       end
     end
@@ -80,10 +73,18 @@ module DynamicImage
       params[:format]
     end
 
+    def send_image(image)
+      send_data(
+        image.cropped_and_resized(requested_size),
+        content_type: image.content_type,
+        disposition:  'inline'
+      )
+    end
+
     def verify_signed_params
-      key = [:action, :id, :size].map { |k|
+      key = [:action, :id, :size].map do |k|
         k == :id ? params.require(k).to_i : params.require(k)
-      }.join('-')
+      end.join('-')
       DynamicImage.digest_verifier.verify(key, params[:digest])
     end
   end

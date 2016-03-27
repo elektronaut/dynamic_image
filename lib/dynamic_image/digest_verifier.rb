@@ -52,11 +52,17 @@ module DynamicImage
 
     def generate_digest(data)
       require 'openssl' unless defined?(OpenSSL)
-      OpenSSL::HMAC.hexdigest(OpenSSL::Digest.const_get(@digest).new, @secret, data)
+      OpenSSL::HMAC.hexdigest(
+        OpenSSL::Digest.const_get(@digest).new,
+        @secret,
+        data
+      )
     end
 
     def valid_digest?(data, digest)
-      data.present? && digest.present? && secure_compare(digest, generate_digest(data))
+      data.present? &&
+        digest.present? &&
+        secure_compare(digest, generate_digest(data))
     end
   end
 end

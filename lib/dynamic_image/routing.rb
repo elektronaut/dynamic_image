@@ -9,7 +9,7 @@ module DynamicImage
     # Declares an image resource.
     #
     #   image_resources :avatars
-    def image_resources(resource_name, options={})
+    def image_resources(resource_name, options = {})
       options = {
         path:        "#{resource_name}/:digest(/:size)",
         constraints: { size: /\d+x\d+/ },

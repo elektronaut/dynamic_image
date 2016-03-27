@@ -70,17 +70,17 @@ module DynamicImage
 
     # Returns true if the image is in the CMYK colorspace
     def cmyk?
-      colorspace == "cmyk"
+      colorspace == 'cmyk'
     end
 
     # Returns true if the image is in the grayscale colorspace
     def gray?
-      colorspace == "gray"
+      colorspace == 'gray'
     end
 
     # Returns true if the image is in the RGB colorspace
     def rgb?
-      colorspace == "rgb"
+      colorspace == 'rgb'
     end
 
     # Finds a web safe content type. GIF, JPEG and PNG images are allowed,
@@ -102,15 +102,14 @@ module DynamicImage
     private
 
     def read_image_metadata
-      metadata = DynamicImage::Metadata.new(self.data)
+      metadata = DynamicImage::Metadata.new(data)
+      @valid_image = false
       if metadata.valid?
         self.colorspace = metadata.colorspace
         self.real_width = metadata.width
         self.real_height = metadata.height
         self.content_type = metadata.content_type
         @valid_image = true
-      else
-        @valid_image = false
       end
       true
     end
@@ -120,11 +119,11 @@ module DynamicImage
     end
 
     def safe_content_types
-      %w{
+      %w(
         image/png
         image/gif
         image/jpeg
-      }
+      )
     end
   end
 end

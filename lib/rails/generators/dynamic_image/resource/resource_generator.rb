@@ -6,7 +6,7 @@ require 'rails/generators/rails/resource/resource_generator'
 module DynamicImage
   module Generators
     class ResourceGenerator < Rails::Generators::ResourceGenerator
-      desc "Creates a DynamicImage resource"
+      desc 'Creates a DynamicImage resource'
 
       def initialize(args, *options)
         super(inject_dynamic_image_attributes(args), *options)
@@ -14,14 +14,14 @@ module DynamicImage
 
       def add_controller_extension
         inject_into_file(
-          File.join('app/controllers', class_path, "#{file_name.pluralize}_controller.rb"),
+          File.join(
+            'app/controllers',
+            class_path,
+            "#{file_name.pluralize}_controller.rb"),
           after: "ApplicationController\n"
         ) do
-          "  include DynamicImage::Controller\n\n" +
-          "  private\n\n" +
-          "  def model\n" +
-          "    #{class_name}\n" +
-          "  end\n"
+          "  include DynamicImage::Controller\n\n  private\n\n" \
+            "  def model\n    #{class_name}\n  end\n"
         end
       end
 
@@ -46,28 +46,23 @@ module DynamicImage
 
       def inject_dynamic_image_attributes(args)
         if args.any?
-          args = [args[0]] + dynamic_image_attributes + args[1..args.length]
+          [args[0]] + dynamic_image_attributes + args[1..args.length]
         else
           args
         end
       end
 
       def dynamic_image_attributes
-        %w{
-          content_hash:string
-          content_type:string
+        %w(
+          content_hash:string    content_type:string
           content_length:integer
           filename:string
           colorspace:string
-          real_width:integer
-          real_height:integer
-          crop_width:integer
-          crop_height:integer
-          crop_start_x:integer
-          crop_start_y:integer
-          crop_gravity_x:integer
-          crop_gravity_y:integer
-        }
+          real_width:integer     real_height:integer
+          crop_width:integer     crop_height:integer
+          crop_start_x:integer   crop_start_y:integer
+          crop_gravity_x:integer crop_gravity_y:integer
+        )
       end
     end
   end

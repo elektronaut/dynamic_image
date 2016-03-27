@@ -1,0 +1,10 @@
+AllCops:
+  Exclude:
+    - 'spec/internal/config/**/*'
+    - 'spec/internal/db/**/*'
+
+Rails:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false

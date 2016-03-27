@@ -6,11 +6,11 @@ module DynamicImage
   # Handles all processing of images. Takes an instance of
   # +DynamicImage::Model+ as argument.
   class ProcessedImage
-    def initialize(record, options={})
+    def initialize(record, options = {})
       @record    = record
       @uncropped = options[:uncropped] ? true : false
       @format    = options[:format].to_s.upcase if options[:format]
-      @format    = "JPEG" if defined?(@format) && @format == "JPG"
+      @format    = 'JPEG' if defined?(@format) && @format == 'JPG'
     end
 
     # Returns the content type of the processed image.
@@ -57,7 +57,7 @@ module DynamicImage
     #   jpg_data = processed.normalized
     #
     # Returns a binary string.
-    def normalized(&block)
+    def normalized
       require_valid_image!
       process_data do |image|
         image.combine_options do |combined|
@@ -89,7 +89,8 @@ module DynamicImage
     end
 
     def image_sizing
-      @image_sizing ||= DynamicImage::ImageSizing.new(record, uncropped: @uncropped)
+      @image_sizing ||= DynamicImage::ImageSizing.new(record,
+                                                      uncropped: @uncropped)
     end
 
     def needs_colorspace_conversion?
@@ -101,13 +102,11 @@ module DynamicImage
     end
 
     def optimize(image)
-      if gif?
-        image.layers 'optimize'
-      end
+      image.layers 'optimize' if gif?
       image.strip
     end
 
-    def process_data(&block)
+    def process_data
       image = coalesced(MiniMagick::Image.read(record.data))
       yield(image)
       result = image.to_blob
@@ -115,9 +114,7 @@ module DynamicImage
       result
     end
 
-    def record
-      @record
-    end
+    attr_reader :record
 
     def record_format
       case record.content_type
@@ -133,9 +130,7 @@ module DynamicImage
     end
 
     def require_valid_image!
-      unless record.valid?
-        raise DynamicImage::Errors::InvalidImage
-      end
+      raise DynamicImage::Errors::InvalidImage unless record.valid?
     end
   end
 end

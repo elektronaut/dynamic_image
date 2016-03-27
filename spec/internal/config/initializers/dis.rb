@@ -2,7 +2,7 @@
 
 # Creates a local storage layer in db/dis:
 Dis::Storage.layers << Dis::Layer.new(
-  Fog::Storage.new({ provider: 'Local', local_root: Rails.root.join('db', 'dis') }),
+  Fog::Storage.new(provider: 'Local', local_root: Rails.root.join('db', 'dis')),
   path: Rails.env
 )
 

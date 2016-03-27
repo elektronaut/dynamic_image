@@ -16,27 +16,23 @@ module DynamicImage
       if valid?
         case metadata[:colorspace]
         when /rgb/i
-          "rgb"
+          'rgb'
         when /cmyk/i
-          "cmyk"
+          'cmyk'
         when /gray/i
-          "gray"
+          'gray'
         end
       end
     end
 
     # Returns the content type of the image.
     def content_type
-      if valid?
-        "image/#{format.downcase}"
-      end
+      "image/#{format.downcase}" if valid?
     end
 
     # Returns the dimensions of the image as a vector.
     def dimensions
-      if valid?
-        Vector2d.new(*metadata[:dimensions])
-      end
+      Vector2d.new(*metadata[:dimensions]) if valid?
     end
 
     # Returns the width of the image.
@@ -51,9 +47,7 @@ module DynamicImage
 
     # Returns the format of the image.
     def format
-      if valid?
-        metadata[:format]
-      end
+      metadata[:format] if valid?
     end
 
     # Returns true if the image is valid.
@@ -67,18 +61,24 @@ module DynamicImage
       @metadata ||= read_metadata
     end
 
-    def read_metadata
+    def read_image
       image = MiniMagick::Image.read(@data)
       image.auto_orient
-      metadata = {
-        colorspace: image[:colorspace],
-        dimensions: image[:dimensions],
-        format:     image[:format]
-      }
+      result = yield image
       image.destroy!
-      metadata
+      result
     rescue MiniMagick::Invalid
       :invalid
+    end
+
+    def read_metadata
+      read_image do |image|
+        {
+          colorspace: image[:colorspace],
+          dimensions: image[:dimensions],
+          format:     image[:format]
+        }
+      end
     end
   end
 end

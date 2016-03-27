@@ -13,34 +13,34 @@ module DynamicImage
         validates_data_presence
 
         validates :colorspace,
-          presence: true,
-          inclusion: { in: allowed_colorspaces }
+                  presence: true,
+                  inclusion: { in: allowed_colorspaces }
 
         validates :content_type,
-          presence: true,
-          inclusion: { in: allowed_content_types }
+                  presence: true,
+                  inclusion: { in: allowed_content_types }
 
         validates :content_length,
-          presence: true,
-          numericality: { greater_than: 0, only_integer: true }
+                  presence: true,
+                  numericality: { greater_than: 0, only_integer: true }
 
         validates :filename,
-          presence: true,
-          length: { maximum: 255 }
+                  presence: true,
+                  length: { maximum: 255 }
 
         validates :real_width, :real_height,
-          numericality: { greater_than: 0, only_integer: true }
+                  numericality: { greater_than: 0, only_integer: true }
 
         validates :real_width, :real_height,
-          numericality: { greater_than: 0, only_integer: true }
+                  numericality: { greater_than: 0, only_integer: true }
 
         validates :crop_width, :crop_height,
-          :crop_gravity_x, :crop_gravity_y,
-          numericality: { greater_than: 0, only_integer: true },
-          allow_nil: true
+                  :crop_gravity_x, :crop_gravity_y,
+                  numericality: { greater_than: 0, only_integer: true },
+                  allow_nil: true
 
         validates :real_width, :real_height,
-          presence: true
+                  presence: true
 
         validates :crop_width, presence: true, if: :crop_height?
         validates :crop_height, presence: true, if: :crop_width?
@@ -57,21 +57,21 @@ module DynamicImage
 
       module ClassMethods
         def allowed_colorspaces
-          %w{
+          %w(
             rgb
             cmyk
             gray
-          }
+          )
         end
 
         def allowed_content_types
-          %w{
+          %w(
             image/gif
             image/jpeg
             image/pjpeg
             image/png
             image/tiff
-          }
+          )
         end
       end
 
@@ -80,14 +80,12 @@ module DynamicImage
       def validate_crop_bounds
         required_size = crop_start + crop_size
         if required_size.x > real_size.x || required_size.y > real_size.y
-          self.errors.add(:crop_size, "is out of bounds")
+          errors.add(:crop_size, 'is out of bounds')
         end
       end
 
       def validate_image
-        unless valid_image?
-         self.errors.add(:data, :invalid)
-        end
+        errors.add(:data, :invalid) unless valid_image?
       end
     end
   end

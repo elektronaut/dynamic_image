@@ -7,7 +7,7 @@ module DynamicImage
   module Helper
     # Returns the path for a DynamicImage::Model record.
     # Takes the same options as +dynamic_image_url+
-    def dynamic_image_path(record_or_array, options={})
+    def dynamic_image_path(record_or_array, options = {})
       dynamic_image_url(record_or_array, { routing_type: :path }.merge(options))
     end
 
@@ -29,24 +29,18 @@ module DynamicImage
     #   # => <img alt="My file" height="200" src="..." width="320" />
     #   dynamic_image_tag(image, size: "100x100", alt="Avatar")
     #   # => <img alt="Avatar" height="62" src="..." width="100" />
-    def dynamic_image_tag(record_or_array, options={})
+    def dynamic_image_tag(record_or_array, options = {})
       record = extract_dynamic_image_record(record_or_array)
-      options = {
-        alt: image_alt(record.filename)
-      }.merge(options)
+      options = { alt: image_alt(record.filename) }.merge(options)
 
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)
       html_options = { size: size }.merge(options)
 
-      image_tag(
-        dynamic_image_path_with_size(
-          record_or_array,
-          size,
-          url_options
-        ),
-        html_options
-      )
+      image_tag(dynamic_image_path_with_size(record_or_array,
+                                             size,
+                                             url_options),
+                html_options)
     end
 
     # Returns the URL for a DynamicImage::Model record.
@@ -71,38 +65,38 @@ module DynamicImage
     #   # => "http://example.com/images/72...c2/100x62/1-2014062020...00.jpg"
     #   dynamic_image_url(image, size: '100x100', crop: true)
     #   # => "http://example.com/images/a4...6b/100x100/1-2014062020...00.jpg"
-    def dynamic_image_url(record_or_array, options={})
+    def dynamic_image_url(record_or_array, options = {})
       size = fit_size!(record_or_array, options)
       dynamic_image_url_with_size(record_or_array, size, options)
     end
 
     # Returns a path to the original uploaded file, without any processing
     # applied. Sizing options are not supported.
-    def original_dynamic_image_path(record_or_array, options={})
+    def original_dynamic_image_path(record_or_array, options = {})
       dynamic_image_path(record_or_array, { action: :original }.merge(options))
     end
 
     # Returns a URL to the original uploaded file, without any processing
     # applied. Sizing options are not supported.
-    def original_dynamic_image_url(record_or_array, options={})
+    def original_dynamic_image_url(record_or_array, options = {})
       dynamic_image_url(record_or_array, { action: :original }.merge(options))
     end
 
     # Same as +dynamic_image_path+, but points to an image with any
     # pre-cropping disabled.
-    def uncropped_dynamic_image_path(record_or_array, options={})
+    def uncropped_dynamic_image_path(record_or_array, options = {})
       dynamic_image_path(record_or_array, { action: :uncropped }.merge(options))
     end
 
     # Same as +dynamic_image_tag+, but renders an image with any
     # pre-cropping disabled.
-    def uncropped_dynamic_image_tag(record_or_array, options={})
+    def uncropped_dynamic_image_tag(record_or_array, options = {})
       dynamic_image_tag(record_or_array, { action: :uncropped }.merge(options))
     end
 
     # Same as +dynamic_image_url+, but points to an image with any
     # pre-cropping disabled.
-    def uncropped_dynamic_image_url(record_or_array, options={})
+    def uncropped_dynamic_image_url(record_or_array, options = {})
       dynamic_image_url(record_or_array, { action: :uncropped }.merge(options))
     end
 
@@ -120,16 +114,18 @@ module DynamicImage
       Mime::Type.lookup(record.safe_content_type).to_sym
     end
 
-    def dynamic_image_digest(record, action, size=nil)
+    def dynamic_image_digest(record, action, size = nil)
       key = [action || 'show', record.id, size].compact.join('-')
       DynamicImage.digest_verifier.generate(key)
     end
 
-    def dynamic_image_path_with_size(record_or_array, size=nil, options={})
-      dynamic_image_url_with_size(record_or_array, size, { routing_type: :path }.merge(options))
+    def dynamic_image_path_with_size(record_or_array, size = nil, options = {})
+      dynamic_image_url_with_size(record_or_array,
+                                  size,
+                                  { routing_type: :path }.merge(options))
     end
 
-    def dynamic_image_url_with_size(record_or_array, size=nil, options={})
+    def dynamic_image_url_with_size(record_or_array, size = nil, options = {})
       record = extract_dynamic_image_record(record_or_array)
       options = {
         routing_type: :url,
@@ -137,7 +133,8 @@ module DynamicImage
         format: default_format_for_image(record),
         size: size
       }.merge(options)
-      options[:digest] = dynamic_image_digest(record, options[:action], options[:size])
+      options[:digest] =
+        dynamic_image_digest(record, options[:action], options[:size])
       polymorphic_url(record_or_array, options)
     end
 
@@ -154,17 +151,17 @@ module DynamicImage
       record = extract_dynamic_image_record(record_or_array)
       action = options[:action].try(:to_s)
       size_opts = options.extract!(:size, :crop, :upscale)
-
       if size_opts[:size]
-        DynamicImage::ImageSizing.new(
-          record,
-          uncropped: (action == "uncropped")
-        ).fit(size_opts[:size], size_opts).floor.to_s
-      elsif action == "original"
-        record.real_size.floor.to_s
+        image_sizing(record, size_opts, (action == 'uncropped'))
       else
-        record.size.floor.to_s
+        (action == 'original' ? record.real_size : record.size).floor.to_s
       end
+    end
+
+    def image_sizing(record, size_opts, uncropped)
+      ImageSizing
+        .new(record, uncropped: uncropped)
+        .fit(size_opts[:size], size_opts).floor.to_s
     end
   end
 end

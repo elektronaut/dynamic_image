@@ -5,7 +5,7 @@ module DynamicImage
   #
   # Calculates cropping and fitting for image sizes.
   class ImageSizing
-    def initialize(record, options={})
+    def initialize(record, options = {})
       @record = record
       @uncropped = options[:uncropped] ? true : false
     end
@@ -76,7 +76,7 @@ module DynamicImage
     #   sizing.fit(Vector2d(500, 500), upscale: true)
     #   # => Vector2d(500.0, 312.5)
     #
-    def fit(fit_size, options={})
+    def fit(fit_size, options = {})
       fit_size = parse_vector(fit_size)
       require_dimensions!(fit_size)     if options[:crop]
       fit_size = size.fit(fit_size)     unless options[:crop]
@@ -122,12 +122,10 @@ module DynamicImage
     end
 
     def parse_vector(v)
-      v.kind_of?(String) ? str_to_vector(v) : v
+      v.is_a?(String) ? str_to_vector(v) : v
     end
 
-    def record
-      @record
-    end
+    attr_reader :record
 
     def require_dimensions!(v)
       raise DynamicImage::Errors::InvalidSizeOptions unless v.x > 0 && v.y > 0
@@ -141,7 +139,7 @@ module DynamicImage
     end
 
     def str_to_vector(str)
-      x, y = str.match(/(\d*)x(\d*)/)[1,2].map(&:to_i)
+      x, y = str.match(/(\d*)x(\d*)/)[1, 2].map(&:to_i)
       Vector2d.new(x, y)
     end
 

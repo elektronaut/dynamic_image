@@ -5,7 +5,6 @@ module DynamicImage
     # = DynamicImage Model Dimensions
     #
     module Dimensions
-
       # Returns the crop gravity.
       #
       # DynamicImage will try to keep the pixel represented by
@@ -33,9 +32,7 @@ module DynamicImage
 
       # Returns the crop size, or nil if no cropping is applied.
       def crop_size
-        if crop_size?
-          vector(crop_width, crop_height)
-        end
+        vector(crop_width, crop_height) if crop_size?
       end
 
       # Returns true if crop size has been set.
@@ -64,9 +61,7 @@ module DynamicImage
 
       # Returns the real size of the image, without any cropping applied.
       def real_size
-        if real_size?
-          vector(real_width, real_height)
-        end
+        vector(real_width, real_height) if real_size?
       end
 
       # Returns true if the size has been set.

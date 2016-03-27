@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynamic_image (2.0.0.beta7)
+    dynamic_image (2.0.0)
       dis (~> 1.0.0)
       mini_magick (~> 4.5.1)
       rails (~> 4.2.0)

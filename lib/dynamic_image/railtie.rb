@@ -2,7 +2,7 @@
 
 module DynamicImage
   class Railtie < ::Rails::Railtie
-    initializer "dynamic_image" do
+    initializer 'dynamic_image' do
       ActionDispatch::Routing::Mapper.send :include, DynamicImage::Routing
 
       config.after_initialize do |app|

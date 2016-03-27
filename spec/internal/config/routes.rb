@@ -3,5 +3,5 @@
 Rails.application.routes.draw do
   image_resources :images
   resources :posts
-  root to: "posts#index"
+  root to: 'posts#index'
 end
