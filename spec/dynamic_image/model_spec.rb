@@ -54,7 +54,7 @@ describe DynamicImage::Model do
     let(:timestamp) { DateTime.new(2014, 6, 18, 12, 0).utc }
     subject { image.to_param }
     let(:image) { Image.new(updated_at: timestamp) }
-    it { is_expected.to eq("#{image.id}-20140618120000000000000") }
+    it { is_expected.to eq("#{image.id}-20140618120000000000") }
   end
 
   describe '.web_safe_content_type' do

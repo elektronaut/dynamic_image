@@ -25,10 +25,11 @@ describe ImagesController, type: :controller do
       it 'should raise an error' do
         expect do
           get(:show,
-              id: 1,
-              size: '100x101',
-              digest: digest('show-1-100x100'),
-              format: :png)
+              params: {
+                id: 1,
+                size: '100x101',
+                digest: digest('show-1-100x100'),
+                format: :png })
         end.to raise_error(DynamicImage::Errors::InvalidSignature)
       end
     end
@@ -36,7 +37,8 @@ describe ImagesController, type: :controller do
     context 'with a missing parameter' do
       it 'should raise an error' do
         expect do
-          get :show, id: 1, digest: digest('show-1-100x100'), format: :png
+          get(:show,
+              params: { id: 1, digest: digest('show-1-100x100'), format: :png })
         end.to raise_error(ActionController::ParameterMissing)
       end
     end
@@ -45,7 +47,9 @@ describe ImagesController, type: :controller do
   describe 'GET show' do
     context 'with a nonexistant record' do
       it 'should raise an error' do
-        expect { get :show, digested(:show, id: 1, size: '100x100') }.to(
+        expect do
+          get :show, params: digested(:show, id: 1, size: '100x100')
+        end.to(
           raise_error(ActiveRecord::RecordNotFound)
         )
       end
@@ -56,7 +60,10 @@ describe ImagesController, type: :controller do
         request.env['HTTP_IF_MODIFIED_SINCE'] = (
           Time.zone.now + 10.minutes
         ).httpdate
-        get :show, digested(:show, id: image.id, size: '100x100', format: :png)
+        get(:show, params: digested(:show,
+                                    id: image.id,
+                                    size: '100x100',
+                                    format: :png))
       end
 
       it 'should respond with 304 not modified' do
@@ -69,7 +76,11 @@ describe ImagesController, type: :controller do
         request.env['HTTP_IF_MODIFIED_SINCE'] = (
           Time.zone.now + 10.minutes
         ).httpdate
-        get :show, digested(:show, id: image.id, size: '100x100', format: :png)
+        get(:show,
+            params: digested(:show,
+                             id: image.id,
+                             size: '100x100',
+                             format: :png))
       end
 
       it 'should respond with 304 not modified' do
@@ -79,7 +90,7 @@ describe ImagesController, type: :controller do
 
     context 'with an existing record' do
       before do
-        get :show, digested(
+        get :show, params: digested(
           :show, id: image.id, size: '100x100', format: :png
         ).merge(id: image.to_param)
       end
@@ -103,7 +114,8 @@ describe ImagesController, type: :controller do
 
     context 'as an image format' do
       before do
-        get :show, digested(:show, id: image.id, size: '100x100', format: :png)
+        get :show,
+            params: digested(:show, id: image.id, size: '100x100', format: :png)
       end
 
       it 'should respond with success' do
@@ -121,7 +133,8 @@ describe ImagesController, type: :controller do
 
     context 'as GIF format' do
       before do
-        get :show, digested(:show, id: image.id, size: '100x100', format: :gif)
+        get :show,
+            params: digested(:show, id: image.id, size: '100x100', format: :gif)
       end
 
       it 'should set the content type' do
@@ -135,7 +148,8 @@ describe ImagesController, type: :controller do
 
     context 'as JPEG format' do
       before do
-        get :show, digested(:show, id: image.id, size: '100x100', format: :jpeg)
+        get :show,
+            params: digested(:show, id: image.id, size: '100x100', format: :jpeg)
       end
 
       it 'should set the content type' do
@@ -149,7 +163,8 @@ describe ImagesController, type: :controller do
 
     context 'as JPG format' do
       before do
-        get :show, digested(:show, id: image.id, size: '100x100', format: :jpg)
+        get :show,
+            params: digested(:show, id: image.id, size: '100x100', format: :jpg)
       end
 
       it 'should set the content type' do
@@ -163,7 +178,8 @@ describe ImagesController, type: :controller do
 
     context 'as PNG format' do
       before do
-        get :show, digested(:show, id: image.id, size: '100x100', format: :png)
+        get :show,
+            params: digested(:show, id: image.id, size: '100x100', format: :png)
       end
 
       it 'should set the content type' do
@@ -177,7 +193,8 @@ describe ImagesController, type: :controller do
 
     context 'as TIFF format' do
       before do
-        get :show, digested(:show, id: image.id, size: '100x100', format: :tiff)
+        get :show,
+            params: digested(:show, id: image.id, size: '100x100', format: :tiff)
       end
 
       it 'should set the content type' do
@@ -194,7 +211,7 @@ describe ImagesController, type: :controller do
     context 'with a nonexistant record' do
       it 'should raise an error' do
         expect do
-          get :uncropped, digested(:uncropped, id: 1, size: '100x100')
+          get :uncropped, params: digested(:uncropped, id: 1, size: '100x100')
         end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -202,7 +219,10 @@ describe ImagesController, type: :controller do
     context 'with an existing record' do
       before do
         get(:uncropped,
-            digested(:uncropped, id: image.id, size: '100x100', format: :png))
+            params: digested(:uncropped,
+                             id: image.id,
+                             size: '100x100',
+                             format: :png))
       end
 
       it 'should respond with success' do
@@ -232,7 +252,7 @@ describe ImagesController, type: :controller do
     context 'with a nonexistant record' do
       it 'should raise an error' do
         expect do
-          get :original, digested(:original, id: 1, size: '320x200')
+          get :original, params: digested(:original, id: 1, size: '320x200')
         end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -240,7 +260,10 @@ describe ImagesController, type: :controller do
     context 'with an existing record' do
       before do
         get(:original,
-            digested(:original, id: image.id, size: '320x200', format: :png))
+            params: digested(:original,
+                             id: image.id,
+                             size: '320x200',
+                             format: :png))
       end
 
       it 'should respond with success' do
