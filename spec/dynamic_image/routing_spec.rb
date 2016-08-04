@@ -104,4 +104,32 @@ describe ImagesController, type: :routing do
       )
     end
   end
+
+  describe "download" do
+    it "routes the URL" do
+      expect(get("/images/123456/1-20140606/download.png")).to(
+        route_to(
+          controller: "images",
+          action: "download",
+          id: "1-20140606",
+          digest: "123456",
+          format: "png"
+        )
+      )
+    end
+
+    it "routes the named route" do
+      expect(
+        get: download_image_path("123456", id: "1-20140606", format: "png")
+      ).to(
+        route_to(
+          controller: "images",
+          action: "download",
+          id: "1-20140606",
+          digest: "123456",
+          format: "png"
+        )
+      )
+    end
+  end
 end

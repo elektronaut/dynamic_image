@@ -70,6 +70,20 @@ module DynamicImage
       dynamic_image_url_with_size(record_or_array, size, options)
     end
 
+    # Returns a path to the original uploaded file for download,
+    # without any processing applied. Sizing options are not
+    # supported.
+    def download_dynamic_image_path(record_or_array, options = {})
+      dynamic_image_path(record_or_array, { action: :download }.merge(options))
+    end
+
+    # Returns a URL to the original uploaded file for download,
+    # without any processing applied. Sizing options are not
+    # supported.
+    def download_dynamic_image_url(record_or_array, options = {})
+      dynamic_image_url(record_or_array, { action: :download }.merge(options))
+    end
+
     # Returns a path to the original uploaded file, without any processing
     # applied. Sizing options are not supported.
     def original_dynamic_image_path(record_or_array, options = {})
