@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'dynamic_image/model/dimensions'
+require 'dynamic_image/model/transformations'
 require 'dynamic_image/model/validations'
 
 module DynamicImage
@@ -62,6 +63,7 @@ module DynamicImage
     extend ActiveSupport::Concern
     include Dis::Model
     include DynamicImage::Model::Dimensions
+    include DynamicImage::Model::Transformations
     include DynamicImage::Model::Validations
 
     included do

@@ -7,5 +7,6 @@ module DynamicImage
     class InvalidHeader < DynamicImage::Errors::Error; end
     class InvalidSignature < DynamicImage::Errors::Error; end
     class InvalidSizeOptions < DynamicImage::Errors::Error; end
+    class InvalidTransformation < DynamicImage::Errors::Error; end
   end
 end
