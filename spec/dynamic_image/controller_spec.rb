@@ -291,6 +291,47 @@ describe ImagesController, type: :controller do
         expect(metadata.format).to eq("PNG")
         expect(metadata.dimensions).to eq(Vector2d.new(320, 200))
       end
+
+      it "should set the Content-Disposition header" do
+        expect(response.headers["Content-Disposition"]).to eq("inline")
+      end
+    end
+  end
+
+  describe "GET download" do
+    before do
+      get(:download,
+          params: digested(:download,
+                           id: image.id,
+                           size: "320x200",
+                           format: :png))
+    end
+
+    it "should respond with success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should find the record" do
+      expect(assigns(:record)).to eq(image)
+    end
+
+    it "should set the caching headers" do
+      expect(response.headers["Cache-Control"]).to(
+        eq("max-age=2592000, public")
+      )
+      expect(response.headers["Last-Modified"]).to be_a(String)
+      expect(response.headers["ETag"]).to be_a(String)
+    end
+
+    it "should return the original PNG image" do
+      expect(metadata.format).to eq("PNG")
+      expect(metadata.dimensions).to eq(Vector2d.new(320, 200))
+    end
+
+    it "should set the Content-Disposition header" do
+      expect(response.headers["Content-Disposition"]).to eq(
+        'attachment; filename="image.png"'
+      )
     end
   end
 end

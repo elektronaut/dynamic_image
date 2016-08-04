@@ -139,6 +139,28 @@ describe DynamicImage::Helper, type: :helper do
     end
   end
 
+  describe "#download_dynamic_image_path" do
+    let(:options) { {} }
+    let(:digest) { generate_digest("download-#{image.id}-320x200") }
+    subject { helper.download_dynamic_image_path(image, options) }
+    it do
+      is_expected.to eq(
+        "/images/#{digest}/320x200/#{image.to_param}/download.png"
+      )
+    end
+  end
+
+  describe "#download_dynamic_image_url" do
+    let(:options) { {} }
+    let(:digest) { generate_digest("download-#{image.id}-320x200") }
+    subject { helper.download_dynamic_image_url(image, options) }
+    it do
+      is_expected.to eq(
+        "#{host}/images/#{digest}/320x200/#{image.to_param}/download.png"
+      )
+    end
+  end
+
   describe "#uncropped_dynamic_image_path" do
     let(:options) { { size: "100x100" } }
     let(:digest) { generate_digest("uncropped-#{image.id}-100x62") }

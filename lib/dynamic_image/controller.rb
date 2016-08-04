@@ -29,16 +29,11 @@ module DynamicImage
 
     # Renders the original image data, without any processing.
     def original
-      return unless stale?(@record)
-      respond_to do |format|
-        format.any(:gif, :jpeg, :png, :tiff) do
-          send_data(
-            @record.data,
-            content_type: @record.content_type,
-            disposition:  "inline"
-          )
-        end
-      end
+      render_raw_image
+    end
+
+    def download
+      render_raw_image(disposition: "attachment", filename: @record.filename)
     end
 
     # Returns the requested size as a vector.
@@ -65,6 +60,20 @@ module DynamicImage
         end
         format.any(:gif, :jpeg, :png, :tiff) do
           send_image(DynamicImage::ProcessedImage.new(@record, options))
+        end
+      end
+    end
+
+    def render_raw_image(disposition: "inline", filename: nil)
+      return unless stale?(@record)
+      respond_to do |format|
+        format.any(:gif, :jpeg, :png, :tiff) do
+          send_data(
+            @record.data,
+            filename: filename,
+            content_type: @record.content_type,
+            disposition: disposition
+          )
         end
       end
     end
