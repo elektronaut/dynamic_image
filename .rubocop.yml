@@ -6,5 +6,8 @@ AllCops:
 Rails:
   Enabled: true
 
+StringLiterals:
+  EnforcedStyle: double_quotes
+
 Style/Documentation:
   Enabled: false

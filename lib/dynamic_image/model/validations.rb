@@ -80,7 +80,7 @@ module DynamicImage
       def validate_crop_bounds
         required_size = crop_start + crop_size
         if required_size.x > real_size.x || required_size.y > real_size.y
-          errors.add(:crop_size, 'is out of bounds')
+          errors.add(:crop_size, "is out of bounds")
         end
       end
 

@@ -10,7 +10,7 @@ module DynamicImage
       @record    = record
       @uncropped = options[:uncropped] ? true : false
       @format    = options[:format].to_s.upcase if options[:format]
-      @format    = 'JPEG' if defined?(@format) && @format == 'JPG'
+      @format    = "JPEG" if defined?(@format) && @format == "JPG"
     end
 
     # Returns the content type of the processed image.
@@ -62,7 +62,7 @@ module DynamicImage
       process_data do |image|
         image.combine_options do |combined|
           combined.auto_orient
-          combined.colorspace('sRGB') if needs_colorspace_conversion?
+          combined.colorspace("sRGB") if needs_colorspace_conversion?
           yield(combined) if block_given?
           optimize(combined)
         end
@@ -85,7 +85,7 @@ module DynamicImage
     end
 
     def gif?
-      content_type == 'image/gif'
+      content_type == "image/gif"
     end
 
     def image_sizing
@@ -102,7 +102,7 @@ module DynamicImage
     end
 
     def optimize(image)
-      image.layers 'optimize' if gif?
+      image.layers "optimize" if gif?
       image.strip
     end
 
@@ -118,14 +118,14 @@ module DynamicImage
 
     def record_format
       case record.content_type
-      when 'image/png'
-        'PNG'
-      when 'image/gif'
-        'GIF'
-      when 'image/jpeg', 'image/pjpeg'
-        'JPEG'
-      when 'image/tiff'
-        'TIFF'
+      when "image/png"
+        "PNG"
+      when "image/gif"
+        "GIF"
+      when "image/jpeg", "image/pjpeg"
+        "JPEG"
+      when "image/tiff"
+        "TIFF"
       end
     end
 

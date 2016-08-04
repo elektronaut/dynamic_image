@@ -20,7 +20,7 @@ module DynamicImage
   class DigestVerifier
     def initialize(secret, options = {})
       @secret = secret
-      @digest = options[:digest] || 'SHA1'
+      @digest = options[:digest] || "SHA1"
     end
 
     # Generates a digest for a string.
@@ -47,11 +47,11 @@ module DynamicImage
 
       res = 0
       b.each_byte { |byte| res |= byte ^ l.shift }
-      res == 0
+      res.zero?
     end
 
     def generate_digest(data)
-      require 'openssl' unless defined?(OpenSSL)
+      require "openssl" unless defined?(OpenSSL)
       OpenSSL::HMAC.hexdigest(
         OpenSSL::Digest.const_get(@digest).new,
         @secret,

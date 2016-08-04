@@ -16,11 +16,11 @@ module DynamicImage
       if valid?
         case metadata[:colorspace]
         when /rgb/i
-          'rgb'
+          "rgb"
         when /cmyk/i
-          'cmyk'
+          "cmyk"
         when /gray/i
-          'gray'
+          "gray"
         end
       end
     end

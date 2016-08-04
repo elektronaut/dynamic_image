@@ -1,16 +1,16 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
-gem 'jquery-rails'
+gem "jquery-rails"
 
 group :development, :test do
-  gem 'pry'
-  gem 'pry-stack_explorer'
-  gem 'pry-rescue'
+  gem "pry"
+  gem "pry-stack_explorer"
+  gem "pry-rescue"
 end
 
 group :test do
-  gem 'codeclimate-test-reporter', require: false
-  gem 'rails-controller-testing'
+  gem "codeclimate-test-reporter", require: false
+  gem "rails-controller-testing"
 end

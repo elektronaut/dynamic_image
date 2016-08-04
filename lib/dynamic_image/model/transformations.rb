@@ -9,11 +9,11 @@ module DynamicImage
       def rotate(degrees = 90)
         degrees = degrees.to_i % 360
 
-        return self if degrees == 0
+        return self if degrees.zero?
 
-        if degrees % 90 != 0
+        if (degrees % 90).nonzero?
           raise DynamicImage::Errors::InvalidTransformation,
-                'angle must be a multiple of 90 degrees'
+                "angle must be a multiple of 90 degrees"
         end
 
         transform_image do |image|

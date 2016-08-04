@@ -35,7 +35,7 @@ module DynamicImage
           send_data(
             @record.data,
             content_type: @record.content_type,
-            disposition:  'inline'
+            disposition:  "inline"
           )
         end
       end
@@ -60,7 +60,7 @@ module DynamicImage
       return unless stale?(@record)
       respond_to do |format|
         format.html do
-          render(file: File.join(File.dirname(__FILE__), 'templates/show'),
+          render(file: File.join(File.dirname(__FILE__), "templates/show"),
                  layout: false, locals: { options: options })
         end
         format.any(:gif, :jpeg, :png, :tiff) do
@@ -77,14 +77,14 @@ module DynamicImage
       send_data(
         image.cropped_and_resized(requested_size),
         content_type: image.content_type,
-        disposition:  'inline'
+        disposition:  "inline"
       )
     end
 
     def verify_signed_params
       key = [:action, :id, :size].map do |k|
         k == :id ? params.require(k).to_i : params.require(k)
-      end.join('-')
+      end.join("-")
       DynamicImage.digest_verifier.verify(key, params[:digest])
     end
   end

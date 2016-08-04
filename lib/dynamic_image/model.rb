@@ -1,8 +1,8 @@
 # encoding: utf-8
 
-require 'dynamic_image/model/dimensions'
-require 'dynamic_image/model/transformations'
-require 'dynamic_image/model/validations'
+require "dynamic_image/model/dimensions"
+require "dynamic_image/model/transformations"
+require "dynamic_image/model/validations"
 
 module DynamicImage
   # = DynamicImage Model
@@ -72,17 +72,17 @@ module DynamicImage
 
     # Returns true if the image is in the CMYK colorspace
     def cmyk?
-      colorspace == 'cmyk'
+      colorspace == "cmyk"
     end
 
     # Returns true if the image is in the grayscale colorspace
     def gray?
-      colorspace == 'gray'
+      colorspace == "gray"
     end
 
     # Returns true if the image is in the RGB colorspace
     def rgb?
-      colorspace == 'rgb'
+      colorspace == "rgb"
     end
 
     # Finds a web safe content type. GIF, JPEG and PNG images are allowed,
@@ -91,14 +91,14 @@ module DynamicImage
       if safe_content_types.include?(content_type)
         content_type
       else
-        'image/jpeg'
+        "image/jpeg"
       end
     end
 
     # Includes a timestamp fingerprint in the URL param, so
     # that rendered images can be cached indefinitely.
     def to_param
-      [id, updated_at.utc.to_s(cache_timestamp_format)].join('-')
+      [id, updated_at.utc.to_s(cache_timestamp_format)].join("-")
     end
 
     private

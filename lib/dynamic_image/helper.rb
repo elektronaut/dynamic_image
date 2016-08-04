@@ -115,7 +115,7 @@ module DynamicImage
     end
 
     def dynamic_image_digest(record, action, size = nil)
-      key = [action || 'show', record.id, size].compact.join('-')
+      key = [action || "show", record.id, size].compact.join("-")
       DynamicImage.digest_verifier.generate(key)
     end
 
@@ -152,9 +152,9 @@ module DynamicImage
       action = options[:action].try(:to_s)
       size_opts = options.extract!(:size, :crop, :upscale)
       if size_opts[:size]
-        image_sizing(record, size_opts, (action == 'uncropped'))
+        image_sizing(record, size_opts, (action == "uncropped"))
       else
-        (action == 'original' ? record.real_size : record.size).floor.to_s
+        (action == "original" ? record.real_size : record.size).floor.to_s
       end
     end
 
