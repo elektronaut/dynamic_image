@@ -76,6 +76,11 @@ describe DynamicImage::Model::Validations do
       it { is_expected.to include("is invalid") }
     end
 
+    context "when blank" do
+      let(:image) { Image.new(data: "") }
+      it { is_expected.to include("is invalid") }
+    end
+
     context "when a valid image" do
       let(:image) { Image.new(data: uploaded_file) }
       it { is_expected.to eq([]) }

@@ -12,6 +12,7 @@ module DynamicImage
     end
 
     def valid_header?
+      return false if file_header.blank?
       magic_bytes.each do |expr|
         if (expr.is_a?(Regexp) && file_header =~ /^#{expr}/) ||
            (expr.is_a?(String) && file_header.start_with?(expr))
