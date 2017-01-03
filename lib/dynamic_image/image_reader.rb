@@ -38,6 +38,7 @@ module DynamicImage
     def jpeg_magic_bytes
       [
         "\xff\xd8\xff\xdb".force_encoding("binary"),
+        "\xff\xd8\xff\xe2".force_encoding("binary"),
         Regexp.new("\xff\xd8\xff\xe0(.*){2}JFIF".force_encoding("binary"),
                    Regexp::MULTILINE),
         Regexp.new("\xff\xd8\xff\xe1(.*){2}Exif".force_encoding("binary"),
