@@ -12,3 +12,5 @@ script:
 before_script:
   - bundle exec rake app:db:create
   - bundle exec rake app:db:schema:load
+after_script:
+  - bundle exec codeclimate-test-reporter
