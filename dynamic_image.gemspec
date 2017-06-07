@@ -26,10 +26,10 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 1.9.2"
 
-  s.add_dependency "rails", ">= 4.2.0", "< 5.1.0"
+  s.add_dependency 'rails', '~> 5.0'
   s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
   s.add_dependency "mini_magick", "~> 4.6.0"
-  s.add_dependency "dis", "~> 1.0.6"
+  s.add_dependency "dis", "~> 1.1", ">= 1.0.6"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails", "~> 3.5.1"

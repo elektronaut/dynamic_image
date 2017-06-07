@@ -1,10 +1,10 @@
-addons:
-  code_climate:
-    repo_token: 05e44f79bfab91587e3081a5b09b11f8a81c5e133fa326c4877cc95b26a59b32
 language: ruby
+sudo: false
+cache: bundler
 rvm:
-  - 2.2.2
-  - 2.3.0
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
 env:
   - RAILS_ENV=test
 script:
@@ -13,4 +13,4 @@ before_script:
   - bundle exec rake app:db:create
   - bundle exec rake app:db:schema:load
 after_script:
-  - bundle exec codeclimate-test-reporter
+  - CODECLIMATE_REPO_TOKEN=05e44f79bfab91587e3081a5b09b11f8a81c5e133fa326c4877cc95b26a59b32 bundle exec codeclimate-test-reporter
