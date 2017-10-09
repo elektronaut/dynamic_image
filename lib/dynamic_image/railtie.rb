@@ -5,6 +5,10 @@ module DynamicImage
     initializer "dynamic_image" do
       ActionDispatch::Routing::Mapper.send :include, DynamicImage::Routing
 
+      ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
+        "DynamicImage::Errors::InvalidSignature" => :unauthorized
+      )
+
       config.after_initialize do |app|
         secret = app.key_generator.generate_key("dynamic_image")
         DynamicImage.digest_verifier = DynamicImage::DigestVerifier.new(secret)
