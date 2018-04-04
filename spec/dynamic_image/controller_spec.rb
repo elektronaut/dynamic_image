@@ -40,7 +40,7 @@ describe ImagesController, type: :controller do
         expect do
           get(:show,
               params: { id: 1, digest: digest("show-1-100x100"), format: :png })
-        end.to raise_error(ActionController::ParameterMissing)
+        end.to raise_error(DynamicImage::Errors::ParameterMissing)
       end
     end
   end

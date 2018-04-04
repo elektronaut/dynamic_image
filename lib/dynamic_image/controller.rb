@@ -95,6 +95,8 @@ module DynamicImage
         k == :id ? params.require(k).to_i : params.require(k)
       end.join("-")
       DynamicImage.digest_verifier.verify(key, params[:digest])
+    rescue ActionController::ParameterMissing => e
+      raise DynamicImage::Errors::ParameterMissing, e.message
     end
   end
 end
