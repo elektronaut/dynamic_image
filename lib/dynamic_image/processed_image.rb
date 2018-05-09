@@ -108,7 +108,11 @@ module DynamicImage
     def optimize(image)
       image.layers "optimize" if gif?
       image.strip
-      image.quality(85) if jpeg?
+      if jpeg?
+        image.quality(85)
+        image.sampling_factor "4:2:0"
+        image.interlace "JPEG"
+      end
     end
 
     def process_data
