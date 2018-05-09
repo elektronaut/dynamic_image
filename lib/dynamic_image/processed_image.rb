@@ -88,6 +88,10 @@ module DynamicImage
       content_type == "image/gif"
     end
 
+    def jpeg?
+      content_type == "image/jpeg" || content_type == "image/jpeg"
+    end
+
     def image_sizing
       @image_sizing ||= DynamicImage::ImageSizing.new(record,
                                                       uncropped: @uncropped)
@@ -104,6 +108,7 @@ module DynamicImage
     def optimize(image)
       image.layers "optimize" if gif?
       image.strip
+      image.quality(85) if jpeg?
     end
 
     def process_data
