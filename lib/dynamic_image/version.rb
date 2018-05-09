@@ -1,5 +1,5 @@
 # encoding: utf-8
 
 module DynamicImage
-  VERSION = "2.0.11".freeze
+  VERSION = "2.0.12".freeze
 end
