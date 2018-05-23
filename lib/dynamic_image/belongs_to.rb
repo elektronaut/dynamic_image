@@ -7,7 +7,7 @@ module DynamicImage
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def belongs_to_image(name, scope = nil, options = {})
+      def belongs_to_image(name, scope = nil, **options)
         belongs_to(name, scope, options)
 
         define_method "#{name}=" do |new_image|
