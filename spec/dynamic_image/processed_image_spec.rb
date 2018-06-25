@@ -9,6 +9,7 @@ describe DynamicImage::ProcessedImage do
   let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
   let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
   let(:tiff_image) { source_image.tap { |o| o.format("TIFF") } }
+  let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
 
   let(:rgb_image)  { source_image }
   let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
@@ -49,6 +50,13 @@ describe DynamicImage::ProcessedImage do
         DynamicImage::ProcessedImage.new(record, format: :tiff)
       end
       it { is_expected.to eq("image/tiff") }
+    end
+
+    context "when format is BMP" do
+      let(:processed) do
+        DynamicImage::ProcessedImage.new(record, format: :bmp)
+      end
+      it { is_expected.to eq("image/bmp") }
     end
   end
 
@@ -111,6 +119,18 @@ describe DynamicImage::ProcessedImage do
       context "when image is TIFF" do
         let(:image) { tiff_image }
         it { is_expected.to eq("image/tiff") }
+      end
+
+      context "when image is BMP" do
+        let(:image) { bmp_image }
+        it { is_expected.to eq("image/bmp") }
+      end
+
+      context "converting BMP to JPEG" do
+        let(:processed) do
+          DynamicImage::ProcessedImage.new(record, format: :bmp)
+        end
+        it { is_expected.to eq("image/bmp") }
       end
 
       context "converting PNG to GIF" do

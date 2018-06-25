@@ -57,7 +57,7 @@ describe DynamicImage::Model do
     it { is_expected.to eq("#{image.id}-20140618120000000000") }
   end
 
-  describe ".web_safe_content_type" do
+  describe ".safe_content_type" do
     subject { image.safe_content_type }
 
     context "when image is GIF" do
@@ -77,6 +77,11 @@ describe DynamicImage::Model do
 
     context "when image is TIFF" do
       let(:image) { Image.new(content_type: "image/tiff") }
+      it { is_expected.to eq("image/jpeg") }
+    end
+
+    context "when image is BMP" do
+      let(:image) { Image.new(content_type: "image/bmp") }
       it { is_expected.to eq("image/jpeg") }
     end
   end

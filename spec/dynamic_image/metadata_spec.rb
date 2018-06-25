@@ -9,6 +9,7 @@ describe DynamicImage::Metadata do
   let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
   let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
   let(:tiff_image) { source_image.tap { |o| o.format("TIFF") } }
+  let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
 
   let(:rgb_image) { source_image }
   let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
@@ -63,6 +64,11 @@ describe DynamicImage::Metadata do
     context "when image is TIFF" do
       let(:image) { tiff_image }
       it { is_expected.to eq("image/tiff") }
+    end
+
+    context "when image is BMP" do
+      let(:image) { bmp_image }
+      it { is_expected.to eq("image/bmp") }
     end
 
     context "with invalid data" do
@@ -122,6 +128,11 @@ describe DynamicImage::Metadata do
     context "when image is TIFF" do
       let(:image) { tiff_image }
       it { is_expected.to eq("TIFF") }
+    end
+
+    context "when image is BMP" do
+      let(:image) { bmp_image }
+      it { is_expected.to eq("BMP") }
     end
 
     context "with invalid data" do

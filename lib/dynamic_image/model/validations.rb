@@ -66,6 +66,7 @@ module DynamicImage
 
         def allowed_content_types
           %w(
+            image/bmp
             image/gif
             image/jpeg
             image/pjpeg

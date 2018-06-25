@@ -16,7 +16,7 @@ uploaded, DynamicImage stores the original file and generates images
 on demand. It handles cropping, resizing, format and colorspace
 conversion.
 
-Supported formats at the moment are JPEG, PNG, GIF and TIFF. The
+Supported formats at the moment are JPEG, PNG, GIF, BMP and TIFF. The
 latter will automatically be converted to JPG. CMYK images will be
 converted to RGB, and RGB images will be converted to the sRGB
 colorspace for consistent appearance in all browsers.

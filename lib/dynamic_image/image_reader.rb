@@ -32,7 +32,8 @@ module DynamicImage
         "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a".force_encoding("binary"), # PNG
         "\xff\xd8".force_encoding("binary"),                         # JPEG
         "\x49\x49\x2a\x00".force_encoding("binary"),                 # TIFF
-        "\x4d\x4d\x00\x2a".force_encoding("binary")
+        "\x4d\x4d\x00\x2a".force_encoding("binary"),
+        "\x42\x4d".force_encoding("binary")                          # BMP
       ]
     end
   end

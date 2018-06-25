@@ -127,6 +127,8 @@ module DynamicImage
 
     def record_format
       case record.content_type
+      when "image/bmp"
+        "BMP"
       when "image/png"
         "PNG"
       when "image/gif"
