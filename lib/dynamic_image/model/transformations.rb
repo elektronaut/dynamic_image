@@ -5,6 +5,18 @@ module DynamicImage
     # = DynamicImage Model Transformations
     #
     module Transformations
+      # Resizes the image
+      def resize(max_size)
+        transform_image do |image|
+          new_size = real_size.constrain_both(max_size)
+          scale = new_size.x / real_size.x
+          image.resize(new_size)
+          crop_attributes.each do |attr|
+            self[attr] = self[attr] * scale if self[attr]
+          end
+        end
+      end
+
       # Rotates the image
       def rotate(degrees = 90)
         degrees = degrees.to_i % 360
@@ -23,6 +35,11 @@ module DynamicImage
       end
 
       private
+
+      def crop_attributes
+        %i[crop_width crop_height crop_start_x crop_start_y
+           crop_gravity_x crop_gravity_y]
+      end
 
       def rotate_dimensions(width, height, degrees)
         (degrees / 90).times do
@@ -64,6 +81,7 @@ module DynamicImage
         self.data = processed_image.normalized do |image|
           yield(image) if block_given?
         end
+        read_image_metadata
         self
       end
     end

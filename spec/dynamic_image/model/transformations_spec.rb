@@ -6,19 +6,38 @@ describe DynamicImage::Model::Transformations do
   let(:content_type) { "image/png" }
   let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
 
-  let(:image) { Image.new(file: uploaded_file) }
+  let(:image) do
+    Image.new(file: uploaded_file,
+              crop_width: 40,
+              crop_height: 30,
+              crop_start_x: 20,
+              crop_start_y: 10,
+              crop_gravity_x: 50,
+              crop_gravity_y: 60)
+  end
+
+  describe "#resize" do
+    subject(:resized) { image.resize("160x160") }
+
+    it "resizes the image" do
+      expect(resized.real_size).to eq(Vector2d(160, 100))
+    end
+
+    it "adjusts the crop size" do
+      expect(resized.crop_size).to eq(Vector2d(20, 15))
+    end
+
+    it "adjusts the crop start" do
+      expect(resized.crop_start).to eq(Vector2d(10, 5))
+    end
+
+    it "adjusts the crop gravity" do
+      expect(resized.crop_gravity).to eq(Vector2d(25, 30))
+    end
+  end
 
   describe "#rotate" do
     let(:degrees) { 90 }
-    let(:image) do
-      Image.new(file: uploaded_file,
-                crop_width: 40,
-                crop_height: 30,
-                crop_start_x: 20,
-                crop_start_y: 10,
-                crop_gravity_x: 50,
-                crop_gravity_y: 60)
-    end
 
     subject do
       image.rotate(degrees)
