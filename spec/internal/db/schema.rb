@@ -1,4 +1,3 @@
-# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,35 +10,58 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_140_622_183_348) do
-  create_table 'images', force: :cascade do |t|
-    t.string   'content_hash',   null: false
-    t.string   'content_type',   null: false
-    t.integer  'content_length', null: false
-    t.string   'filename',       null: false
-    t.string   'colorspace',     null: false
-    t.integer  'real_width',     null: false
-    t.integer  'real_height',    null: false
-    t.integer  'crop_width'
-    t.integer  'crop_height'
-    t.integer  'crop_start_x'
-    t.integer  'crop_start_y'
-    t.integer  'crop_gravity_x'
-    t.integer  'crop_gravity_y'
-    t.datetime 'created_at'
-    t.datetime 'updated_at'
+ActiveRecord::Schema.define(version: 2019_06_20_160500) do
+
+  create_table "dynamic_image_variants", force: :cascade do |t|
+    t.string "image_type", null: false
+    t.integer "image_id", null: false
+    t.string "content_hash", null: false
+    t.string "content_type", null: false
+    t.integer "content_length", null: false
+    t.string "filename", null: false
+    t.string "format", null: false
+    t.integer "width", null: false
+    t.integer "height", null: false
+    t.integer "crop_width", null: false
+    t.integer "crop_height", null: false
+    t.integer "crop_start_x", null: false
+    t.integer "crop_start_y", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["image_id", "image_type", "format", "width", "height", "crop_width", "crop_height", "crop_start_x", "crop_start_y"], name: "dynamic_image_variants_by_format_and_size", unique: true
+    t.index ["image_id", "image_type"], name: "dynamic_image_variants_by_image"
+    t.index ["image_type", "image_id"], name: "index_dynamic_image_variants_on_image_type_and_image_id"
   end
 
-  create_table 'posts', force: :cascade do |t|
-    t.string   'name'
-    t.integer  'image_id'
-    t.datetime 'created_at'
-    t.datetime 'updated_at'
+  create_table "images", force: :cascade do |t|
+    t.string "content_hash", null: false
+    t.string "content_type", null: false
+    t.integer "content_length", null: false
+    t.string "filename", null: false
+    t.string "colorspace", null: false
+    t.integer "real_width", null: false
+    t.integer "real_height", null: false
+    t.integer "crop_width"
+    t.integer "crop_height"
+    t.integer "crop_start_x"
+    t.integer "crop_start_y"
+    t.integer "crop_gravity_x"
+    t.integer "crop_gravity_y"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
-  create_table 'users', force: :cascade do |t|
-    t.integer  'avatar_id'
-    t.datetime 'created_at'
-    t.datetime 'updated_at'
+  create_table "posts", force: :cascade do |t|
+    t.string "name"
+    t.integer "image_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
+
+  create_table "users", force: :cascade do |t|
+    t.integer "avatar_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
 end
