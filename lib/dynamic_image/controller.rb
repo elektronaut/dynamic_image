@@ -82,11 +82,11 @@ module DynamicImage
       params[:format]
     end
 
-    def send_image(image)
+    def send_image(processed_image)
       send_data(
-        image.cropped_and_resized(requested_size),
-        content_type: image.content_type,
-        disposition:  "inline"
+        processed_image.cropped_and_resized(requested_size),
+        content_type: processed_image.content_type,
+        disposition: "inline"
       )
     end
 
