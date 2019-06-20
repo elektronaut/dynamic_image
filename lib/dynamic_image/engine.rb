@@ -10,14 +10,14 @@ module DynamicImage
     end
 
     initializer "dynamic_image.migrations" do |app|
-      unless app.root.to_s.match root.to_s
+      unless app.root.to_s.match?(root.to_s)
         config.paths["db/migrate"].expanded.each do |expanded_path|
           app.config.paths["db/migrate"] << expanded_path
         end
       end
     end
 
-    initializer "dynamic_image.rails_extensions", before: :load_active_support do
+    initializer "dynamic_image.extensions", before: :load_active_support do
       ActiveSupport.on_load(:active_record) do
         send :include, DynamicImage::BelongsTo
       end

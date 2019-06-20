@@ -163,13 +163,14 @@ module DynamicImage
 
     def variant_params(size)
       crop_size, crop_start = image_sizing.crop_geometry(size)
+                                          .map(&:to_i_vector)
 
       { width: size.x.to_i,
         height: size.y.to_i,
-        crop_width: crop_size.x.to_i,
-        crop_height: crop_size.y.to_i,
-        crop_start_x: crop_start.x.to_i,
-        crop_start_y: crop_start.y.to_i,
+        crop_width: crop_size.x,
+        crop_height: crop_size.y,
+        crop_start_x: crop_start.x,
+        crop_start_y: crop_start.y,
         format: format }
     end
   end
