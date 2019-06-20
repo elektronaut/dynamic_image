@@ -3,6 +3,7 @@
 require "dynamic_image/model/dimensions"
 require "dynamic_image/model/transformations"
 require "dynamic_image/model/validations"
+require "dynamic_image/model/variants"
 
 module DynamicImage
   # = DynamicImage Model
@@ -65,6 +66,7 @@ module DynamicImage
     include DynamicImage::Model::Dimensions
     include DynamicImage::Model::Transformations
     include DynamicImage::Model::Validations
+    include DynamicImage::Model::Variants
 
     included do
       before_validation :read_image_metadata, if: :data_changed?
