@@ -11,6 +11,8 @@ class DynamicImage::Variant < ActiveRecord::Base
   validates :format, presence: true
 
   validates :width, :height, :crop_width, :crop_height,
-            :crop_start_x, :crop_start_y,
             numericality: { greater_than: 0, only_integer: true }
+
+  validates :crop_start_x, :crop_start_y,
+            numericality: { only_integer: true }
 end

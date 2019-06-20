@@ -65,7 +65,24 @@ describe DynamicImage::ProcessedImage do
     let(:normalized) { processed.cropped_and_resized(size) }
     let(:metadata) { DynamicImage::Metadata.new(normalized) }
     subject { metadata.dimensions }
-    it { is_expected.to eq(size) }
+
+    context "when image is saved" do
+      let(:record) { Image.create(data: image.to_blob, filename: "test.png") }
+
+      it { is_expected.to eq(size) }
+
+      it "creates a variant" do
+        expect { subject }.to change { DynamicImage::Variant.count }.by(1)
+      end
+    end
+
+    context "when image isn't saved" do
+      it { is_expected.to eq(size) }
+
+      it "doesn't create a variant" do
+        expect { subject }.to change { DynamicImage::Variant.count }.by(0)
+      end
+    end
   end
 
   describe "#normalized" do

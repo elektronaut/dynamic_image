@@ -35,12 +35,9 @@ module DynamicImage
     #
     # Returns a binary string.
     def cropped_and_resized(size)
-      normalized do |image|
-        if record.cropped? || size != record.size
-          image.crop(image_sizing.crop_geometry_string(size))
-          image.resize(size)
-        end
-      end
+      return crop_and_resize(size) unless record.persisted?
+
+      find_or_create_variant(size).data
     end
 
     # Normalizes the image.
@@ -78,6 +75,26 @@ module DynamicImage
         image = DynamicImage::ImageReader.new(image.to_blob).read
       end
       image
+    end
+
+    def crop_and_resize(size)
+      normalized do |image|
+        if record.cropped? || size != record.size
+          image.crop(image_sizing.crop_geometry_string(size))
+          image.resize(size)
+        end
+      end
+    end
+
+    def find_or_create_variant(size)
+      record.variants.find_by(variant_params(size)) ||
+        record.variants.create(
+          variant_params(size).merge(
+            filename: record.filename,
+            content_type: content_type,
+            data: crop_and_resize(size)
+          )
+        )
     end
 
     def format
@@ -142,6 +159,18 @@ module DynamicImage
 
     def require_valid_image!
       raise DynamicImage::Errors::InvalidImage unless record.valid?
+    end
+
+    def variant_params(size)
+      crop_size, crop_start = image_sizing.crop_geometry(size)
+
+      { width: size.x.to_i,
+        height: size.y.to_i,
+        crop_width: crop_size.x.to_i,
+        crop_height: crop_size.y.to_i,
+        crop_start_x: crop_start.x.to_i,
+        crop_start_y: crop_start.y.to_i,
+        format: format }
     end
   end
 end
