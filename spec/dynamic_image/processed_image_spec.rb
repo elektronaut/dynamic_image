@@ -3,14 +3,20 @@
 require "spec_helper"
 
 describe DynamicImage::ProcessedImage do
-  let(:file_path) { "../../support/fixtures/image.png" }
-  let(:file) { File.open(File.expand_path(file_path, __FILE__)) }
-  let(:source_image) { MiniMagick::Image.read(file.read) }
+  def read_image(filename)
+    MiniMagick::Image.read(
+      File.open(
+        File.expand_path("../../support/fixtures/#{filename}", __FILE__)
+      )
+    )
+  end
+
+  let(:source_image) { read_image("image.png") }
 
   let(:gif_image)  { source_image.tap { |o| o.format("GIF") } }
   let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
   let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
-  let(:tiff_image) { source_image.tap { |o| o.format("TIFF") } }
+  let(:tiff_image) { read_image("image.tif") }
   let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
 
   let(:rgb_image)  { source_image }

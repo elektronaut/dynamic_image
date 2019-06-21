@@ -3,6 +3,7 @@ sudo: false
 cache: bundler
 dist: bionic
 rvm:
+  - 2.4.5
   - 2.6.3
 env:
   - RAILS_ENV=test
