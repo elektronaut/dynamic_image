@@ -20,53 +20,60 @@ describe DynamicImage::ProcessedImage do
   let(:image) { source_image }
 
   let(:record) { Image.new(data: image.to_blob, filename: "test.png") }
-  let(:processed) { DynamicImage::ProcessedImage.new(record) }
+  let(:processed) { described_class.new(record) }
 
   describe "#content_type" do
-    let(:record) { Image.new }
     subject { processed.content_type }
+
+    let(:record) { Image.new }
 
     context "when format is GIF" do
       let(:processed) do
-        DynamicImage::ProcessedImage.new(record, format: :gif)
+        described_class.new(record, format: :gif)
       end
+
       it { is_expected.to eq("image/gif") }
     end
 
     context "when format is JPEG" do
       let(:processed) do
-        DynamicImage::ProcessedImage.new(record, format: :jpg)
+        described_class.new(record, format: :jpg)
       end
+
       it { is_expected.to eq("image/jpeg") }
     end
 
     context "when format is PNG" do
       let(:processed) do
-        DynamicImage::ProcessedImage.new(record, format: :png)
+        described_class.new(record, format: :png)
       end
+
       it { is_expected.to eq("image/png") }
     end
 
     context "when format is TIFF" do
       let(:processed) do
-        DynamicImage::ProcessedImage.new(record, format: :tiff)
+        described_class.new(record, format: :tiff)
       end
+
       it { is_expected.to eq("image/tiff") }
     end
 
     context "when format is BMP" do
       let(:processed) do
-        DynamicImage::ProcessedImage.new(record, format: :bmp)
+        described_class.new(record, format: :bmp)
       end
+
       it { is_expected.to eq("image/bmp") }
     end
   end
 
   describe "#cropped_and_resized" do
+    subject(:dimensions) { metadata.dimensions }
+
     let(:size) { Vector2d.new(149, 149) }
     let(:normalized) { processed.cropped_and_resized(size) }
     let(:metadata) { DynamicImage::Metadata.new(normalized) }
-    subject(:dimensions) { metadata.dimensions }
 
     context "when image is saved" do
       let(:record) { Image.create(data: image.to_blob, filename: "test.png") }
@@ -90,95 +97,130 @@ describe DynamicImage::ProcessedImage do
   describe "#normalized" do
     let(:normalized) { processed.normalized }
     let(:metadata) { DynamicImage::Metadata.new(normalized) }
+    let(:colorspace) { metadata.colorspace }
+    let(:content_type) { metadata.content_type }
 
     context "with invalid data" do
       let(:record) { Image.new(data: "foo") }
-      it "should raise an error" do
+
+      it "raises an error" do
         expect { normalized }.to raise_error(DynamicImage::Errors::InvalidImage)
       end
     end
 
-    describe "colorspace conversion" do
-      subject { metadata.colorspace }
+    context "when image is in CMYK" do
+      let(:image) { cmyk_image }
 
-      context "when image is in CMYK" do
-        let(:image) { cmyk_image }
-        it { is_expected.to eq("rgb") }
-      end
-
-      context "when image is in grayscale" do
-        let(:image) { gray_image }
-        it { is_expected.to eq("gray") }
-      end
-
-      context "when image is in RGB" do
-        let(:image) { rgb_image }
-        it { is_expected.to eq("rgb") }
+      it "converts to RGB" do
+        expect(colorspace).to eq("rgb")
       end
     end
 
-    describe "format conversion" do
-      subject { metadata.content_type }
+    context "when image is in grayscale" do
+      let(:image) { gray_image }
 
-      context "when image is GIF" do
-        let(:image) { gif_image }
-        it { is_expected.to eq("image/gif") }
+      it "keeps the colorspace" do
+        expect(colorspace).to eq("gray")
+      end
+    end
+
+    context "when image is in RGB" do
+      let(:image) { rgb_image }
+
+      it "stays in RGB" do
+        expect(colorspace).to eq("rgb")
+      end
+    end
+
+    context "when image is GIF" do
+      let(:image) { gif_image }
+
+      it "returns a GIF" do
+        expect(content_type).to eq("image/gif")
+      end
+    end
+
+    context "when image is JPEG" do
+      let(:image) { jpeg_image }
+
+      it "returns a JPEG" do
+        expect(content_type).to eq("image/jpeg")
+      end
+    end
+
+    context "when image is PNG" do
+      let(:image) { png_image }
+
+      it "returns a PNG" do
+        expect(content_type).to eq("image/png")
+      end
+    end
+
+    context "when image is TIFF" do
+      let(:image) { tiff_image }
+
+      it "returns a TIFF" do
+        expect(content_type).to eq("image/tiff")
+      end
+    end
+
+    context "when image is BMP" do
+      let(:image) { bmp_image }
+
+      it "returns a BMP" do
+        expect(content_type).to eq("image/bmp")
+      end
+    end
+
+    context "when converting BMP to JPEG" do
+      let(:image) { bmp_image }
+      let(:processed) do
+        described_class.new(record, format: :jpeg)
       end
 
-      context "when image is JPEG" do
-        let(:image) { jpeg_image }
-        it { is_expected.to eq("image/jpeg") }
+      it "returns a JPEG" do
+        expect(content_type).to eq("image/jpeg")
+      end
+    end
+
+    context "when converting PNG to GIF" do
+      let(:processed) do
+        described_class.new(record, format: :gif)
       end
 
-      context "when image is PNG" do
-        let(:image) { png_image }
-        it { is_expected.to eq("image/png") }
+      it "returns a GIF" do
+        expect(content_type).to eq("image/gif")
+      end
+    end
+
+    context "when converting PNG to JPEG" do
+      let(:processed) do
+        described_class.new(record, format: :jpeg)
       end
 
-      context "when image is TIFF" do
-        let(:image) { tiff_image }
-        it { is_expected.to eq("image/tiff") }
+      it "returns a JPEG" do
+        expect(content_type).to eq("image/jpeg")
+      end
+    end
+
+    context "when converting JPEG to PNG" do
+      let(:image) { jpeg_image }
+      let(:processed) do
+        described_class.new(record, format: :png)
       end
 
-      context "when image is BMP" do
-        let(:image) { bmp_image }
-        it { is_expected.to eq("image/bmp") }
+      it "returns a PNG" do
+        expect(content_type).to eq("image/png")
+      end
+    end
+
+    context "when converting PNG to TIFF" do
+      let(:processed) do
+        described_class.new(record, format: :tiff)
       end
 
-      context "converting BMP to JPEG" do
-        let(:processed) do
-          DynamicImage::ProcessedImage.new(record, format: :bmp)
-        end
-        it { is_expected.to eq("image/bmp") }
-      end
-
-      context "converting PNG to GIF" do
-        let(:processed) do
-          DynamicImage::ProcessedImage.new(record, format: :gif)
-        end
-        it { is_expected.to eq("image/gif") }
-      end
-
-      context "converting PNG to JPEG" do
-        let(:processed) do
-          DynamicImage::ProcessedImage.new(record, format: :jpeg)
-        end
-        it { is_expected.to eq("image/jpeg") }
-      end
-
-      context "converting JPEG to PNG" do
-        let(:image) { jpeg_image }
-        let(:processed) do
-          DynamicImage::ProcessedImage.new(record, format: :png)
-        end
-        it { is_expected.to eq("image/png") }
-      end
-
-      context "converting PNG to TIFF" do
-        let(:processed) do
-          DynamicImage::ProcessedImage.new(record, format: :tiff)
-        end
-        it { is_expected.to eq("image/tiff") }
+      it "returns a TIFF" do
+        expect(content_type).to eq("image/tiff")
       end
     end
   end

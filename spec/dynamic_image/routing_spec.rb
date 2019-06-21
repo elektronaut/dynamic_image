@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ImagesController, type: :routing do
@@ -9,16 +11,18 @@ describe ImagesController, type: :routing do
   let(:image) { Image.create(file: uploaded_file) }
 
   describe "show" do
+    let(:route) do
+      { controller: "images",
+        action: "show",
+        id: "1-20140606",
+        digest: "123456",
+        size: "100x100",
+        format: "png" }
+    end
+
     it "routes the URL" do
       expect(get("/images/123456/100x100/1-20140606.png")).to(
-        route_to(
-          controller: "images",
-          action: "show",
-          id: "1-20140606",
-          digest: "123456",
-          size: "100x100",
-          format: "png"
-        )
+        route_to(route)
       )
     end
 
@@ -26,14 +30,7 @@ describe ImagesController, type: :routing do
       expect(
         get: image_path("123456", "100x100", id: "1-20140606", format: "png")
       ).to(
-        route_to(
-          controller: "images",
-          action: "show",
-          id: "1-20140606",
-          digest: "123456",
-          size: "100x100",
-          format: "png"
-        )
+        route_to(route)
       )
     end
 
@@ -43,50 +40,42 @@ describe ImagesController, type: :routing do
   end
 
   describe "uncropped" do
+    let(:route) do
+      { controller: "images",
+        action: "uncropped",
+        id: "1-20140606",
+        digest: "123456",
+        size: "100x100",
+        format: "png" }
+    end
+
+    let(:helper_path) do
+      uncropped_image_path("123456", "100x100", id: "1-20140606", format: "png")
+    end
+
     it "routes the URL" do
       expect(get("/images/123456/100x100/1-20140606/uncropped.png")).to(
-        route_to(
-          controller: "images",
-          action: "uncropped",
-          id: "1-20140606",
-          digest: "123456",
-          size: "100x100",
-          format: "png"
-        )
+        route_to(route)
       )
     end
 
     it "routes the named route" do
-      expect(
-        get: uncropped_image_path(
-          "123456",
-          "100x100",
-          id: "1-20140606",
-          format: "png"
-        )
-      ).to(
-        route_to(
-          controller: "images",
-          action: "uncropped",
-          id: "1-20140606",
-          digest: "123456",
-          size: "100x100",
-          format: "png"
-        )
-      )
+      expect(get: helper_path).to(route_to(route))
     end
   end
 
   describe "original" do
+    let(:route) do
+      { controller: "images",
+        action: "original",
+        id: "1-20140606",
+        digest: "123456",
+        format: "png" }
+    end
+
     it "routes the URL" do
       expect(get("/images/123456/1-20140606/original.png")).to(
-        route_to(
-          controller: "images",
-          action: "original",
-          id: "1-20140606",
-          digest: "123456",
-          format: "png"
-        )
+        route_to(route)
       )
     end
 
@@ -94,27 +83,23 @@ describe ImagesController, type: :routing do
       expect(
         get: original_image_path("123456", id: "1-20140606", format: "png")
       ).to(
-        route_to(
-          controller: "images",
-          action: "original",
-          id: "1-20140606",
-          digest: "123456",
-          format: "png"
-        )
+        route_to(route)
       )
     end
   end
 
   describe "download" do
+    let(:route) do
+      { controller: "images",
+        action: "download",
+        id: "1-20140606",
+        digest: "123456",
+        format: "png" }
+    end
+
     it "routes the URL" do
       expect(get("/images/123456/1-20140606/download.png")).to(
-        route_to(
-          controller: "images",
-          action: "download",
-          id: "1-20140606",
-          digest: "123456",
-          format: "png"
-        )
+        route_to(route)
       )
     end
 
@@ -122,13 +107,7 @@ describe ImagesController, type: :routing do
       expect(
         get: download_image_path("123456", id: "1-20140606", format: "png")
       ).to(
-        route_to(
-          controller: "images",
-          action: "download",
-          id: "1-20140606",
-          digest: "123456",
-          format: "png"
-        )
+        route_to(route)
       )
     end
   end

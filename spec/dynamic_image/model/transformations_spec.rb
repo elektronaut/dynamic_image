@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe DynamicImage::Model::Transformations do
@@ -37,78 +39,81 @@ describe DynamicImage::Model::Transformations do
   end
 
   describe "#rotate" do
-    let(:degrees) { 90 }
-
-    subject do
+    subject(:rotated) do
       image.rotate(degrees)
     end
 
+    let(:degrees) { 90 }
+    let(:real_size) { rotated.real_size }
+    let(:crop_size) { rotated.crop_size }
+    let(:crop_start) { rotated.crop_start }
+    let(:crop_gravity) { rotated.crop_gravity }
+
     it { is_expected.to eq(image) }
 
-    context "invalid angle" do
-      let(:degrees) { 45 }
-      it "should raise an error" do
-        expect { subject }.to(
+    context "with an invalid angle" do
+      it "raises an error" do
+        expect { image.rotate(45) }.to(
           raise_error(DynamicImage::Errors::InvalidTransformation)
         )
       end
     end
 
-    context "90 degrees" do
-      it "should rotate the image" do
-        expect(subject.real_size).to eq(Vector2d.new(200, 320))
+    context "with a 90 degree rotation" do
+      it "rotates the image" do
+        expect(real_size).to eq(Vector2d.new(200, 320))
       end
 
-      it "should adjust the crop size" do
-        expect(subject.crop_size).to eq(Vector2d.new(30, 40))
+      it "adjusts the crop size" do
+        expect(crop_size).to eq(Vector2d.new(30, 40))
       end
 
-      it "should adjust the crop start" do
-        expect(subject.crop_start).to eq(Vector2d.new(160, 20))
+      it "adjusts the crop start" do
+        expect(crop_start).to eq(Vector2d.new(160, 20))
       end
 
-      it "should adjust the crop gravity" do
-        expect(subject.crop_gravity).to eq(Vector2d.new(140, 50))
+      it "adjusts the crop gravity" do
+        expect(crop_gravity).to eq(Vector2d.new(140, 50))
       end
     end
 
-    context "180 degrees" do
+    context "with a 180 degree rotation" do
       let(:degrees) { 180 }
 
-      it "should keep the image size" do
-        expect(subject.real_size).to eq(Vector2d.new(320, 200))
+      it "keeps the image size" do
+        expect(real_size).to eq(Vector2d.new(320, 200))
       end
 
-      it "should keep the crop size" do
-        expect(subject.crop_size).to eq(Vector2d.new(40, 30))
+      it "keeps the crop size" do
+        expect(crop_size).to eq(Vector2d.new(40, 30))
       end
 
-      it "should adjust the crop start" do
-        expect(subject.crop_start).to eq(Vector2d.new(260, 160))
+      it "adjusts the crop start" do
+        expect(crop_start).to eq(Vector2d.new(260, 160))
       end
 
-      it "should adjust the crop gravity" do
-        expect(subject.crop_gravity).to eq(Vector2d.new(270, 140))
+      it "adjusts the crop gravity" do
+        expect(crop_gravity).to eq(Vector2d.new(270, 140))
       end
     end
 
-    context "-90 degrees" do
+    context "with a -90 degree rotation" do
       let(:degrees) { -90 }
 
-      it "should rotate the image" do
-        expect(subject.real_size).to eq(Vector2d.new(200, 320))
+      it "rotates the image" do
+        expect(real_size).to eq(Vector2d.new(200, 320))
       end
 
-      it "should adjust the crop size" do
-        expect(subject.crop_size).to eq(Vector2d.new(30, 40))
+      it "adjusts the crop size" do
+        expect(crop_size).to eq(Vector2d.new(30, 40))
       end
 
-      it "should adjust the crop start" do
-        expect(subject.crop_start).to eq(Vector2d.new(10, 260))
+      it "adjusts the crop start" do
+        expect(crop_start).to eq(Vector2d.new(10, 260))
       end
 
-      it "should adjust the crop gravity" do
-        expect(subject.crop_gravity).to eq(Vector2d.new(60, 270))
+      it "adjusts the crop gravity" do
+        expect(crop_gravity).to eq(Vector2d.new(60, 270))
       end
     end
   end

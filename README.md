@@ -28,8 +28,8 @@ and enumeration attacks.
 
 ## Requirements
 
-* Rails 4.2
-* Ruby 1.9.3+
+* Rails 5
+* Ruby 2.4+
 * ImageMagick command line tools
 
 ## Documentation

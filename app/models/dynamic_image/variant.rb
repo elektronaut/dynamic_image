@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module DynamicImage
-  class Variant < ActiveRecord::Base
+  class Variant < ApplicationRecord
     include Dis::Model
 
     self.table_name = "dynamic_image_variants"

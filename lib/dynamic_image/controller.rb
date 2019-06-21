@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   # = DynamicImage Controller
@@ -53,6 +53,7 @@ module DynamicImage
 
     def render_image(options)
       return unless stale?(@record)
+
       respond_to do |format|
         format.html do
           render(file: File.join(File.dirname(__FILE__), "templates/show"),
@@ -66,14 +67,13 @@ module DynamicImage
 
     def render_raw_image(disposition: "inline", filename: nil)
       return unless stale?(@record)
+
       respond_to do |format|
         format.any(:gif, :jpeg, :png, :tiff) do
-          send_data(
-            @record.data,
-            filename: filename,
-            content_type: @record.content_type,
-            disposition: disposition
-          )
+          send_data(@record.data,
+                    filename: filename,
+                    content_type: @record.content_type,
+                    disposition: disposition)
         end
       end
     end
@@ -91,7 +91,7 @@ module DynamicImage
     end
 
     def verify_signed_params
-      key = [:action, :id, :size].map do |k|
+      key = %i[action id size].map do |k|
         k == :id ? params.require(k).to_i : params.require(k)
       end.join("-")
       DynamicImage.digest_verifier.verify(key, params[:digest])

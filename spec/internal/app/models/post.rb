@@ -1,4 +1,6 @@
-class Post < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Post < ApplicationRecord
   belongs_to :image, dependent: :destroy
   validates :image, presence: true
   accepts_nested_attributes_for :image

@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   # = DynamicImage Metadata
@@ -13,15 +13,15 @@ module DynamicImage
     # Returns the color space of the image as a string. The result will be one
     # of the following: "rgb", "cmyk", "gray".
     def colorspace
-      if valid?
-        case metadata[:colorspace]
-        when /rgb/i
-          "rgb"
-        when /cmyk/i
-          "cmyk"
-        when /gray/i
-          "gray"
-        end
+      return unless valid?
+
+      case metadata[:colorspace]
+      when /rgb/i
+        "rgb"
+      when /cmyk/i
+        "cmyk"
+      when /gray/i
+        "gray"
       end
     end
 
@@ -80,7 +80,7 @@ module DynamicImage
         {
           colorspace: image[:colorspace],
           dimensions: image[:dimensions],
-          format:     image[:format]
+          format: image[:format]
         }
       end
     end

@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   # = DynamicImage Digest Verifier
@@ -31,22 +31,20 @@ module DynamicImage
     # Verifies that <tt>digest</tt> is valid for <tt>data</tt>.
     # Raises a +DynamicImage::Errors::InvalidSignature+ error if not.
     def verify(data, digest)
-      if valid_digest?(data, digest)
-        true
-      else
-        raise DynamicImage::Errors::InvalidSignature
-      end
+      return true if valid_digest?(data, digest)
+
+      raise DynamicImage::Errors::InvalidSignature
     end
 
     private
 
-    def secure_compare(a, b)
-      return false unless a.bytesize == b.bytesize
+    def secure_compare(str, other)
+      return false unless str.bytesize == other.bytesize
 
-      l = a.unpack "C#{a.bytesize}"
+      l = str.unpack "C#{str.bytesize}"
 
       res = 0
-      b.each_byte { |byte| res |= byte ^ l.shift }
+      other.each_byte { |byte| res |= byte ^ l.shift }
       res.zero?
     end
 

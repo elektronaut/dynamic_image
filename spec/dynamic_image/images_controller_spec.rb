@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe ImagesController, type: :controller do
@@ -6,7 +8,7 @@ describe ImagesController, type: :controller do
   end
 
   def digested(action, options = {})
-    key = ([action] + [:id, :size]
+    key = ([action] + %i[id size]
       .select { |k| options.key?(k) }.map { |k| options[k] }).join("-")
     { digest: digest(key) }.merge(options)
   end
@@ -22,21 +24,22 @@ describe ImagesController, type: :controller do
 
   describe "signed params verification" do
     context "with an invalid digest" do
-      it "should raise an error" do
-        expect do
-          get(:show,
-              params: {
-                id: 1,
-                size: "100x101",
-                digest: digest("show-1-100x100"),
-                format: :png
-              })
-        end.to raise_error(DynamicImage::Errors::InvalidSignature)
+      let(:params) do
+        { id: 1,
+          size: "100x101",
+          digest: digest("show-1-100x100"),
+          format: :png }
+      end
+
+      it "raises an error" do
+        expect { get(:show, params: params) }.to(
+          raise_error(DynamicImage::Errors::InvalidSignature)
+        )
       end
     end
 
     context "with a missing parameter" do
-      it "should raise an error" do
+      it "raises an error" do
         expect do
           get(:show,
               params: { id: 1, digest: digest("show-1-100x100"), format: :png })
@@ -47,7 +50,7 @@ describe ImagesController, type: :controller do
 
   describe "GET show" do
     context "with a nonexistant record" do
-      it "should raise an error" do
+      it "raises an error" do
         expect do
           get :show, params: digested(:show, id: 1, size: "100x100")
         end.to(
@@ -67,8 +70,8 @@ describe ImagesController, type: :controller do
                                     format: :png))
       end
 
-      it "should respond with 304 not modified" do
-        expect(response).to have_http_status(304)
+      it "responds with 304 not modified" do
+        expect(response).to have_http_status(:not_modified)
       end
     end
 
@@ -84,8 +87,8 @@ describe ImagesController, type: :controller do
                              format: :png))
       end
 
-      it "should respond with 304 not modified" do
-        expect(response).to have_http_status(304)
+      it "responds with 304 not modified" do
+        expect(response).to have_http_status(:not_modified)
       end
     end
 
@@ -96,58 +99,64 @@ describe ImagesController, type: :controller do
         ).merge(id: image.to_param)
       end
 
-      it "should respond with success" do
-        expect(response).to have_http_status(:success)
+      it "responds with success" do
+        expect(response.successful?).to eq(true)
       end
 
-      it "should find the record" do
+      it "finds the record" do
         expect(assigns(:record)).to eq(image)
       end
 
-      it "should set the caching headers" do
+      it "sets the Cache-Control header" do
         expect(response.headers["Cache-Control"]).to(
           eq("max-age=2592000, public")
         )
+      end
+
+      it "sets the Last-Modified header" do
         expect(response.headers["Last-Modified"]).to be_a(String)
+      end
+
+      it "sets the ETag header" do
         expect(response.headers["ETag"]).to be_a(String)
       end
     end
 
-    context "as an image format" do
+    context "with an image format" do
       before do
         get :show,
             params: digested(:show, id: image.id, size: "100x100", format: :png)
       end
 
-      it "should respond with success" do
-        expect(response).to have_http_status(:success)
+      it "responds with success" do
+        expect(response.successful?).to eq(true)
       end
 
-      it "should set the content disposition" do
+      it "sets the content disposition" do
         expect(response.headers["Content-Disposition"]).to eq("inline")
       end
 
-      it "should resize the image" do
+      it "resizes the image" do
         expect(metadata.dimensions).to eq(Vector2d.new(100, 100))
       end
     end
 
-    context "as GIF format" do
+    context "when format is GIF" do
       before do
         get :show,
             params: digested(:show, id: image.id, size: "100x100", format: :gif)
       end
 
-      it "should set the content type" do
+      it "sets the content type" do
         expect(response.content_type).to eq("image/gif")
       end
 
-      it "should return a GIF image" do
+      it "returns a GIF image" do
         expect(metadata.format).to eq("GIF")
       end
     end
 
-    context "as JPEG format" do
+    context "when format is JPEG" do
       before do
         get(
           :show,
@@ -155,46 +164,46 @@ describe ImagesController, type: :controller do
         )
       end
 
-      it "should set the content type" do
+      it "sets the content type" do
         expect(response.content_type).to eq("image/jpeg")
       end
 
-      it "should return a JPEG image" do
+      it "returns a JPEG image" do
         expect(metadata.format).to eq("JPEG")
       end
     end
 
-    context "as JPG format" do
+    context "when format is JPG" do
       before do
         get :show,
             params: digested(:show, id: image.id, size: "100x100", format: :jpg)
       end
 
-      it "should set the content type" do
+      it "sets the content type" do
         expect(response.content_type).to eq("image/jpeg")
       end
 
-      it "should return a JPEG image" do
+      it "returns a JPEG image" do
         expect(metadata.format).to eq("JPEG")
       end
     end
 
-    context "as PNG format" do
+    context "when format is PNG" do
       before do
         get :show,
             params: digested(:show, id: image.id, size: "100x100", format: :png)
       end
 
-      it "should set the content type" do
+      it "sets the content type" do
         expect(response.content_type).to eq("image/png")
       end
 
-      it "should return a PNG image" do
+      it "returns a PNG image" do
         expect(metadata.format).to eq("PNG")
       end
     end
 
-    context "as TIFF format" do
+    context "when format is TIFF" do
       before do
         get(
           :show,
@@ -202,11 +211,11 @@ describe ImagesController, type: :controller do
         )
       end
 
-      it "should set the content type" do
+      it "sets the content type" do
         expect(response.content_type).to eq("image/tiff")
       end
 
-      it "should return a TIFF image" do
+      it "returns a TIFF image" do
         expect(metadata.format).to eq("TIFF")
       end
     end
@@ -214,7 +223,7 @@ describe ImagesController, type: :controller do
 
   describe "GET uncropped" do
     context "with a nonexistant record" do
-      it "should raise an error" do
+      it "raises an error" do
         expect do
           get :uncropped, params: digested(:uncropped, id: 1, size: "100x100")
         end.to raise_error(ActiveRecord::RecordNotFound)
@@ -230,24 +239,33 @@ describe ImagesController, type: :controller do
                              format: :png))
       end
 
-      it "should respond with success" do
-        expect(response).to have_http_status(:success)
+      it "responds with success" do
+        expect(response.successful?).to eq(true)
       end
 
-      it "should find the record" do
+      it "finds the record" do
         expect(assigns(:record)).to eq(image)
       end
 
-      it "should set the caching headers" do
+      it "sets the Cache-Control header" do
         expect(response.headers["Cache-Control"]).to(
           eq("max-age=2592000, public")
         )
+      end
+
+      it "sets the Last-Modified header" do
         expect(response.headers["Last-Modified"]).to be_a(String)
+      end
+
+      it "sets the ETag header" do
         expect(response.headers["ETag"]).to be_a(String)
       end
 
-      it "should return a PNG image" do
+      it "returns a PNG image" do
         expect(metadata.format).to eq("PNG")
+      end
+
+      it "returns the requested size" do
         expect(metadata.dimensions).to eq(Vector2d.new(100, 100))
       end
     end
@@ -255,7 +273,7 @@ describe ImagesController, type: :controller do
 
   describe "GET original" do
     context "with a nonexistant record" do
-      it "should raise an error" do
+      it "raises an error" do
         expect do
           get :original, params: digested(:original, id: 1, size: "320x200")
         end.to raise_error(ActiveRecord::RecordNotFound)
@@ -271,28 +289,37 @@ describe ImagesController, type: :controller do
                              format: :png))
       end
 
-      it "should respond with success" do
-        expect(response).to have_http_status(:success)
+      it "responds with success" do
+        expect(response.successful?).to eq(true)
       end
 
-      it "should find the record" do
+      it "finds the record" do
         expect(assigns(:record)).to eq(image)
       end
 
-      it "should set the caching headers" do
+      it "sets the Cache-Control header" do
         expect(response.headers["Cache-Control"]).to(
           eq("max-age=2592000, public")
         )
+      end
+
+      it "sets the Last-Modified header" do
         expect(response.headers["Last-Modified"]).to be_a(String)
+      end
+
+      it "sets the ETag header" do
         expect(response.headers["ETag"]).to be_a(String)
       end
 
-      it "should return the original PNG image" do
+      it "returns the correct format" do
         expect(metadata.format).to eq("PNG")
+      end
+
+      it "returns the correct size" do
         expect(metadata.dimensions).to eq(Vector2d.new(320, 200))
       end
 
-      it "should set the Content-Disposition header" do
+      it "sets the Content-Disposition header" do
         expect(response.headers["Content-Disposition"]).to eq("inline")
       end
     end
@@ -307,28 +334,37 @@ describe ImagesController, type: :controller do
                            format: :png))
     end
 
-    it "should respond with success" do
-      expect(response).to have_http_status(:success)
+    it "responds with success" do
+      expect(response.successful?).to eq(true)
     end
 
-    it "should find the record" do
+    it "finds the record" do
       expect(assigns(:record)).to eq(image)
     end
 
-    it "should set the caching headers" do
+    it "sets the Cache-Control header" do
       expect(response.headers["Cache-Control"]).to(
         eq("max-age=2592000, public")
       )
+    end
+
+    it "sets the Last-Modified header" do
       expect(response.headers["Last-Modified"]).to be_a(String)
+    end
+
+    it "sets the ETag header" do
       expect(response.headers["ETag"]).to be_a(String)
     end
 
-    it "should return the original PNG image" do
+    it "returns the correct format" do
       expect(metadata.format).to eq("PNG")
+    end
+
+    it "returns the correct size" do
       expect(metadata.dimensions).to eq(Vector2d.new(320, 200))
     end
 
-    it "should set the Content-Disposition header" do
+    it "sets the Content-Disposition header" do
       expect(response.headers["Content-Disposition"]).to eq(
         'attachment; filename="image.png"'
       )

@@ -1,262 +1,226 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe DynamicImage::ImageSizing do
-  def vector(x, y)
+  def crop_geometry(width, height)
+    sizing.crop_geometry(v(width, height))
+  end
+
+  def v(x, y)
     Vector2d.new(x, y)
   end
 
-  let(:record) { Image.new }
-  let(:sizing) { DynamicImage::ImageSizing.new(record) }
+  let(:real_size) { v(320, 200) }
+  let(:crop_gravity) { nil }
+  let(:crop_size) { real_size }
+  let(:crop_start) { v(0, 0) }
+  let(:sizing) { described_class.new(record) }
+  let(:record) do
+    Image.new(real_width: real_size.x,
+              real_height: real_size.y,
+              crop_gravity_x: crop_gravity&.x,
+              crop_gravity_y: crop_gravity&.y,
+              crop_width: crop_size.x,
+              crop_height: crop_size.y,
+              crop_start_x: crop_start.x,
+              crop_start_y: crop_start.y)
+  end
 
   describe "#crop_geometry_string" do
-    let(:record) { Image.new(real_width: 320, real_height: 200) }
-    let(:crop_size) { vector(200, 200) }
-    subject { sizing.crop_geometry_string(crop_size) }
+    subject { sizing.crop_geometry_string(v(200, 200)) }
+
     it { is_expected.to eq("200x200+60+0!") }
   end
 
-  describe "#crop_geometry" do
-    subject { sizing.crop_geometry(crop_size) }
+  describe "#crop_geometry (uncropped image)" do
+    subject { crop_geometry(200, 200) }
 
     context "when image isn't cropped" do
-      let(:record) { Image.new(real_width: 321, real_height: 201) }
+      let(:real_size) { v(321, 201) }
 
-      context "cropping horizontally" do
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(201, 201), vector(60, 0)]) }
+      it "crops horizontally" do
+        expect(crop_geometry(200, 200)).to(eq([v(201, 201), v(60, 0)]))
       end
 
-      context "cropping vertically" do
-        let(:crop_size) { vector(160, 50) }
-        it { is_expected.to eq([vector(321, 100), vector(0, 50)]) }
+      it "crops vertically" do
+        expect(crop_geometry(160, 50)).to(eq([v(321, 100), v(0, 50)]))
       end
 
-      context "cropping with large size" do
-        let(:crop_size) { vector(600, 600) }
-        it { is_expected.to eq([vector(201, 201), vector(60, 0)]) }
-      end
-
-      context "cropping with top left gravity" do
-        let(:record) do
-          Image.new(
-            crop_gravity_x: 0,
-            crop_gravity_y: 0,
-            real_width: 320,
-            real_height: 200
-          )
-        end
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(200, 200), vector(0, 0)]) }
-      end
-
-      context "cropping with bottom right gravity" do
-        let(:record) do
-          Image.new(
-            crop_gravity_x: 320,
-            crop_gravity_y: 200,
-            real_width: 320,
-            real_height: 200
-          )
-        end
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(200, 200), vector(120, 0)]) }
+      it "downscales when size is large" do
+        expect(crop_geometry(600, 600)).to(eq([v(201, 201), v(60, 0)]))
       end
     end
 
-    context "when image is cropped" do
-      let(:record) do
-        Image.new(
-          real_width: 521,
-          real_height: 401,
-          crop_width: 321,
-          crop_height: 201,
-          crop_start_x: 10,
-          crop_start_y: 10
-        )
-      end
+    context "when crop gravity is top left" do
+      let(:crop_gravity) { v(0, 0) }
 
-      context "cropping horizontally" do
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(201, 201), vector(70, 10)]) }
-      end
+      it { is_expected.to eq([v(200, 200), v(0, 0)]) }
+    end
 
-      context "cropping vertically" do
-        let(:crop_size) { vector(160, 50) }
-        it { is_expected.to eq([vector(321, 100), vector(10, 60)]) }
-      end
+    context "when crop gravity is bottom real_height" do
+      let(:crop_gravity) { v(320, 200) }
 
-      context "cropping with top left gravity" do
-        let(:record) do
-          Image.new(
-            crop_gravity_x: 0,
-            crop_gravity_y: 0,
-            real_width: 521,
-            real_height: 401,
-            crop_width: 320,
-            crop_height: 200,
-            crop_start_x: 10,
-            crop_start_y: 10
-          )
-        end
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(200, 200), vector(10, 10)]) }
-      end
+      it { is_expected.to eq([v(200, 200), v(120, 0)]) }
+    end
+  end
 
-      context "cropping with bottom right gravity" do
-        let(:record) do
-          Image.new(
-            crop_gravity_x: 320,
-            crop_gravity_y: 200,
-            real_width: 521,
-            real_height: 401,
-            crop_width: 320,
-            crop_height: 200,
-            crop_start_x: 10,
-            crop_start_y: 10
-          )
-        end
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(200, 200), vector(130, 10)]) }
-      end
+  describe "#crop_geometry (cropped image)" do
+    subject { crop_geometry(200, 200) }
 
-      context "and crop start is zero" do
-        let(:record) do
-          Image.new(
-            real_width: 520,
-            real_height: 400,
-            crop_width: 320,
-            crop_height: 200,
-            crop_start_x: 0,
-            crop_start_y: 0
-          )
-        end
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(200, 200), vector(60, 0)]) }
-      end
+    let(:real_size) { v(521, 401) }
+    let(:crop_size) { v(321, 201) }
+    let(:crop_start) { v(10, 10) }
 
-      context "with precropping disabled" do
-        let(:sizing) { DynamicImage::ImageSizing.new(record, uncropped: true) }
-        let(:crop_size) { vector(200, 200) }
-        it { is_expected.to eq([vector(401, 401), vector(60, 0)]) }
-      end
+    context "when cropping horizontally" do
+      it { is_expected.to eq([v(201, 201), v(70, 10)]) }
+    end
+
+    context "when cropping vertically" do
+      subject { crop_geometry(160, 50) }
+
+      it { is_expected.to eq([v(321, 100), v(10, 60)]) }
+    end
+
+    context "when cropping with top left gravity" do
+      let(:crop_gravity) { v(0, 0) }
+
+      it { is_expected.to eq([v(201, 201), v(10, 10)]) }
+    end
+
+    context "when cropping with bottom right gravity" do
+      let(:crop_gravity) { v(320, 200) }
+
+      it { is_expected.to eq([v(201, 201), v(130, 10)]) }
+    end
+
+    context "with crop start = zero" do
+      let(:crop_start) { v(0, 0) }
+
+      it { is_expected.to eq([v(201, 201), v(60, 0)]) }
+    end
+
+    context "with precropping disabled" do
+      let(:sizing) { described_class.new(record, uncropped: true) }
+
+      it { is_expected.to eq([v(401, 401), v(60, 0)]) }
     end
   end
 
   describe "#fit" do
-    let(:record) { Image.new(real_width: 320, real_height: 200) }
+    subject(:fit) { sizing.fit(size, options) }
+
     let(:options) { {} }
-    let(:size) { vector(100, 100) }
-    subject { sizing.fit(size, options) }
+    let(:size) { v(100, 100) }
 
-    context "with string argument" do
-      context "with both dimensions" do
-        let(:size) { "100x100" }
-        it { is_expected.to eq(vector(100, 62.5)) }
-      end
+    context "with string argument, both dimensions" do
+      let(:size) { "100x100" }
 
-      context "with only width" do
-        let(:size) { "100x" }
-        it { is_expected.to eq(vector(100, 62.5)) }
-      end
-
-      context "with only height" do
-        let(:size) { "x100" }
-        it { is_expected.to eq(vector(160, 100)) }
-      end
+      it { is_expected.to eq(v(100, 62.5)) }
     end
 
-    context "with no options" do
-      context "when fit_size is smaller" do
-        it { is_expected.to eq(vector(100, 62.5)) }
-      end
+    context "with string argument, only width" do
+      let(:size) { "100x" }
 
-      context "when fit_size is larger" do
-        let(:size) { vector(500, 500) }
-        it { is_expected.to eq(vector(320, 200)) }
-      end
+      it { is_expected.to eq(v(100, 62.5)) }
     end
 
-    context "with crop: true" do
+    context "with string argument, only height" do
+      let(:size) { "x100" }
+
+      it { is_expected.to eq(v(160, 100)) }
+    end
+
+    context "when fit_size is smaller" do
+      it { is_expected.to eq(v(100, 62.5)) }
+    end
+
+    context "when fit_size is larger" do
+      let(:size) { v(500, 500) }
+
+      it { is_expected.to eq(v(320, 200)) }
+    end
+
+    context "when fit_size is smaller and crop: true" do
       let(:options) { { crop: true } }
 
-      context "when fit_size is smaller" do
-        it { is_expected.to eq(vector(100, 100)) }
-      end
+      it { is_expected.to eq(v(100, 100)) }
+    end
 
-      context "with unspecified width" do
-        let(:size) { vector(0, 100) }
-        it "should raise an error" do
-          expect { subject }.to(
-            raise_error(DynamicImage::Errors::InvalidSizeOptions)
-          )
-        end
-      end
-
-      context "with unspecified height" do
-        let(:size) { vector(100, 0) }
-        it "should raise an error" do
-          expect { subject }.to(
-            raise_error(DynamicImage::Errors::InvalidSizeOptions)
-          )
-        end
-      end
-
-      context "when fit_size is larger" do
-        let(:size) { vector(500, 500) }
-        it { is_expected.to eq(vector(200, 200)) }
+    context "with unspecified width and crop: true" do
+      it "raises an error" do
+        expect { sizing.fit(v(0, 100), crop: true) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
       end
     end
 
-    context "with upscale: true" do
+    context "with unspecified height and crop: true" do
+      it "raises an error" do
+        expect { sizing.fit(v(100, 0), crop: true) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "when fit_size is larger and crop: true" do
+      let(:options) { { crop: true } }
+      let(:size) { v(500, 500) }
+
+      it { is_expected.to eq(v(200, 200)) }
+    end
+
+    context "when fit_size is smaller and upscale: true" do
       let(:options) { { upscale: true } }
 
-      context "when fit_size is smaller" do
-        it { is_expected.to eq(vector(100, 62.5)) }
-      end
+      it { is_expected.to eq(v(100, 62.5)) }
+    end
 
-      context "with only width" do
-        let(:size) { vector(400, 0) }
-        it { is_expected.to eq(vector(400, 250)) }
-      end
+    context "with only width and upscale: true" do
+      let(:options) { { upscale: true } }
+      let(:size) { v(400, 0) }
 
-      context "with only height" do
-        let(:size) { vector(0, 300) }
-        it { is_expected.to eq(vector(480, 300)) }
-      end
+      it { is_expected.to eq(v(400, 250)) }
+    end
 
-      context "when fit_size is larger" do
-        let(:size) { vector(500, 500) }
-        it { is_expected.to eq(vector(500, 312.5)) }
-      end
+    context "with only height and upscale: true" do
+      let(:options) { { upscale: true } }
+      let(:size) { v(0, 300) }
+
+      it { is_expected.to eq(v(480, 300)) }
+    end
+
+    context "when fit_size is larger and upscale: true" do
+      let(:options) { { upscale: true } }
+      let(:size) { v(500, 500) }
+
+      it { is_expected.to eq(v(500, 312.5)) }
     end
 
     context "with crop: true, upscale: true" do
       let(:options) { { crop: true, upscale: true } }
-      let(:size) { vector(500, 520) }
-      it { is_expected.to eq(vector(500, 520)) }
+      let(:size) { v(500, 520) }
+
+      it { is_expected.to eq(v(500, 520)) }
     end
 
-    context "with a cropped image" do
-      let(:record) do
-        Image.new(
-          real_width: 520,
-          real_height: 500,
-          crop_width: 320,
-          crop_height: 200,
-          crop_start_x: 10,
-          crop_start_y: 10
-        )
-      end
-      let(:size) { vector(1000, 1000) }
+    context "with a cropped image and normal sizing" do
+      let(:size) { v(1000, 1000) }
+      let(:real_size) { v(520, 500) }
+      let(:crop_size) { v(320, 200) }
+      let(:crop_start) { v(10, 10) }
 
-      context "and normal sizing" do
-        it { is_expected.to eq(vector(320, 200)) }
-      end
+      it { is_expected.to eq(v(320, 200)) }
+    end
 
-      context "and uncropped sizing" do
-        let(:sizing) { DynamicImage::ImageSizing.new(record, uncropped: true) }
-        it { is_expected.to eq(vector(520, 500)) }
-      end
+    context "with a cropped image and uncropped sizing" do
+      let(:size) { v(1000, 1000) }
+      let(:real_size) { v(520, 500) }
+      let(:crop_size) { v(320, 200) }
+      let(:crop_start) { v(10, 10) }
+      let(:sizing) { described_class.new(record, uncropped: true) }
+
+      it { is_expected.to eq(v(520, 500)) }
     end
   end
 end

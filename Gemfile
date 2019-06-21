@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
-gem "rails", "~> 5.2.0"
 gem "mime-types"
+gem "rails", "~> 5.2.0"
 
 gemspec
 
@@ -9,8 +11,8 @@ gem "jquery-rails"
 
 group :development, :test do
   gem "pry"
-  gem "pry-stack_explorer"
   gem "pry-rescue"
+  gem "pry-stack_explorer"
 end
 
 group :test do

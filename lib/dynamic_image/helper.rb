@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   # = DynamicImage Helper
@@ -117,11 +117,9 @@ module DynamicImage
     private
 
     def allowed_dynamic_image_url_options
-      [
-        :format, :only_path, :protocol, :host, :subdomain, :domain,
-        :tld_length, :port, :anchor, :trailing_slash, :script_name,
-        :action, :routing_type
-      ]
+      %i[format only_path protocol host subdomain domain
+         tld_length port anchor trailing_slash script_name
+         action routing_type ]
     end
 
     def default_format_for_image(record)
@@ -162,9 +160,9 @@ module DynamicImage
     end
 
     def filename_to_alt(str)
-      File.basename(str, ".*".freeze)
-          .sub(/-[[:xdigit:]]{32,64}\z/, "".freeze)
-          .tr("-_".freeze, " ".freeze)
+      File.basename(str, ".*")
+          .sub(/-[[:xdigit:]]{32,64}\z/, "")
+          .tr("-_", " ")
           .capitalize
     end
 

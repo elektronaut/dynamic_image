@@ -1,6 +1,6 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
-$LOAD_PATH.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
 require "dynamic_image/version"
@@ -24,13 +24,13 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.required_ruby_version = ">= 1.9.2"
+  s.required_ruby_version = ">= 2.4.0"
 
-  s.add_dependency 'rails', '~> 5.0'
-  s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
-  s.add_dependency "mini_magick", "~> 4.6.0"
   s.add_dependency "dis", "~> 1.1", ">= 1.0.6"
+  s.add_dependency "mini_magick", "~> 4.6.0"
+  s.add_dependency "rails", "~> 5.0"
+  s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
 
-  s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails", "~> 3.7.0"
+  s.add_development_dependency "sqlite3"
 end

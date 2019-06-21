@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   module Model
@@ -9,6 +9,7 @@ module DynamicImage
     # integrity.
     module Validations
       extend ActiveSupport::Concern
+
       included do
         validates_data_presence
 
@@ -57,22 +58,18 @@ module DynamicImage
 
       module ClassMethods
         def allowed_colorspaces
-          %w(
-            rgb
-            cmyk
-            gray
-          )
+          %w[rgb
+             cmyk
+             gray]
         end
 
         def allowed_content_types
-          %w(
-            image/bmp
-            image/gif
-            image/jpeg
-            image/pjpeg
-            image/png
-            image/tiff
-          )
+          %w[image/bmp
+             image/gif
+             image/jpeg
+             image/pjpeg
+             image/png
+             image/tiff]
         end
       end
 
@@ -80,9 +77,10 @@ module DynamicImage
 
       def validate_crop_bounds
         required_size = crop_start + crop_size
-        if required_size.x > real_size.x || required_size.y > real_size.y
-          errors.add(:crop_size, "is out of bounds")
-        end
+        return unless required_size.x > real_size.x ||
+                      required_size.y > real_size.y
+
+        errors.add(:crop_size, "is out of bounds")
       end
 
       def validate_image

@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   # = DynamicImage Processed Image
@@ -70,11 +70,9 @@ module DynamicImage
     private
 
     def coalesced(image)
-      if gif?
-        image.coalesce
-        image = DynamicImage::ImageReader.new(image.to_blob).read
-      end
-      image
+      return image unless gif?
+
+      DynamicImage::ImageReader.new(image.coalesce.to_blob).read
     end
 
     def crop_and_resize(size)
@@ -89,11 +87,9 @@ module DynamicImage
     def find_or_create_variant(size)
       record.variants.find_by(variant_params(size)) ||
         record.variants.create(
-          variant_params(size).merge(
-            filename: record.filename,
-            content_type: content_type,
-            data: crop_and_resize(size)
-          )
+          variant_params(size).merge(filename: record.filename,
+                                     content_type: content_type,
+                                     data: crop_and_resize(size))
         )
     end
 
@@ -110,8 +106,8 @@ module DynamicImage
     end
 
     def image_sizing
-      @image_sizing ||= DynamicImage::ImageSizing.new(record,
-                                                      uncropped: @uncropped)
+      @image_sizing ||=
+        DynamicImage::ImageSizing.new(record, uncropped: @uncropped)
     end
 
     def needs_colorspace_conversion?
@@ -125,11 +121,8 @@ module DynamicImage
     def optimize(image)
       image.layers "optimize" if gif?
       image.strip
-      if jpeg?
-        image.quality(85)
-        image.sampling_factor "4:2:0"
-        image.interlace "JPEG"
-      end
+      image.quality(85).sampling_factor("4:2:0").interlace("JPEG") if jpeg?
+      image
     end
 
     def process_data
@@ -143,18 +136,12 @@ module DynamicImage
     attr_reader :record
 
     def record_format
-      case record.content_type
-      when "image/bmp"
-        "BMP"
-      when "image/png"
-        "PNG"
-      when "image/gif"
-        "GIF"
-      when "image/jpeg", "image/pjpeg"
-        "JPEG"
-      when "image/tiff"
-        "TIFF"
-      end
+      { "image/bmp" => "BMP",
+        "image/png" => "PNG",
+        "image/gif" => "GIF",
+        "image/jpeg" => "JPEG",
+        "image/pjpeg" => "JPEG",
+        "image/tiff" => "TIFF" }[record.content_type]
     end
 
     def require_valid_image!
@@ -163,10 +150,9 @@ module DynamicImage
 
     def variant_params(size)
       crop_size, crop_start = image_sizing.crop_geometry(size)
-                                          .map(&:to_i_vector)
 
-      { width: size.x.to_i,
-        height: size.y.to_i,
+      { width: size.x,
+        height: size.y,
         crop_width: crop_size.x,
         crop_height: crop_size.y,
         crop_start_x: crop_start.x,

@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 require "rails/generators"
 require "rails/generators/rails/resource/resource_generator"
@@ -52,16 +52,14 @@ module DynamicImage
       end
 
       def dynamic_image_attributes
-        %w(
-          content_hash:string content_type:string
-          content_length:integer
-          filename:string
-          colorspace:string
-          real_width:integer real_height:integer
-          crop_width:integer crop_height:integer
-          crop_start_x:integer crop_start_y:integer
-          crop_gravity_x:integer crop_gravity_y:integer
-        )
+        %w[content_hash:string content_type:string
+           content_length:integer
+           filename:string
+           colorspace:string
+           real_width:integer real_height:integer
+           crop_width:integer crop_height:integer
+           crop_start_x:integer crop_start_y:integer
+           crop_gravity_x:integer crop_gravity_y:integer]
       end
     end
   end

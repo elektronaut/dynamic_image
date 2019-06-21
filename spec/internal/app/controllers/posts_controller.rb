@@ -1,19 +1,19 @@
+# frozen_string_literal: true
+
 class PostsController < ApplicationController
-  before_action :find_post, only: [:show, :edit, :update, :destroy]
+  before_action :find_post, only: %i[show edit update destroy]
 
   def index
     @posts = Post.order("created_at DESC")
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @post = Post.new
   end
 
-  def edit
-  end
+  def edit; end
 
   def create
     @post = Post.create(post_params)

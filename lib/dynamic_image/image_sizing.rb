@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   # = DynamicImage Image Sizing
@@ -121,20 +121,22 @@ module DynamicImage
       start
     end
 
-    def parse_vector(v)
-      v.is_a?(String) ? str_to_vector(v) : v
+    def parse_vector(vector)
+      vector.is_a?(String) ? str_to_vector(vector) : vector
     end
 
     attr_reader :record
 
-    def require_dimensions!(v)
-      raise DynamicImage::Errors::InvalidSizeOptions unless v.x > 0 && v.y > 0
+    def require_dimensions!(vector)
+      return if vector.x.positive? && vector.y.positive?
+
+      raise DynamicImage::Errors::InvalidSizeOptions
     end
 
     def shift_vector(vect)
       vector(
-        vect.x < 0 ? vect.x.abs : 0,
-        vect.y < 0 ? vect.y.abs : 0
+        vect.x.negative? ? vect.x.abs : 0,
+        vect.y.negative? ? vect.y.abs : 0
       )
     end
 

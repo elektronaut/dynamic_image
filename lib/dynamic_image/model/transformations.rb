@@ -1,4 +1,4 @@
-# encoding: utf-8
+# frozen_string_literal: true
 
 module DynamicImage
   module Model
@@ -59,6 +59,7 @@ module DynamicImage
 
       def rotated_crop(new_width)
         return nil unless cropped?
+
         [
           new_width - (crop_start_y + crop_height),
           crop_start_x,
@@ -69,6 +70,7 @@ module DynamicImage
 
       def rotated_crop_gravity(new_width)
         return nil unless crop_gravity?
+
         [new_width - crop_gravity_y, crop_gravity_x]
       end
 
