@@ -1,6 +1,7 @@
 language: ruby
 sudo: false
 cache: bundler
+dist: bionic
 rvm:
   - 2.6.3
 env:
