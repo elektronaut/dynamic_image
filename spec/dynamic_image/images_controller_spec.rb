@@ -148,7 +148,7 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the content type" do
-        expect(response.content_type).to eq("image/gif")
+        expect(response.media_type).to eq("image/gif")
       end
 
       it "returns a GIF image" do
@@ -165,7 +165,7 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the content type" do
-        expect(response.content_type).to eq("image/jpeg")
+        expect(response.media_type).to eq("image/jpeg")
       end
 
       it "returns a JPEG image" do
@@ -180,7 +180,7 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the content type" do
-        expect(response.content_type).to eq("image/jpeg")
+        expect(response.media_type).to eq("image/jpeg")
       end
 
       it "returns a JPEG image" do
@@ -195,7 +195,7 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the content type" do
-        expect(response.content_type).to eq("image/png")
+        expect(response.media_type).to eq("image/png")
       end
 
       it "returns a PNG image" do
@@ -212,7 +212,7 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the content type" do
-        expect(response.content_type).to eq("image/tiff")
+        expect(response.media_type).to eq("image/tiff")
       end
 
       it "returns a TIFF image" do
@@ -366,7 +366,7 @@ describe ImagesController, type: :controller do
 
     it "sets the Content-Disposition header" do
       expect(response.headers["Content-Disposition"]).to eq(
-        'attachment; filename="image.png"'
+        'attachment; filename="image.png"; filename*=UTF-8\'\'image.png'
       )
     end
   end
