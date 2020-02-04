@@ -151,8 +151,8 @@ module DynamicImage
     def variant_params(size)
       crop_size, crop_start = image_sizing.crop_geometry(size)
 
-      { width: size.x,
-        height: size.y,
+      { width: size.x.round,
+        height: size.y.round,
         crop_width: crop_size.x,
         crop_height: crop_size.y,
         crop_start_x: crop_start.x,
