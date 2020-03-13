@@ -141,7 +141,8 @@ module DynamicImage
         "image/gif" => "GIF",
         "image/jpeg" => "JPEG",
         "image/pjpeg" => "JPEG",
-        "image/tiff" => "TIFF" }[record.content_type]
+        "image/tiff" => "TIFF",
+        "image/webp" => "WEBP" }[record.content_type]
     end
 
     def require_valid_image!

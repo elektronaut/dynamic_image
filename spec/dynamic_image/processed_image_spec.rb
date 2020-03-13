@@ -18,6 +18,7 @@ describe DynamicImage::ProcessedImage do
   let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
   let(:tiff_image) { read_image("image.tif") }
   let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
+  let(:webp_image) { read_image("image.webp") }
 
   let(:rgb_image)  { source_image }
   let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
@@ -71,6 +72,14 @@ describe DynamicImage::ProcessedImage do
       end
 
       it { is_expected.to eq("image/bmp") }
+    end
+
+    context "when format is WEBP" do
+      let(:processed) do
+        described_class.new(record, format: :webp)
+      end
+
+      it { is_expected.to eq("image/webp") }
     end
   end
 
@@ -178,8 +187,27 @@ describe DynamicImage::ProcessedImage do
       end
     end
 
+    context "when image is WEBP" do
+      let(:image) { webp_image }
+
+      it "returns a WEBP" do
+        expect(content_type).to eq("image/webp")
+      end
+    end
+
     context "when converting BMP to JPEG" do
       let(:image) { bmp_image }
+      let(:processed) do
+        described_class.new(record, format: :jpeg)
+      end
+
+      it "returns a JPEG" do
+        expect(content_type).to eq("image/jpeg")
+      end
+    end
+
+    context "when converting WEBP to JPEG" do
+      let(:image) { webp_image }
       let(:processed) do
         described_class.new(record, format: :jpeg)
       end

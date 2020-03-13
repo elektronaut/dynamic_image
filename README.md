@@ -15,9 +15,9 @@ uploaded, DynamicImage stores the original file and generates images
 on demand. It handles cropping, resizing, format and colorspace
 conversion.
 
-Supported formats at the moment are JPEG, PNG, GIF, BMP and TIFF. The
-latter will automatically be converted to JPG. CMYK images will be
-converted to RGB, and RGB images will be converted to the sRGB
+Supported formats at the moment are JPEG, PNG, GIF, BMP, WebP and TIFF.
+BMP, WebP and TIFF images will automatically be converted to JPG. CMYK
+images will be converted to RGB, and RGB images will be converted to the sRGB
 colorspace for consistent appearance in all browsers.
 
 DynamicImage is built on [Dis](https://github.com/elektronaut/dis)

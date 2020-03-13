@@ -59,7 +59,7 @@ module DynamicImage
           render(file: File.join(File.dirname(__FILE__), "templates/show"),
                  layout: false, locals: { options: options })
         end
-        format.any(:gif, :jpeg, :png, :tiff) do
+        format.any(:gif, :jpeg, :png, :tiff, :webp) do
           send_image(DynamicImage::ProcessedImage.new(@record, options))
         end
       end
@@ -69,7 +69,7 @@ module DynamicImage
       return unless stale?(@record)
 
       respond_to do |format|
-        format.any(:gif, :jpeg, :png, :tiff) do
+        format.any(:gif, :jpeg, :png, :tiff, :webp) do
           send_data(@record.data,
                     filename: filename,
                     content_type: @record.content_type,

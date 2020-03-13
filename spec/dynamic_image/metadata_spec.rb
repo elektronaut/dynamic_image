@@ -18,6 +18,7 @@ describe DynamicImage::Metadata do
   let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
   let(:tiff_image) { read_image("image.tif") }
   let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
+  let(:webp_image) { read_image("image.webp") }
 
   let(:rgb_image) { source_image }
   let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
@@ -86,6 +87,12 @@ describe DynamicImage::Metadata do
       let(:image) { bmp_image }
 
       it { is_expected.to eq("image/bmp") }
+    end
+
+    context "when image is WEBP" do
+      let(:image) { webp_image }
+
+      it { is_expected.to eq("image/webp") }
     end
 
     context "with invalid data" do
@@ -162,6 +169,12 @@ describe DynamicImage::Metadata do
       let(:image) { bmp_image }
 
       it { is_expected.to eq("BMP") }
+    end
+
+    context "when image is WEBP" do
+      let(:image) { webp_image }
+
+      it { is_expected.to eq("WEBP") }
     end
 
     context "with invalid data" do

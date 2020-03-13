@@ -11,7 +11,8 @@ module DynamicImage
           "\xff\xd8",                         # JPEG
           "\x49\x49\x2a\x00",                 # TIFF
           "\x4d\x4d\x00\x2a",
-          "\x42\x4d"                          # BMP
+          "\x42\x4d",                         # BMP
+          "\x52\x49\x46\x46"                  # WEBP
         ].map { |s| s.dup.force_encoding("binary") }
       end
     end
