@@ -17,6 +17,16 @@ module DynamicImage
       end
     end
 
+    initializer "dynamic_image.mime_types" do
+      Mime::Type.register "image/bmp", :bmp
+      Mime::Type.register "image/gif", :gif
+      Mime::Type.register "image/jpeg", :jpg
+      Mime::Type.register "image/jpeg", :jpeg
+      Mime::Type.register "image/png", :png
+      Mime::Type.register "image/tiff", :tiff
+      Mime::Type.register "image/webp", :webp
+    end
+
     initializer "dynamic_image.extensions", before: :load_active_support do
       ActiveSupport.on_load(:active_record) do
         send :include, DynamicImage::BelongsTo
