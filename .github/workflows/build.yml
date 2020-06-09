@@ -1,0 +1,87 @@
+env:
+  RUBY_VERSION: 2.7
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: dynamic_image_test
+  CC_TEST_REPORTER_ID: 05e44f79bfab91587e3081a5b09b11f8a81c5e133fa326c4877cc95b26a59b32
+
+name: Build
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+jobs:
+  rubocop-test:
+    name: Rubocop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install Rubocop
+        run: gem install rubocop rubocop-rails rubocop-rspec
+      - name: Check code
+        run: rubocop
+
+  rspec-test:
+    name: RSpec
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install system dependencies
+        run: sudo apt-get install -y libpq-dev libsqlite3-dev
+      - name: Ruby gem cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Install Ruby gems
+        run: |
+          gem install bundler
+          bundle config path vendor/bundle
+          bundle install
+      - name: Create database
+        env:
+          DB: postgres
+          RAILS_ENV: test
+          PGHOST: localhost
+          PGUSER: ${{ env.POSTGRES_USER }}
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          bundle exec rake db:migrate
+      - name: Run tests
+        env:
+          DB: postgres
+          PGHOST: localhost
+          PGUSER: ${{ env.POSTGRES_USER }}
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: bundle exec rspec
+      - name: Send results to Code Climate
+        uses: paambaati/codeclimate-action@v2.6.0
+        if: ${{ env.CC_TEST_REPORTER_ID }}
+        env:
+          CC_TEST_REPORTER_ID: ${{ env.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: ls
