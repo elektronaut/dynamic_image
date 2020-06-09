@@ -28,7 +28,7 @@ jobs:
 
   rspec-test:
     name: RSpec
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     services:
       postgres:
         image: postgres:latest
