@@ -70,9 +70,7 @@ module DynamicImage
     private
 
     def coalesced(image)
-      return image unless gif?
-
-      DynamicImage::ImageReader.new(image.coalesce.to_blob).read
+      gif? ? DynamicImage::ImageReader.new(image.coalesce.to_blob).read : image
     end
 
     def crop_and_resize(size)

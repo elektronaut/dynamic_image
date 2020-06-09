@@ -31,7 +31,7 @@ module DynamicImage
       ActiveSupport.on_load(:active_record) do
         send :include, DynamicImage::BelongsTo
       end
-      ActionDispatch::Routing::Mapper.send :include, DynamicImage::Routing
+      ActionDispatch::Routing::Mapper.include DynamicImage::Routing
 
       ActionDispatch::ExceptionWrapper.rescue_responses.merge!(
         "DynamicImage::Errors::InvalidSignature" => :unauthorized

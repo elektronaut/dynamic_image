@@ -149,8 +149,8 @@ module DynamicImage
       @uncropped
     end
 
-    def vector(x, y)
-      Vector2d.new(x, y)
+    def vector(width, height)
+      Vector2d.new(width, height)
     end
   end
 end

@@ -75,23 +75,6 @@ describe ImagesController, type: :controller do
       end
     end
 
-    context "with ETag header" do
-      before do
-        request.env["HTTP_IF_MODIFIED_SINCE"] = (
-          Time.zone.now + 10.minutes
-        ).httpdate
-        get(:show,
-            params: digested(:show,
-                             id: image.id,
-                             size: "100x100",
-                             format: :png))
-      end
-
-      it "responds with 304 not modified" do
-        expect(response).to have_http_status(:not_modified)
-      end
-    end
-
     context "with an existing record" do
       before do
         get :show, params: digested(

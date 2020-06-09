@@ -56,7 +56,7 @@ describe DynamicImage::Metadata do
     end
   end
 
-  describe "#format" do
+  describe "#content_type" do
     subject { meta_info.content_type }
 
     context "when image is GIF" do

@@ -7,8 +7,8 @@ describe DynamicImage::ImageSizing do
     sizing.crop_geometry(v(width, height))
   end
 
-  def v(x, y)
-    Vector2d.new(x, y)
+  def v(width, height)
+    Vector2d.new(width, height)
   end
 
   let(:real_size) { v(320, 200) }

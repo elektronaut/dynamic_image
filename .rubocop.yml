@@ -11,7 +11,7 @@ AllCops:
 Rails:
   Enabled: true
 
-StringLiterals:
+Style/StringLiterals:
   EnforcedStyle: double_quotes
 
 Style/Documentation:
