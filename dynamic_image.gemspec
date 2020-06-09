@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency "rails", "> 5.0"
   s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
 
+  s.add_development_dependency "rails-controller-testing"
   s.add_development_dependency "rspec-rails", "~> 3.7.0"
   s.add_development_dependency "sqlite3"
 end

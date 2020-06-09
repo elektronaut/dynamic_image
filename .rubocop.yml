@@ -1,6 +1,7 @@
 require: rubocop-rspec
 
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 2.4
   Exclude:
     - 'spec/internal/config/**/*'
@@ -16,11 +17,16 @@ StringLiterals:
 Style/Documentation:
   Enabled: false
 
+Layout/LineLength:
+  AutoCorrect: true
+  Max: 80
+
 Metrics/BlockLength:
   ExcludedMethods:
     - "included"
   Exclude:
     - "*.gemspec"
+    - "**/*.rake"
     - "**/*.builder"
     - "spec/internal/config/environments/*"
     - "config/routes.rb"
@@ -32,8 +38,3 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Exclude:
     - "db/migrate/*"
-
-Naming/UncommunicativeMethodParamName:
-  AllowedNames:
-    - "x"
-    - "y"

@@ -13,9 +13,8 @@ group :development, :test do
   gem "pry"
   gem "pry-rescue"
   gem "pry-stack_explorer"
-end
 
-group :test do
-  gem "codeclimate-test-reporter", require: false
-  gem "rails-controller-testing"
+  gem "rubocop", require: false
+  gem "rubocop-rails", require: false
+  gem "rubocop-rspec", require: false
 end
