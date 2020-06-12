@@ -73,6 +73,14 @@ module DynamicImage
       gif? ? DynamicImage::ImageReader.new(image.coalesce.to_blob).read : image
     end
 
+    def create_variant(size)
+      record.variants.create(
+        variant_params(size).merge(filename: record.filename,
+                                   content_type: content_type,
+                                   data: crop_and_resize(size))
+      )
+    end
+
     def crop_and_resize(size)
       normalized do |image|
         if record.cropped? || size != record.size
@@ -83,12 +91,9 @@ module DynamicImage
     end
 
     def find_or_create_variant(size)
-      record.variants.find_by(variant_params(size)) ||
-        record.variants.create(
-          variant_params(size).merge(filename: record.filename,
-                                     content_type: content_type,
-                                     data: crop_and_resize(size))
-        )
+      record.variants.find_by(variant_params(size)) || create_variant(size)
+    rescue ActiveRecord::RecordNotUnique
+      record.variants.find_by(variant_params(size))
     end
 
     def format
