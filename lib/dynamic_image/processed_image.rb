@@ -43,7 +43,7 @@ module DynamicImage
     # Normalizes the image.
     #
     # * Applies EXIF rotation
-    # * CMYK images are converted to sRGB
+    # * Converts to sRGB
     # * Strips metadata
     # * Optimizes GIFs
     # * Performs format conversion if the requested format is different
@@ -59,7 +59,7 @@ module DynamicImage
       process_data do |image|
         image.combine_options do |combined|
           combined.auto_orient
-          combined.colorspace("sRGB") if needs_colorspace_conversion?
+          convert_to_srgb(image, combined)
           yield(combined) if block_given?
           optimize(combined)
         end
@@ -71,6 +71,11 @@ module DynamicImage
 
     def coalesced(image)
       gif? ? DynamicImage::ImageReader.new(image.coalesce.to_blob).read : image
+    end
+
+    def convert_to_srgb(image, combined)
+      combined.profile(srgb_profile) if image.data["profiles"].present?
+      combined.colorspace("sRGB") if record.cmyk?
     end
 
     def create_variant(size)
@@ -113,10 +118,6 @@ module DynamicImage
         DynamicImage::ImageSizing.new(record, uncropped: @uncropped)
     end
 
-    def needs_colorspace_conversion?
-      record.cmyk?
-    end
-
     def needs_format_conversion?
       format != record_format
     end
@@ -139,17 +140,17 @@ module DynamicImage
     attr_reader :record
 
     def record_format
-      { "image/bmp" => "BMP",
-        "image/png" => "PNG",
-        "image/gif" => "GIF",
-        "image/jpeg" => "JPEG",
-        "image/pjpeg" => "JPEG",
-        "image/tiff" => "TIFF",
+      { "image/bmp" => "BMP", "image/png" => "PNG", "image/gif" => "GIF",
+        "image/jpeg" => "JPEG", "image/pjpeg" => "JPEG", "image/tiff" => "TIFF",
         "image/webp" => "WEBP" }[record.content_type]
     end
 
     def require_valid_image!
       raise DynamicImage::Errors::InvalidImage unless record.valid?
+    end
+
+    def srgb_profile
+      File.join(File.dirname(__FILE__), "profiles/sRGB_ICC_v4_Appearance.icc")
     end
 
     def variant_params(size)
