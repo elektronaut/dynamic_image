@@ -23,6 +23,7 @@ describe DynamicImage::ProcessedImage do
   let(:rgb_image)  { source_image }
   let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
   let(:gray_image) { jpeg_image.tap { |o| o.colorspace("Gray") } }
+  let(:adobe_rgb_image) { read_image("adobe-rgb.jpg") }
 
   let(:image) { source_image }
 
@@ -144,6 +145,16 @@ describe DynamicImage::ProcessedImage do
 
       it "stays in RGB" do
         expect(colorspace).to eq("rgb")
+      end
+    end
+
+    context "when image is in Adobe RGB" do
+      let(:image) { adobe_rgb_image }
+      let(:pixels) { MiniMagick::Image.read(normalized).get_pixels }
+      let(:top_left) { pixels[0][0] }
+
+      it "converts the colors" do
+        expect(top_left).to eq([0x00, 0xff, 0x01])
       end
     end
 
