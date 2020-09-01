@@ -11,24 +11,10 @@ describe DynamicImage::ProcessedImage do
     )
   end
 
-  let(:source_image) { read_image("image.png") }
+  subject(:processed) { described_class.new(record) }
 
-  let(:gif_image)  { source_image.tap { |o| o.format("GIF") } }
-  let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
-  let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
-  let(:tiff_image) { read_image("image.tif") }
-  let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
-  let(:webp_image) { read_image("image.webp") }
-
-  let(:rgb_image)  { source_image }
-  let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
-  let(:gray_image) { jpeg_image.tap { |o| o.colorspace("Gray") } }
-  let(:adobe_rgb_image) { read_image("adobe-rgb.jpg") }
-
-  let(:image) { source_image }
-
+  let(:image) { read_image("image.png") }
   let(:record) { Image.new(data: image.to_blob, filename: "test.png") }
-  let(:processed) { described_class.new(record) }
 
   describe "#content_type" do
     subject { processed.content_type }
@@ -113,8 +99,6 @@ describe DynamicImage::ProcessedImage do
   describe "#normalized" do
     let(:normalized) { processed.normalized }
     let(:metadata) { DynamicImage::Metadata.new(normalized) }
-    let(:colorspace) { metadata.colorspace }
-    let(:content_type) { metadata.content_type }
 
     context "with invalid data" do
       let(:record) { Image.new(data: "foo") }
@@ -125,106 +109,107 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when image is in CMYK" do
-      let(:image) { cmyk_image }
+      let(:image) do
+        super().tap { |o| o.format("JPEG") }
+               .tap { |o| o.colorspace("CMYK") }
+      end
 
       it "converts to RGB" do
-        expect(colorspace).to eq("rgb")
+        expect(metadata.colorspace).to eq("rgb")
       end
     end
 
     context "when image is in grayscale" do
-      let(:image) { gray_image }
+      let(:image) do
+        super().tap { |o| o.format("JPEG") }
+               .tap { |o| o.colorspace("Gray") }
+      end
 
       it "keeps the colorspace" do
-        expect(colorspace).to eq("gray")
+        expect(metadata.colorspace).to eq("gray")
       end
     end
 
     context "when image is in RGB" do
-      let(:image) { rgb_image }
-
       it "stays in RGB" do
-        expect(colorspace).to eq("rgb")
+        expect(metadata.colorspace).to eq("rgb")
       end
     end
 
     context "when image is in Adobe RGB" do
-      let(:image) { adobe_rgb_image }
+      let(:image) { read_image("adobe-rgb.jpg") }
       let(:pixels) { MiniMagick::Image.read(normalized).get_pixels }
-      let(:top_left) { pixels[0][0] }
 
       it "converts the colors" do
-        expect(top_left).to eq([0x00, 0xff, 0x01])
+        expect(pixels[0][0]).to eq([0x00, 0xff, 0x01])
       end
     end
 
     context "when image is GIF" do
-      let(:image) { gif_image }
+      let(:image) { super().tap { |o| o.format("GIF") } }
 
       it "returns a GIF" do
-        expect(content_type).to eq("image/gif")
+        expect(metadata.content_type).to eq("image/gif")
       end
     end
 
     context "when image is JPEG" do
-      let(:image) { jpeg_image }
+      let(:image) { super().tap { |o| o.format("JPEG") } }
 
       it "returns a JPEG" do
-        expect(content_type).to eq("image/jpeg")
+        expect(metadata.content_type).to eq("image/jpeg")
       end
     end
 
     context "when image is PNG" do
-      let(:image) { png_image }
-
       it "returns a PNG" do
-        expect(content_type).to eq("image/png")
+        expect(metadata.content_type).to eq("image/png")
       end
     end
 
     context "when image is TIFF" do
-      let(:image) { tiff_image }
+      let(:image) { read_image("image.tif") }
 
       it "returns a TIFF" do
-        expect(content_type).to eq("image/tiff")
+        expect(metadata.content_type).to eq("image/tiff")
       end
     end
 
     context "when image is BMP" do
-      let(:image) { bmp_image }
+      let(:image) { super().tap { |o| o.format("BMP") } }
 
       it "returns a BMP" do
-        expect(content_type).to eq("image/bmp")
+        expect(metadata.content_type).to eq("image/bmp")
       end
     end
 
     context "when image is WEBP" do
-      let(:image) { webp_image }
+      let(:image) { read_image("image.webp") }
 
       it "returns a WEBP" do
-        expect(content_type).to eq("image/webp")
+        expect(metadata.content_type).to eq("image/webp")
       end
     end
 
     context "when converting BMP to JPEG" do
-      let(:image) { bmp_image }
+      let(:image) { super().tap { |o| o.format("BMP") } }
       let(:processed) do
         described_class.new(record, format: :jpeg)
       end
 
       it "returns a JPEG" do
-        expect(content_type).to eq("image/jpeg")
+        expect(metadata.content_type).to eq("image/jpeg")
       end
     end
 
     context "when converting WEBP to JPEG" do
-      let(:image) { webp_image }
+      let(:image) { read_image("image.webp") }
       let(:processed) do
         described_class.new(record, format: :jpeg)
       end
 
       it "returns a JPEG" do
-        expect(content_type).to eq("image/jpeg")
+        expect(metadata.content_type).to eq("image/jpeg")
       end
     end
 
@@ -234,7 +219,7 @@ describe DynamicImage::ProcessedImage do
       end
 
       it "returns a GIF" do
-        expect(content_type).to eq("image/gif")
+        expect(metadata.content_type).to eq("image/gif")
       end
     end
 
@@ -244,18 +229,18 @@ describe DynamicImage::ProcessedImage do
       end
 
       it "returns a JPEG" do
-        expect(content_type).to eq("image/jpeg")
+        expect(metadata.content_type).to eq("image/jpeg")
       end
     end
 
     context "when converting JPEG to PNG" do
-      let(:image) { jpeg_image }
+      let(:image) { super().tap { |o| o.format("JPEG") } }
       let(:processed) do
         described_class.new(record, format: :png)
       end
 
       it "returns a PNG" do
-        expect(content_type).to eq("image/png")
+        expect(metadata.content_type).to eq("image/png")
       end
     end
 
@@ -265,7 +250,7 @@ describe DynamicImage::ProcessedImage do
       end
 
       it "returns a TIFF" do
-        expect(content_type).to eq("image/tiff")
+        expect(metadata.content_type).to eq("image/tiff")
       end
     end
   end

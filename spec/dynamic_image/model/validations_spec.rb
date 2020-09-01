@@ -98,8 +98,7 @@ describe DynamicImage::Model::Validations do
     end
 
     context "when a valid image has been saved previously" do
-      let(:existing_image) { Image.create(file: uploaded_file) }
-      let(:image) { Image.find(existing_image.id) }
+      let(:image) { Image.find(Image.create(file: uploaded_file).id) }
 
       it { is_expected.to eq([]) }
     end

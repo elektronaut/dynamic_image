@@ -3,9 +3,13 @@
 require "spec_helper"
 
 describe DynamicImage::Model::Variants do
-  let(:file_path) { "../../../support/fixtures/image.png" }
-  let(:file) { File.open(File.expand_path(file_path, __FILE__)) }
-  let(:source_image) { MiniMagick::Image.read(file.read) }
+  let(:source_image) do
+    MiniMagick::Image.read(
+      File.open(
+        File.expand_path("../../support/fixtures/image.png", __dir__)
+      ).read
+    )
+  end
 
   let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
   let(:png_image)  { source_image.tap { |o| o.format("PNG") } }

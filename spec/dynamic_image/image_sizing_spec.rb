@@ -11,11 +11,12 @@ describe DynamicImage::ImageSizing do
     Vector2d.new(width, height)
   end
 
+  subject(:sizing) { described_class.new(record) }
+
   let(:real_size) { v(320, 200) }
   let(:crop_gravity) { nil }
   let(:crop_size) { real_size }
   let(:crop_start) { v(0, 0) }
-  let(:sizing) { described_class.new(record) }
   let(:record) do
     Image.new(real_width: real_size.x,
               real_height: real_size.y,
@@ -101,32 +102,32 @@ describe DynamicImage::ImageSizing do
     end
 
     context "with precropping disabled" do
-      let(:sizing) { described_class.new(record, uncropped: true) }
+      subject do
+        described_class.new(record, uncropped: true)
+                       .crop_geometry(v(200, 200))
+      end
 
       it { is_expected.to eq([v(401, 401), v(60, 0)]) }
     end
   end
 
   describe "#fit" do
-    subject(:fit) { sizing.fit(size, options) }
-
-    let(:options) { {} }
-    let(:size) { v(100, 100) }
+    subject(:fit) { sizing.fit(v(100, 100)) }
 
     context "with string argument, both dimensions" do
-      let(:size) { "100x100" }
+      subject(:fit) { sizing.fit("100x100") }
 
       it { is_expected.to eq(v(100, 62.5)) }
     end
 
     context "with string argument, only width" do
-      let(:size) { "100x" }
+      subject(:fit) { sizing.fit("100x") }
 
       it { is_expected.to eq(v(100, 62.5)) }
     end
 
     context "with string argument, only height" do
-      let(:size) { "x100" }
+      subject(:fit) { sizing.fit("x100") }
 
       it { is_expected.to eq(v(160, 100)) }
     end
@@ -136,13 +137,13 @@ describe DynamicImage::ImageSizing do
     end
 
     context "when fit_size is larger" do
-      let(:size) { v(500, 500) }
+      subject(:fit) { sizing.fit(v(500, 500)) }
 
       it { is_expected.to eq(v(320, 200)) }
     end
 
     context "when fit_size is smaller and crop: true" do
-      let(:options) { { crop: true } }
+      subject(:fit) { sizing.fit(v(100, 100), crop: true) }
 
       it { is_expected.to eq(v(100, 100)) }
     end
@@ -164,48 +165,44 @@ describe DynamicImage::ImageSizing do
     end
 
     context "when fit_size is larger and crop: true" do
-      let(:options) { { crop: true } }
-      let(:size) { v(500, 500) }
+      subject(:fit) { sizing.fit(v(500, 500), crop: true) }
 
       it { is_expected.to eq(v(200, 200)) }
     end
 
     context "when fit_size is smaller and upscale: true" do
-      let(:options) { { upscale: true } }
+      subject(:fit) { sizing.fit(v(100, 100), upscale: true) }
 
       it { is_expected.to eq(v(100, 62.5)) }
     end
 
     context "with only width and upscale: true" do
-      let(:options) { { upscale: true } }
-      let(:size) { v(400, 0) }
+      subject(:fit) { sizing.fit(v(400, 0), upscale: true) }
 
       it { is_expected.to eq(v(400, 250)) }
     end
 
     context "with only height and upscale: true" do
-      let(:options) { { upscale: true } }
-      let(:size) { v(0, 300) }
+      subject(:fit) { sizing.fit(v(0, 300), upscale: true) }
 
       it { is_expected.to eq(v(480, 300)) }
     end
 
     context "when fit_size is larger and upscale: true" do
-      let(:options) { { upscale: true } }
-      let(:size) { v(500, 500) }
+      subject(:fit) { sizing.fit(v(500, 500), upscale: true) }
 
       it { is_expected.to eq(v(500, 312.5)) }
     end
 
     context "with crop: true, upscale: true" do
-      let(:options) { { crop: true, upscale: true } }
-      let(:size) { v(500, 520) }
+      subject(:fit) { sizing.fit(v(500, 520), upscale: true, crop: true) }
 
       it { is_expected.to eq(v(500, 520)) }
     end
 
     context "with a cropped image and normal sizing" do
-      let(:size) { v(1000, 1000) }
+      subject(:fit) { sizing.fit(v(1000, 1000)) }
+
       let(:real_size) { v(520, 500) }
       let(:crop_size) { v(320, 200) }
       let(:crop_start) { v(10, 10) }
@@ -214,11 +211,13 @@ describe DynamicImage::ImageSizing do
     end
 
     context "with a cropped image and uncropped sizing" do
-      let(:size) { v(1000, 1000) }
+      subject(:fit) do
+        described_class.new(record, uncropped: true).fit(v(1000, 1000))
+      end
+
       let(:real_size) { v(520, 500) }
       let(:crop_size) { v(320, 200) }
       let(:crop_start) { v(10, 10) }
-      let(:sizing) { described_class.new(record, uncropped: true) }
 
       it { is_expected.to eq(v(520, 500)) }
     end

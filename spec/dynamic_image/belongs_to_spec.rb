@@ -5,10 +5,10 @@ require "spec_helper"
 describe DynamicImage::BelongsTo do
   storage_root = Rails.root.join("tmp", "spec")
 
-  let(:file_path) { "../../support/fixtures/image.png" }
-  let(:file) { File.open(File.expand_path(file_path, __FILE__)) }
-  let(:content_type) { "image/png" }
-  let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
+  let(:file) do
+    File.open(File.expand_path("../support/fixtures/image.png", __dir__))
+  end
+  let(:uploaded_file) { Rack::Test::UploadedFile.new(file, "image/png") }
   let(:image) { Image.create(file: uploaded_file) }
 
   after do

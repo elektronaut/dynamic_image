@@ -11,40 +11,35 @@ describe DynamicImage::Metadata do
     )
   end
 
+  subject(:meta_info) { described_class.new(image_data) }
+
   let(:source_image) { read_image("image.png") }
-
-  let(:gif_image)  { source_image.tap { |o| o.format("GIF") } }
-  let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
-  let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
   let(:tiff_image) { read_image("image.tif") }
-  let(:bmp_image) { source_image.tap { |o| o.format("BMP") } }
   let(:webp_image) { read_image("image.webp") }
-
-  let(:rgb_image) { source_image }
-  let(:cmyk_image) { jpeg_image.tap { |o| o.colorspace("CMYK") } }
-  let(:gray_image) { jpeg_image.tap { |o| o.colorspace("Gray") } }
 
   let(:image) { source_image }
   let(:image_data) { image.to_blob }
-  let(:meta_info) { described_class.new(image_data) }
 
   describe "#colorspace" do
     subject { meta_info.colorspace }
 
     context "when image is sRGB" do
-      let(:image) { rgb_image }
+      let(:image) { source_image }
 
       it { is_expected.to eq("rgb") }
     end
 
     context "when image is grayscale" do
-      let(:image) { gray_image }
+      let(:image) { source_image.tap { |o| o.colorspace("Gray") } }
 
       it { is_expected.to eq("gray") }
     end
 
     context "when image is CMYK" do
-      let(:image) { cmyk_image }
+      let(:image) do
+        source_image.tap { |o| o.format("JPEG") }
+                    .tap { |o| o.colorspace("CMYK") }
+      end
 
       it { is_expected.to eq("cmyk") }
     end
@@ -60,19 +55,19 @@ describe DynamicImage::Metadata do
     subject { meta_info.content_type }
 
     context "when image is GIF" do
-      let(:image) { gif_image }
+      let(:image) { source_image.tap { |o| o.format("GIF") } }
 
       it { is_expected.to eq("image/gif") }
     end
 
     context "when image is JPEG" do
-      let(:image) { jpeg_image }
+      let(:image) { source_image.tap { |o| o.format("JPEG") } }
 
       it { is_expected.to eq("image/jpeg") }
     end
 
     context "when image is PNG" do
-      let(:image) { png_image }
+      let(:image) { source_image }
 
       it { is_expected.to eq("image/png") }
     end
@@ -84,7 +79,7 @@ describe DynamicImage::Metadata do
     end
 
     context "when image is BMP" do
-      let(:image) { bmp_image }
+      let(:image) { source_image.tap { |o| o.format("BMP") } }
 
       it { is_expected.to eq("image/bmp") }
     end
@@ -142,19 +137,19 @@ describe DynamicImage::Metadata do
     subject { meta_info.format }
 
     context "when image is GIF" do
-      let(:image) { gif_image }
+      let(:image) { source_image.tap { |o| o.format("GIF") } }
 
       it { is_expected.to eq("GIF") }
     end
 
     context "when image is JPEG" do
-      let(:image) { jpeg_image }
+      let(:image) { source_image.tap { |o| o.format("JPEG") } }
 
       it { is_expected.to eq("JPEG") }
     end
 
     context "when image is PNG" do
-      let(:image) { png_image }
+      let(:image) { source_image }
 
       it { is_expected.to eq("PNG") }
     end
@@ -166,7 +161,7 @@ describe DynamicImage::Metadata do
     end
 
     context "when image is BMP" do
-      let(:image) { bmp_image }
+      let(:image) { source_image.tap { |o| o.format("BMP") } }
 
       it { is_expected.to eq("BMP") }
     end

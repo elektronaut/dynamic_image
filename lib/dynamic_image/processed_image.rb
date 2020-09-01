@@ -110,7 +110,7 @@ module DynamicImage
     end
 
     def jpeg?
-      content_type == "image/jpeg" || content_type == "image/jpeg"
+      content_type == "image/jpeg"
     end
 
     def image_sizing

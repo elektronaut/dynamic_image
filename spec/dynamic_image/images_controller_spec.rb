@@ -13,13 +13,15 @@ describe ImagesController, type: :controller do
     { digest: digest(key) }.merge(options)
   end
 
-  let(:file_path) { "../../support/fixtures/image.png" }
-  let(:file) { File.open(File.expand_path(file_path, __FILE__)) }
-  let(:content_type) { "image/png" }
-  let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
-
-  let(:image) { Image.create(file: uploaded_file) }
-
+  let(:image) do
+    Image.create(
+      file: Rack::Test::UploadedFile.new(
+        File.open(File.expand_path("../support/fixtures/image.png",
+                                   __dir__)),
+        "image/png"
+      )
+    )
+  end
   let(:metadata) { DynamicImage::Metadata.new(response.body) }
 
   describe "signed params verification" do

@@ -7,13 +7,14 @@ describe DynamicImage::Helper, type: :helper do
     DynamicImage.digest_verifier.generate(str)
   end
 
-  let(:file_path) { "../../support/fixtures/image.png" }
-  let(:file) { File.open(File.expand_path(file_path, __FILE__)) }
-  let(:content_type) { "image/png" }
-  let(:uploaded_file) { Rack::Test::UploadedFile.new(file, content_type) }
-
   let(:image) do
-    Image.create(file: uploaded_file, filename: "my-uploaded-file.png")
+    Image.create(
+      file: Rack::Test::UploadedFile.new(
+        File.open(File.expand_path("../support/fixtures/image.png", __dir__)),
+        "image/png"
+      ),
+      filename: "my-uploaded-file.png"
+    )
   end
 
   let(:host) { "http://test.host" }
