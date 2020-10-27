@@ -7,6 +7,7 @@ AllCops:
     - 'spec/internal/config/**/*'
     - 'spec/internal/db/**/*'
     - 'spec/internal/db/schema.rb'
+    - 'vendor/**/*'
 
 Rails:
   Enabled: true
