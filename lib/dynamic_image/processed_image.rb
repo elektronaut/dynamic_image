@@ -6,6 +6,8 @@ module DynamicImage
   # Handles all processing of images. Takes an instance of
   # +DynamicImage::Model+ as argument.
   class ProcessedImage
+    attr_reader :record
+
     def initialize(record, options = {})
       @record    = record
       @uncropped = options[:uncropped] ? true : false
@@ -38,6 +40,20 @@ module DynamicImage
       return crop_and_resize(size) unless record.persisted?
 
       find_or_create_variant(size).data
+    end
+
+    # Find or create a variant with the given size.
+    def find_or_create_variant(size)
+      find_variant(size) || create_variant(size)
+    rescue ActiveRecord::RecordNotUnique
+      find_variant(size)
+    end
+
+    # Find a variant with the given size.
+    def find_variant(size)
+      return nil unless record.persisted?
+
+      record.variants.find_by(variant_params(size))
     end
 
     # Normalizes the image.
@@ -95,12 +111,6 @@ module DynamicImage
       end
     end
 
-    def find_or_create_variant(size)
-      record.variants.find_by(variant_params(size)) || create_variant(size)
-    rescue ActiveRecord::RecordNotUnique
-      record.variants.find_by(variant_params(size))
-    end
-
     def format
       @format ||= record_format
     end
@@ -136,8 +146,6 @@ module DynamicImage
       image.destroy!
       result
     end
-
-    attr_reader :record
 
     def record_format
       { "image/bmp" => "BMP", "image/png" => "PNG", "image/gif" => "GIF",
