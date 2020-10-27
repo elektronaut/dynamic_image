@@ -13,8 +13,9 @@ module DynamicImage
       options = {
         path: "#{resource_name}/:digest(/:size)",
         constraints: { size: /\d+x\d+/ },
-        only: [:show]
+        only: %i[show]
       }.merge(options)
+
       resources resource_name, options do
         get :uncropped, on: :member
         get :original, on: :member

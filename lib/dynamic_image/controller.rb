@@ -44,11 +44,17 @@ module DynamicImage
     private
 
     def cache_expiration_header
-      expires_in 30.days, public: true
+      expires_in 30.days, public: true if response.status == 200
     end
 
     def find_record
       @record = model.find(params[:id])
+    end
+
+    def process_later?(processed_image, size)
+      image_size = processed_image.record.size.x * processed_image.record.size.y
+      image_size > 12_500_000 &&
+        !processed_image.find_variant(size)
     end
 
     def render_image(options)
@@ -60,7 +66,7 @@ module DynamicImage
                  layout: false, locals: { options: options })
         end
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
-          send_image(DynamicImage::ProcessedImage.new(@record, options))
+          send_image(@record, options)
         end
       end
     end
@@ -82,12 +88,17 @@ module DynamicImage
       params[:format]
     end
 
-    def send_image(processed_image)
-      send_data(
-        processed_image.cropped_and_resized(requested_size),
-        content_type: processed_image.content_type,
-        disposition: "inline"
-      )
+    def send_image(image, options)
+      processed_image = DynamicImage::ProcessedImage.new(image, options)
+      if process_later?(processed_image, requested_size)
+        DynamicImage::Jobs::CreateVariant
+          .perform_later(image, options, requested_size.to_s)
+        head 503, retry_after: 10
+      else
+        send_data(processed_image.cropped_and_resized(requested_size),
+                  content_type: processed_image.content_type,
+                  disposition: "inline")
+      end
     end
 
     def verify_signed_params
