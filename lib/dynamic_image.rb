@@ -19,5 +19,5 @@ require "dynamic_image/processed_image"
 require "dynamic_image/routing"
 
 module DynamicImage
-  cattr_accessor :digest_verifier
+  cattr_accessor :digest_verifier, :process_later_limit
 end

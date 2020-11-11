@@ -52,8 +52,10 @@ module DynamicImage
     end
 
     def process_later?(processed_image, size)
+      return false unless DynamicImage.process_later_limit
+
       image_size = processed_image.record.size.x * processed_image.record.size.y
-      image_size > 12_500_000 &&
+      image_size > DynamicImage.process_later_limit &&
         !processed_image.find_variant(size)
     end
 
