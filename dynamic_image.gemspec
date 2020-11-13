@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 2.4.0"
 
   s.add_dependency "dis", "~> 1.1", ">= 1.0.6"
+  s.add_dependency "mini_exiftool", "~> 2.10"
   s.add_dependency "mini_magick", "~> 4.9"
   s.add_dependency "rails", "> 5.0"
   s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"

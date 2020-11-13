@@ -90,7 +90,10 @@ module DynamicImage
     end
 
     def convert_to_srgb(image, combined)
-      combined.profile(srgb_profile) if image.data["profiles"].present?
+      if image.data["profiles"].present? &&
+         exif.colorspacedata&.strip&.downcase == record.colorspace
+        combined.profile(srgb_profile)
+      end
       combined.colorspace("sRGB") if record.cmyk?
     end
 
@@ -109,6 +112,10 @@ module DynamicImage
         image.crop(image_sizing.crop_geometry_string(size))
         image.resize(size)
       end
+    end
+
+    def exif
+      @exif ||= DynamicImage::ImageReader.new(record.data).exif
     end
 
     def format
