@@ -1,6 +1,8 @@
 inherit_from: .rubocop_todo.yml
 
-require: rubocop-rspec
+require:
+  - rubocop-rails
+  - rubocop-rspec
 
 AllCops:
   NewCops: enable
@@ -13,6 +15,9 @@ AllCops:
 
 Rails:
   Enabled: true
+
+Rails/ApplicationJob:
+  Enabled: false
 
 Style/StringLiterals:
   EnforcedStyle: double_quotes

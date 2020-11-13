@@ -12,7 +12,7 @@ require "rspec/rails"
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec", "support", "**", "*.rb")].sort.each do |f|
+Dir[Rails.root.join("spec/support/**/*.rb")].sort.each do |f|
   require f
 end
 
@@ -46,7 +46,7 @@ RSpec.configure do |config|
 
   # Clean the Dis storage after each example
   config.after do
-    storage_root = Rails.root.join("db", "dis", "test")
+    storage_root = Rails.root.join("db/dis/test")
     FileUtils.rm_rf(storage_root) if File.exist?(storage_root)
   end
 end

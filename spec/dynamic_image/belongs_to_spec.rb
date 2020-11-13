@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe DynamicImage::BelongsTo do
-  storage_root = Rails.root.join("tmp", "spec")
+  storage_root = Rails.root.join("tmp/spec")
 
   let(:file) do
     File.open(File.expand_path("../support/fixtures/image.png", __dir__))
