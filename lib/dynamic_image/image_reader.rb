@@ -21,6 +21,12 @@ module DynamicImage
       @data = data
     end
 
+    def exif
+      raise DynamicImage::Errors::InvalidHeader unless valid_header?
+
+      MiniExiftool.new(string_io)
+    end
+
     def read
       raise DynamicImage::Errors::InvalidHeader unless valid_header?
 
@@ -39,7 +45,11 @@ module DynamicImage
     private
 
     def file_header
-      @file_header ||= StringIO.new(@data, "rb").read(8)
+      @file_header ||= string_io.read(8)
+    end
+
+    def string_io
+      StringIO.new(@data, "rb")
     end
   end
 end

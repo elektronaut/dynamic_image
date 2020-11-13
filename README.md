@@ -31,6 +31,7 @@ and enumeration attacks.
 * Rails 5
 * Ruby 2.4+
 * ImageMagick command line tools
+* ExifTool
 
 ## Documentation
 
