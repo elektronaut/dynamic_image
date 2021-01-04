@@ -51,6 +51,24 @@ module DynamicImage
       @record = model.find(params[:id])
     end
 
+    def process_and_send(image, options)
+      processed_image = DynamicImage::ProcessedImage.new(image, options)
+      if process_later?(processed_image, requested_size)
+        process_later(image, options, requested_size)
+        head 503, retry_after: 10
+      else
+        send_image(processed_image, requested_size)
+      end
+    rescue MiniMagick::Error
+      process_later(image, options, requested_size)
+      raise
+    end
+
+    def process_later(image, options, requested_size)
+      DynamicImage::Jobs::CreateVariant
+        .perform_later(image, options, requested_size.to_s)
+    end
+
     def process_later?(processed_image, size)
       return false unless DynamicImage.process_later_limit
 
@@ -68,7 +86,7 @@ module DynamicImage
                  layout: false, locals: { options: options })
         end
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
-          send_image(@record, options)
+          process_and_send(@record, options)
         end
       end
     end
@@ -90,17 +108,10 @@ module DynamicImage
       params[:format]
     end
 
-    def send_image(image, options)
-      processed_image = DynamicImage::ProcessedImage.new(image, options)
-      if process_later?(processed_image, requested_size)
-        DynamicImage::Jobs::CreateVariant
-          .perform_later(image, options, requested_size.to_s)
-        head 503, retry_after: 10
-      else
-        send_data(processed_image.cropped_and_resized(requested_size),
-                  content_type: processed_image.content_type,
-                  disposition: "inline")
-      end
+    def send_image(processed_image, requested_size)
+      send_data(processed_image.cropped_and_resized(requested_size),
+                content_type: processed_image.content_type,
+                disposition: "inline")
     end
 
     def verify_signed_params
