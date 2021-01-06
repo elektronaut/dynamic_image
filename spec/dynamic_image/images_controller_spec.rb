@@ -94,7 +94,7 @@ describe ImagesController, type: :controller do
 
       it "sets the Cache-Control header" do
         expect(response.headers["Cache-Control"]).to(
-          eq("max-age=2592000, public")
+          eq("max-age=31556952, public")
         )
       end
 
@@ -251,7 +251,7 @@ describe ImagesController, type: :controller do
 
       it "sets the Cache-Control header" do
         expect(response.headers["Cache-Control"]).to(
-          eq("max-age=2592000, public")
+          eq("max-age=31556952, public")
         )
       end
 
@@ -301,7 +301,7 @@ describe ImagesController, type: :controller do
 
       it "sets the Cache-Control header" do
         expect(response.headers["Cache-Control"]).to(
-          eq("max-age=2592000, public")
+          eq("max-age=31556952, public")
         )
       end
 
@@ -346,7 +346,7 @@ describe ImagesController, type: :controller do
 
     it "sets the Cache-Control header" do
       expect(response.headers["Cache-Control"]).to(
-        eq("max-age=2592000, public")
+        eq("max-age=31556952, public")
       )
     end
 

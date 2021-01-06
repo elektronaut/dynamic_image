@@ -44,7 +44,7 @@ module DynamicImage
     private
 
     def cache_expiration_header
-      expires_in 30.days, public: true if response.status == 200
+      expires_in 1.year, public: true if response.status == 200
     end
 
     def find_record
