@@ -59,9 +59,6 @@ module DynamicImage
       else
         send_image(processed_image, requested_size)
       end
-    rescue MiniMagick::Error
-      process_later(image, options, requested_size)
-      raise
     end
 
     def process_later(image, options, requested_size)
