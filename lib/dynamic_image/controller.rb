@@ -79,7 +79,7 @@ module DynamicImage
 
       respond_to do |format|
         format.html do
-          render(file: File.join(File.dirname(__FILE__), "templates/show"),
+          render(template: "dynamic_image/images/show",
                  layout: false, locals: { options: options })
         end
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
