@@ -75,8 +75,6 @@ jobs:
           gem install bundler
           bundle config path vendor/bundle
           bundle install
-      - name: List supported ImageMagick formats
-        run: identify -list format
       - name: Create database
         env:
           DB: postgres

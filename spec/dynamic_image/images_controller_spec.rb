@@ -217,7 +217,7 @@ describe ImagesController, type: :controller do
         expect(response.media_type).to eq("image/webp")
       end
 
-      xit "returns a WEBP image" do
+      it "returns a WEBP image" do
         expect(metadata.format).to eq("WEBP")
       end
     end

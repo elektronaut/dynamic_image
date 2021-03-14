@@ -187,7 +187,7 @@ describe DynamicImage::ProcessedImage do
     context "when image is WEBP" do
       let(:image) { read_image("image.webp") }
 
-      xit "returns a WEBP" do
+      it "returns a WEBP" do
         expect(metadata.content_type).to eq("image/webp")
       end
     end
@@ -209,7 +209,7 @@ describe DynamicImage::ProcessedImage do
         described_class.new(record, format: :jpeg)
       end
 
-      xit "returns a JPEG" do
+      it "returns a JPEG" do
         expect(metadata.content_type).to eq("image/jpeg")
       end
     end
