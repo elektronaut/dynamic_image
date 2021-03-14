@@ -141,7 +141,8 @@ describe DynamicImage::ProcessedImage do
       let(:pixels) { MiniMagick::Image.read(normalized).get_pixels }
 
       it "converts the colors" do
-        expect(pixels[0][0]).to eq([0x00, 0xff, 0x01])
+        pixels[0][0].zip([0x00, 0xff, 0x01])
+                    .each { |a, b| expect(a).to be_within(1).of(b) }
       end
     end
 
