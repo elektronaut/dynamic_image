@@ -4,11 +4,11 @@ require "spec_helper"
 
 describe DynamicImage::Metadata do
   def read_image(filename)
-    MiniMagick::Image.read(
-      File.open(
+    DynamicImage::ImageReader.new(
+      File.read(
         File.expand_path("../../support/fixtures/#{filename}", __FILE__)
       )
-    )
+    ).read
   end
 
   subject(:meta_info) { described_class.new(image_data) }
@@ -30,16 +30,13 @@ describe DynamicImage::Metadata do
     end
 
     context "when image is grayscale" do
-      let(:image) { source_image.tap { |o| o.colorspace("Gray") } }
+      let(:image) { read_image("gray.jpg") }
 
       it { is_expected.to eq("gray") }
     end
 
     context "when image is CMYK" do
-      let(:image) do
-        source_image.tap { |o| o.format("JPEG") }
-                    .tap { |o| o.colorspace("CMYK") }
-      end
+      let(:image) { read_image("cmyk.jpg") }
 
       it { is_expected.to eq("cmyk") }
     end
@@ -55,13 +52,13 @@ describe DynamicImage::Metadata do
     subject { meta_info.content_type }
 
     context "when image is GIF" do
-      let(:image) { source_image.tap { |o| o.format("GIF") } }
+      let(:image) { read_image("image.gif") }
 
       it { is_expected.to eq("image/gif") }
     end
 
     context "when image is JPEG" do
-      let(:image) { source_image.tap { |o| o.format("JPEG") } }
+      let(:image) { read_image("image.jpg") }
 
       it { is_expected.to eq("image/jpeg") }
     end
@@ -79,7 +76,7 @@ describe DynamicImage::Metadata do
     end
 
     context "when image is BMP" do
-      let(:image) { source_image.tap { |o| o.format("BMP") } }
+      let(:image) { read_image("image.bmp") }
 
       it { is_expected.to eq("image/bmp") }
     end
@@ -137,13 +134,13 @@ describe DynamicImage::Metadata do
     subject { meta_info.format }
 
     context "when image is GIF" do
-      let(:image) { source_image.tap { |o| o.format("GIF") } }
+      let(:image) { read_image("image.gif") }
 
       it { is_expected.to eq("GIF") }
     end
 
     context "when image is JPEG" do
-      let(:image) { source_image.tap { |o| o.format("JPEG") } }
+      let(:image) { read_image("image.jpg") }
 
       it { is_expected.to eq("JPEG") }
     end
@@ -161,7 +158,7 @@ describe DynamicImage::Metadata do
     end
 
     context "when image is BMP" do
-      let(:image) { source_image.tap { |o| o.format("BMP") } }
+      let(:image) { read_image("image.bmp") }
 
       it { is_expected.to eq("BMP") }
     end

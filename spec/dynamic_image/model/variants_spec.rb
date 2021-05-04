@@ -3,19 +3,19 @@
 require "spec_helper"
 
 describe DynamicImage::Model::Variants do
-  let(:source_image) do
-    MiniMagick::Image.read(
-      File.open(
-        File.expand_path("../../support/fixtures/image.png", __dir__)
-      ).read
-    )
+  def read_image(filename)
+    DynamicImage::ImageReader.new(
+      File.read(
+        File.expand_path("../../../support/fixtures/#{filename}", __FILE__)
+      )
+    ).read
   end
 
-  let(:jpeg_image) { source_image.tap { |o| o.format("JPEG") } }
-  let(:png_image)  { source_image.tap { |o| o.format("PNG") } }
+  let(:source_image) { read_image("image.png") }
+  let(:jpeg_image) { read_image("image.jpg") }
 
   let(:image) do
-    Image.create(data: png_image.to_blob,
+    Image.create(data: source_image.to_blob,
                  filename: "test.png")
   end
 

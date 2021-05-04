@@ -4,11 +4,11 @@ require "spec_helper"
 
 describe DynamicImage::ProcessedImage do
   def read_image(filename)
-    MiniMagick::Image.read(
-      File.open(
+    DynamicImage::ImageReader.new(
+      File.read(
         File.expand_path("../../support/fixtures/#{filename}", __FILE__)
       )
-    )
+    ).read
   end
 
   subject(:processed) { described_class.new(record) }
@@ -109,10 +109,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when image is in CMYK" do
-      let(:image) do
-        super().tap { |o| o.format("JPEG") }
-               .tap { |o| o.colorspace("CMYK") }
-      end
+      let(:image) { read_image("cmyk.jpg") }
 
       it "converts to RGB" do
         expect(metadata.colorspace).to eq("rgb")
@@ -120,10 +117,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when image is in grayscale" do
-      let(:image) do
-        super().tap { |o| o.format("JPEG") }
-               .tap { |o| o.colorspace("Gray") }
-      end
+      let(:image) { read_image("gray.jpg") }
 
       it "keeps the colorspace" do
         expect(metadata.colorspace).to eq("gray")
@@ -147,7 +141,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when image is GIF" do
-      let(:image) { super().tap { |o| o.format("GIF") } }
+      let(:image) { read_image("image.gif") }
 
       it "returns a GIF" do
         expect(metadata.content_type).to eq("image/gif")
@@ -155,7 +149,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when image is JPEG" do
-      let(:image) { super().tap { |o| o.format("JPEG") } }
+      let(:image) { read_image("image.jpg") }
 
       it "returns a JPEG" do
         expect(metadata.content_type).to eq("image/jpeg")
@@ -177,7 +171,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when image is BMP" do
-      let(:image) { super().tap { |o| o.format("BMP") } }
+      let(:image) { read_image("image.bmp") }
 
       it "returns a BMP" do
         expect(metadata.content_type).to eq("image/bmp")
@@ -193,7 +187,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when converting BMP to JPEG" do
-      let(:image) { super().tap { |o| o.format("BMP") } }
+      let(:image) { read_image("image.bmp") }
       let(:processed) do
         described_class.new(record, format: :jpeg)
       end
@@ -235,7 +229,7 @@ describe DynamicImage::ProcessedImage do
     end
 
     context "when converting JPEG to PNG" do
-      let(:image) { super().tap { |o| o.format("JPEG") } }
+      let(:image) { read_image("image.jpg") }
       let(:processed) do
         described_class.new(record, format: :png)
       end
