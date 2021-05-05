@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.required_ruby_version = ">= 2.4.0"
+  s.required_ruby_version = ">= 2.7.0"
 
   s.add_dependency "dis", "~> 1.1", ">= 1.0.6"
   s.add_dependency "mini_exiftool", "~> 2.10"
