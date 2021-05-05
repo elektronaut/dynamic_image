@@ -115,7 +115,7 @@ module DynamicImage
     end
 
     def exif
-      @exif ||= DynamicImage::ImageReader.new(record.data).exif
+      @exif ||= DynamicImage::ImageReader.new(record.tempfile).exif
     end
 
     def format
@@ -147,7 +147,7 @@ module DynamicImage
     end
 
     def process_data
-      image = coalesced(DynamicImage::ImageReader.new(record.data).read)
+      image = coalesced(DynamicImage::ImageReader.new(record.tempfile).read)
       yield(image)
       result = image.to_blob
       image.destroy!

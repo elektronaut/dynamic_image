@@ -24,13 +24,15 @@ module DynamicImage
     def exif
       raise DynamicImage::Errors::InvalidHeader unless valid_header?
 
-      MiniExiftool.new(string_io)
+      MiniExiftool.new(stream)
     end
 
     def read
       raise DynamicImage::Errors::InvalidHeader unless valid_header?
 
-      MiniMagick::Image.read(@data)
+      return MiniMagick::Image.open(@data.path) if @data.respond_to?(:path)
+
+      MiniMagick::Image.read(stream.read)
     end
 
     def valid_header?
@@ -45,11 +47,20 @@ module DynamicImage
     private
 
     def file_header
-      @file_header ||= string_io.read(8)
+      @file_header ||= read_file_header
     end
 
-    def string_io
-      StringIO.new(@data, "rb")
+    def read_file_header
+      data_stream = stream
+      header = data_stream.read(8)
+      data_stream.seek((0 - header.length), IO::SEEK_CUR) if header
+      header
+    end
+
+    def stream
+      return StringIO.new(@data, "rb") if @data.is_a?(String)
+
+      @data
     end
   end
 end
