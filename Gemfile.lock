@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     dynamic_image (2.1.4)
-      dis (~> 1.1, >= 1.0.6)
+      dis (~> 1.1, >= 1.1.11)
       mini_exiftool (~> 2.10)
       mini_magick (~> 4.9)
       rails (> 5.0)
