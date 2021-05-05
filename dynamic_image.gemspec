@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency "mini_exiftool", "~> 2.10"
   s.add_dependency "mini_magick", "~> 4.9"
   s.add_dependency "rails", "> 5.0"
+  s.add_dependency "ruby-vips", "~> 2.1.0"
   s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
 
   s.add_development_dependency "rails-controller-testing"
