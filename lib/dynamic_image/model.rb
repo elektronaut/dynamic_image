@@ -106,7 +106,7 @@ module DynamicImage
     private
 
     def read_image_metadata
-      metadata = DynamicImage::Metadata.new(data)
+      metadata = DynamicImage::Metadata.new(tempfile)
       @valid_image = false
       if metadata.valid?
         self.colorspace = metadata.colorspace

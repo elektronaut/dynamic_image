@@ -15,40 +15,49 @@ module DynamicImage
     def colorspace
       return unless valid?
 
-      case metadata[:colorspace]
+      case metadata[:colorspace].to_s
       when /rgb/i
         "rgb"
       when /cmyk/i
         "cmyk"
-      when /gray/i
+      when /gray/i, /b-w/i
         "gray"
       end
     end
 
     # Returns the content type of the image.
     def content_type
-      "image/#{format.downcase}" if valid?
+      reader.format.content_type if valid?
+    end
+
+    def format
+      reader.format.name if valid?
     end
 
     # Returns the dimensions of the image as a vector.
     def dimensions
-      Vector2d.new(*metadata[:dimensions]) if valid?
+      Vector2d.new(metadata[:width], metadata[:height]) if valid?
     end
 
     # Returns the width of the image.
     def width
-      dimensions.try(:x)
+      metadata[:width] if valid?
     end
 
     # Returns the height of the image.
     def height
-      dimensions.try(:y)
+      metadata[:height] if valid?
     end
 
-    # Returns the format of the image.
-    def format
-      metadata[:format] if valid?
-    end
+    # # Returns the format of the image.
+    # def format
+    #   return nil unless valid?
+    #   unless metadata[:loader] == "magickload"
+    #     return metadata[:loader].gsub(/load$/, "").upcase
+    #   end
+
+    #   "TODO"
+    # end
 
     # Returns true if the image is valid.
     def valid?
@@ -63,12 +72,8 @@ module DynamicImage
 
     def read_image
       image = reader.read
-      image.auto_orient
-      result = yield image
-      image.destroy!
-      result
-    rescue MiniMagick::Invalid
-      :invalid
+      image.autorot if image.respond_to?(:autorot)
+      yield image
     end
 
     def reader
@@ -77,11 +82,9 @@ module DynamicImage
 
     def read_metadata
       read_image do |image|
-        {
-          colorspace: image[:colorspace],
-          dimensions: image[:dimensions],
-          format: image[:format]
-        }
+        { width: image.get("width"),
+          height: image.get("height"),
+          colorspace: image.get("interpretation") }
       end
     end
   end

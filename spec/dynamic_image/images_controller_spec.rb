@@ -118,7 +118,11 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the content disposition" do
-        expect(response.headers["Content-Disposition"]).to eq("inline")
+        expect(response.headers["Content-Disposition"]).to match("inline")
+      end
+
+      it "sets the filename" do
+        expect(response.headers["Content-Disposition"]).to match("image.png")
       end
 
       it "resizes the image" do
@@ -138,6 +142,10 @@ describe ImagesController, type: :controller do
 
       it "returns a GIF image" do
         expect(metadata.format).to eq("GIF")
+      end
+
+      it "sets the filename" do
+        expect(response.headers["Content-Disposition"]).to match("image.gif")
       end
     end
 
@@ -322,7 +330,9 @@ describe ImagesController, type: :controller do
       end
 
       it "sets the Content-Disposition header" do
-        expect(response.headers["Content-Disposition"]).to eq("inline")
+        expect(response.headers["Content-Disposition"]).to eq(
+          'inline; filename="image.png"; filename*=UTF-8\'\'image.png'
+        )
       end
     end
   end

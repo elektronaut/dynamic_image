@@ -4,17 +4,16 @@ require "spec_helper"
 
 describe DynamicImage::ProcessedImage do
   def read_image(filename)
-    DynamicImage::ImageReader.new(
-      File.read(
-        File.expand_path("../../support/fixtures/#{filename}", __FILE__)
-      )
-    ).read
+    File.open(
+      File.expand_path("../../support/fixtures/#{filename}", __FILE__),
+      "rb"
+    )
   end
 
   subject(:processed) { described_class.new(record) }
 
   let(:image) { read_image("image.png") }
-  let(:record) { Image.new(data: image.to_blob, filename: "test.png") }
+  let(:record) { Image.new(data: image.read, filename: "test.png") }
 
   describe "#content_type" do
     subject { processed.content_type }
@@ -78,7 +77,7 @@ describe DynamicImage::ProcessedImage do
     let(:metadata) { DynamicImage::Metadata.new(normalized) }
 
     context "when image is saved" do
-      let(:record) { Image.create(data: image.to_blob, filename: "test.png") }
+      let(:record) { Image.create(data: image.read, filename: "test.png") }
 
       it { is_expected.to eq(size) }
 

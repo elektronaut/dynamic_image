@@ -10,10 +10,10 @@ module DynamicImage
         transform_image do |image|
           new_size = real_size.constrain_both(max_size)
           scale = new_size.x / real_size.x
-          image.resize(new_size)
           crop_attributes.each do |attr|
             self[attr] = self[attr] * scale if self[attr]
           end
+          image.resize(scale)
         end
       end
 
@@ -29,8 +29,8 @@ module DynamicImage
         end
 
         transform_image do |image|
-          image.rotate(degrees)
           rotate_dimensions(real_size.x, real_size.y, degrees)
+          image.rotate(degrees)
         end
       end
 

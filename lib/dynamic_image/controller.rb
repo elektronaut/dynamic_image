@@ -33,7 +33,7 @@ module DynamicImage
     end
 
     def download
-      render_raw_image(disposition: "attachment", filename: @record.filename)
+      render_raw_image(disposition: "attachment")
     end
 
     # Returns the requested size as a vector.
@@ -44,11 +44,23 @@ module DynamicImage
     private
 
     def cache_expiration_header
-      expires_in 1.year, public: true if response.status == 200
+      return unless response.status == 200
+
+      response.headers["Cache-Control"] = "max-age=#{1.year}, public"
+      expires_in 1.year, public: true
     end
 
     def find_record
       @record = model.find(params[:id])
+    end
+
+    def filename(format = nil)
+      if format.is_a?(DynamicImage::Format)
+        File.basename(@record.filename, ".*") + format.extension
+      else
+        filename(DynamicImage::Format.find(format) ||
+                 DynamicImage::Format.content_type(@record.content_type))
+      end
     end
 
     def process_and_send(image, options)
@@ -88,12 +100,12 @@ module DynamicImage
       end
     end
 
-    def render_raw_image(disposition: "inline", filename: nil)
+    def render_raw_image(disposition: "inline")
       return unless stale?(@record)
 
       respond_to do |format|
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
-          send_data(@record.data,
+          send_file(@record.tempfile,
                     filename: filename,
                     content_type: @record.content_type,
                     disposition: disposition)
@@ -106,7 +118,8 @@ module DynamicImage
     end
 
     def send_image(processed_image, requested_size)
-      send_data(processed_image.cropped_and_resized(requested_size),
+      send_file(processed_image.cropped_and_resized(requested_size),
+                filename: filename(processed_image.format),
                 content_type: processed_image.content_type,
                 disposition: "inline")
     end
