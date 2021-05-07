@@ -2,13 +2,21 @@
 
 module DynamicImage
   class Format
-    attr_reader :name, :content_types, :extensions, :magic_bytes
+    attr_reader :name, :animated, :content_types, :extensions, :magic_bytes,
+                :save_options
 
-    def initialize(name, content_type: [], extension: [], magic_bytes: [])
+    def initialize(name, animated: false, content_type: [], extension: [],
+                   magic_bytes: [], save_options: {})
       @name = name
+      @animated = animated
       @content_types = Array(content_type)
       @extensions = Array(extension)
       @magic_bytes = magic_bytes.map { |s| s.dup.force_encoding("binary") }
+      @save_options = save_options
+    end
+
+    def animated?
+      animated
     end
 
     def content_type
@@ -29,7 +37,7 @@ module DynamicImage
       end
 
       def find(name)
-        registered_formats[name]
+        registered_formats[name.to_s.upcase]
       end
 
       def formats
@@ -67,16 +75,20 @@ module DynamicImage
 
     register(
       "GIF",
+      animated: true,
       content_type: %w[image/gif],
       extension: %w[.gif],
-      magic_bytes: %w[GIF87a GIF89a]
+      magic_bytes: %w[GIF87a GIF89a],
+      save_options: { optimize_gif_frames: true,
+                      optimize_gif_transparency: true }
     )
 
     register(
       "JPEG",
       content_type: %w[image/jpeg image/pjpeg],
       extension: %w[.jpg .jpeg],
-      magic_bytes: ["\xff\xd8"]
+      magic_bytes: ["\xff\xd8"],
+      save_options: { Q: 90, strip: true }
     )
 
     register(
@@ -95,9 +107,11 @@ module DynamicImage
 
     register(
       "WEBP",
+      animated: true,
       content_type: %w[image/webp],
       extension: %w[.webp],
-      magic_bytes: ["\x52\x49\x46\x46"]
+      magic_bytes: ["\x52\x49\x46\x46"],
+      save_options: { Q: 90, strip: true }
     )
   end
 end

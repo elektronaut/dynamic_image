@@ -19,7 +19,8 @@ module DynamicImage
     def read
       raise DynamicImage::Errors::InvalidHeader unless valid_header?
 
-      Vips::Image.new_from_file(file.path, access: :sequential)
+      path = format.animated? ? "#{file.path}[n=-1]" : file.path
+      Vips::Image.new_from_file(path, access: :random)
     end
 
     def valid_header?

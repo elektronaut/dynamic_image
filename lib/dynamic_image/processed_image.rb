@@ -84,7 +84,7 @@ module DynamicImage
         image = convert_to_srgb(image)
         # TODO: convert profile
         image = yield(image) if block_given?
-        image = optimize(image)
+        # image = optimize(image)
         image
 
         # image.combine_options do |combined|
@@ -126,7 +126,7 @@ module DynamicImage
     def create_variant(size)
       record.variants.create(
         variant_params(size).merge(filename: record.filename,
-                                   content_type: content_type,
+                                   content_type: format.content_type,
                                    data: crop_and_resize(size))
       )
     end
@@ -136,10 +136,14 @@ module DynamicImage
         next unless record.cropped? || size != record.size
 
         crop_size, crop_start = image_sizing.crop_geometry(size)
-        ratio = size.x.to_f / crop_size.x
+        # ratio = size.x.to_f / crop_size.x
+        # image.resize(ratio)
+
+        # raise size.inspect
 
         image.crop(crop_start.x, crop_start.y, crop_size.x, crop_size.y)
-             .resize(ratio)
+             .thumbnail_image(size.x.to_i,
+                              height: size.y.to_i, crop: :none, size: :both)
       end
     end
 
@@ -164,13 +168,13 @@ module DynamicImage
     #   format != record_format
     # end
 
-    def optimize(image)
-      # TODO: Optimize here
-      # image.layers "optimize" if gif?
-      # image.strip
-      # image.quality(85).sampling_factor("4:2:0").interlace("JPEG") if jpeg?
-      image
-    end
+    # def optimize(image)
+    #   # TODO: Optimize here
+    #   # image.layers "optimize" if gif?
+    #   # image.strip
+    #   # image.quality(85).sampling_factor("4:2:0").interlace("JPEG") if jpeg?
+    #   image
+    # end
 
     def process_data
       # image = coalesced(DynamicImage::ImageReader.new(record.tempfile).read)
@@ -183,7 +187,7 @@ module DynamicImage
       tempfile = Tempfile.new(["dynamic_image", format.extension],
                               binmode: true)
       tempfile.close
-      image.write_to_file(tempfile.path)
+      image.write_to_file(tempfile.path, **format.save_options)
       tempfile.open
       tempfile
 
