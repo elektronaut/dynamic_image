@@ -6,12 +6,6 @@ module DynamicImage
       @data = data
     end
 
-    def exif
-      raise DynamicImage::Errors::InvalidHeader unless valid_header?
-
-      MiniExiftool.new(stream)
-    end
-
     def format
       DynamicImage::Format.sniff(file_header)
     end

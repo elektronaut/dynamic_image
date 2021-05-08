@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "mini_exiftool"
-require "mini_magick"
 require "dis"
 require "vector2d"
 require "vips"

@@ -62,7 +62,7 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Install system dependencies
-        run: sudo apt-get install -y libpq-dev libsqlite3-dev webp exiftool
+        run: sudo apt-get install -y libpq-dev libsqlite3-dev libvips
       - name: Ruby gem cache
         uses: actions/cache@v1
         with:
