@@ -126,6 +126,12 @@ describe DynamicImage::Metadata do
 
       it { is_expected.to be nil }
     end
+
+    context "when image is an animated gif" do
+      let(:image) { read_image("animated.gif") }
+
+      it { is_expected.to eq(200) }
+    end
   end
 
   describe "#format" do

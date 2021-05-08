@@ -15,60 +15,6 @@ describe DynamicImage::ProcessedImage do
   let(:image) { read_image("image.png") }
   let(:record) { Image.new(data: image.read, filename: "test.png") }
 
-  describe "#content_type" do
-    subject { processed.content_type }
-
-    let(:record) { Image.new }
-
-    context "when format is GIF" do
-      let(:processed) do
-        described_class.new(record, format: :gif)
-      end
-
-      it { is_expected.to eq("image/gif") }
-    end
-
-    context "when format is JPEG" do
-      let(:processed) do
-        described_class.new(record, format: :jpg)
-      end
-
-      it { is_expected.to eq("image/jpeg") }
-    end
-
-    context "when format is PNG" do
-      let(:processed) do
-        described_class.new(record, format: :png)
-      end
-
-      it { is_expected.to eq("image/png") }
-    end
-
-    context "when format is TIFF" do
-      let(:processed) do
-        described_class.new(record, format: :tiff)
-      end
-
-      it { is_expected.to eq("image/tiff") }
-    end
-
-    context "when format is BMP" do
-      let(:processed) do
-        described_class.new(record, format: :bmp)
-      end
-
-      it { is_expected.to eq("image/bmp") }
-    end
-
-    context "when format is WEBP" do
-      let(:processed) do
-        described_class.new(record, format: :webp)
-      end
-
-      it { is_expected.to eq("image/webp") }
-    end
-  end
-
   describe "#cropped_and_resized" do
     subject(:dimensions) { metadata.dimensions }
 

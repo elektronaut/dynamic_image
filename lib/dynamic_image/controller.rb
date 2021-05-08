@@ -105,7 +105,7 @@ module DynamicImage
 
       respond_to do |format|
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
-          send_file(@record.tempfile,
+          send_data(@record.data,
                     filename: filename,
                     content_type: @record.content_type,
                     disposition: disposition)
@@ -118,9 +118,9 @@ module DynamicImage
     end
 
     def send_image(processed_image, requested_size)
-      send_file(processed_image.cropped_and_resized(requested_size),
+      send_data(processed_image.cropped_and_resized(requested_size),
                 filename: filename(processed_image.format),
-                content_type: processed_image.content_type,
+                content_type: processed_image.format.content_type,
                 disposition: "inline")
     end
 

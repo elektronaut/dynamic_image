@@ -49,16 +49,6 @@ module DynamicImage
       metadata[:height] if valid?
     end
 
-    # # Returns the format of the image.
-    # def format
-    #   return nil unless valid?
-    #   unless metadata[:loader] == "magickload"
-    #     return metadata[:loader].gsub(/load$/, "").upcase
-    #   end
-
-    #   "TODO"
-    # end
-
     # Returns true if the image is valid.
     def valid?
       @data && reader.valid_header? && metadata != :invalid
@@ -82,8 +72,14 @@ module DynamicImage
 
     def read_metadata
       read_image do |image|
+        height = if image.get_fields.include?("page-height")
+                   image.get("page-height")
+                 else
+                   image.get("height")
+                 end
+
         { width: image.get("width"),
-          height: image.get("height"),
+          height: height,
           colorspace: image.get("interpretation") }
       end
     end

@@ -19,8 +19,11 @@ module DynamicImage
     def read
       raise DynamicImage::Errors::InvalidHeader unless valid_header?
 
-      path = format.animated? ? "#{file.path}[n=-1]" : file.path
-      Vips::Image.new_from_file(path, access: :random)
+      if @data.is_a?(String)
+        Vips::Image.new_from_buffer(@data, option_string)
+      else
+        Vips::Image.new_from_file(@data.path + option_string, access: :random)
+      end
     end
 
     def valid_header?
@@ -29,22 +32,12 @@ module DynamicImage
 
     private
 
-    def file
-      return tempfile if @data.is_a?(String)
-
-      @data
-    end
-
-    def tempfile
-      tempfile = Tempfile.new(["dynamic_image", format.extension],
-                              binmode: true)
-      tempfile.write(@data)
-      tempfile.open
-      tempfile
-    end
-
     def file_header
       @file_header ||= read_file_header
+    end
+
+    def option_string
+      format.animated? ? "[n=-1]" : ""
     end
 
     def read_file_header

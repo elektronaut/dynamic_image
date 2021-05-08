@@ -13,7 +13,7 @@ module DynamicImage
           crop_attributes.each do |attr|
             self[attr] = self[attr] * scale if self[attr]
           end
-          image.resize(scale)
+          image.resize(new_size)
         end
       end
 
@@ -74,15 +74,9 @@ module DynamicImage
         [new_width - crop_gravity_y, crop_gravity_x]
       end
 
-      def processed_image
-        DynamicImage::ProcessedImage.new(self, uncropped: true)
-      end
-
-      def transform_image
+      def transform_image(&block)
         read_image_metadata if data_changed?
-        self.data = processed_image.normalized do |image|
-          yield(image) if block_given?
-        end
+        self.data = block.call(DynamicImage::ImageProcessor.new(data)).read
         read_image_metadata
         self
       end

@@ -10,21 +10,25 @@
 
 module DynamicImage
   class ImageProcessor
-    attr_reader :image, :intent
+    attr_reader :image, :target_format
 
-    def initialize(image, intent: nil)
+    def initialize(image, target_format: nil)
       if image.is_a?(Vips::Image)
         @image = image
-        @intent = intent
+        @target_format = target_format
       else
         reader = DynamicImage::ImageReader.new(image)
         @image = reader.read.autorot
-        @intent = reader.format
+        @target_format = reader.format
       end
     end
 
     def convert(new_format)
-      self.class.new(image, intent: new_format)
+      if target_format.animated? && !new_format.animated?
+        self.class.new(extract_frame(0), target_format: new_format)
+      else
+        self.class.new(image, target_format: new_format)
+      end
     end
 
     def crop(crop_start, crop_size)
@@ -51,7 +55,7 @@ module DynamicImage
     end
 
     def read
-      tempfile = Tempfile.new(["dynamic_image", intent.extension],
+      tempfile = Tempfile.new(["dynamic_image", target_format.extension],
                               binmode: true)
       tempfile.close
       write(tempfile.path)
@@ -101,13 +105,13 @@ module DynamicImage
     end
 
     def write(path)
-      image.write_to_file(path, **intent.save_options)
+      image.write_to_file(path, **target_format.save_options)
     end
 
     private
 
     def apply(new_image)
-      self.class.new(new_image, intent: intent)
+      self.class.new(new_image, target_format: target_format)
     end
 
     def each_frame(&block)
@@ -131,12 +135,18 @@ module DynamicImage
     def icc_transform_srgb(image)
       return image unless icc_profile?
 
-      image.icc_transform("srgb")
+      image.icc_transform("srgb", embedded: true, intent: :perceptual)
+    end
+
+    def blank_image
+      image.draw_rect([0.0, 0.0, 0.0, 0.0],
+                      0, 0, image.get("width"), image.get("height"),
+                      fill: true)
     end
 
     def replace_frames(new_frames)
       new_size = Vector2d(new_frames.first.size)
-      image.insert(
+      blank_image.insert(
         Vips::Image.arrayjoin(new_frames, across: 1),
         0, 0, expand: true
       ).extract_area(

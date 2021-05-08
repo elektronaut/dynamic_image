@@ -37,7 +37,9 @@ module DynamicImage
       end
 
       def find(name)
-        registered_formats[name.to_s.upcase]
+        key = name.to_s.upcase
+        key = "JPEG" if key == "JPG"
+        registered_formats[key]
       end
 
       def formats
@@ -88,7 +90,7 @@ module DynamicImage
       content_type: %w[image/jpeg image/pjpeg],
       extension: %w[.jpg .jpeg],
       magic_bytes: ["\xff\xd8"],
-      save_options: { Q: 90, strip: true }
+      save_options: { Q: 90, strip: true, background: [255.0, 255.0, 255.0] }
     )
 
     register(

@@ -26,6 +26,22 @@ describe DynamicImage::ImageProcessor do
     it "converts the image" do
       expect(metadata.content_type).to eq("image/png")
     end
+
+    context "when converting from animated to non-animated" do
+      let(:file) { image_file("animated.gif") }
+      let(:image) { processor.convert(format(:jpeg)) }
+
+      specify { expect(reread.frame_count).to eq(1) }
+      specify { expect(metadata.height).to eq(200) }
+    end
+
+    context "when converting between animated formats" do
+      let(:file) { image_file("animated.webp") }
+      let(:image) { processor.convert(format(:gif)) }
+
+      specify { expect(reread.frame_count).to eq(3) }
+      specify { expect(metadata.height).to eq(200) }
+    end
   end
 
   describe "#crop" do
@@ -69,12 +85,6 @@ describe DynamicImage::ImageProcessor do
     it "extracts the correct frame" do
       expect(reread.image.getpoint(0, 0)).to eq([0.0, 0.0, 255.0, 255.0])
     end
-  end
-
-  describe "#intent" do
-    subject { processor.intent }
-
-    it { is_expected.to eq(DynamicImage::Format.find("PNG")) }
   end
 
   describe "#frame_count" do
@@ -224,6 +234,12 @@ describe DynamicImage::ImageProcessor do
     subject { image.size }
 
     it { is_expected.to eq(Vector2d(320, 200)) }
+  end
+
+  describe "#target_format" do
+    subject { processor.target_format }
+
+    it { is_expected.to eq(DynamicImage::Format.find("PNG")) }
   end
 
   describe "#write" do
