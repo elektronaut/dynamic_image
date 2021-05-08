@@ -146,12 +146,14 @@ module DynamicImage
 
     def replace_frames(new_frames)
       new_size = Vector2d(new_frames.first.size)
-      blank_image.insert(
+      new_image = blank_image.insert(
         Vips::Image.arrayjoin(new_frames, across: 1),
         0, 0, expand: true
       ).extract_area(
         0, 0, new_size.x, new_size.y * frame_count
-      ).mutate { |img| img.set!("page-height", new_size.y) }
+      ).copy
+      new_image.set("page-height", new_size.y)
+      new_image
     end
 
     def valid_crop?(crop_start, crop_size)
