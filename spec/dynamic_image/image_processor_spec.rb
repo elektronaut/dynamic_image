@@ -47,19 +47,19 @@ describe DynamicImage::ImageProcessor do
   describe "#crop" do
     subject(:size) { reread.size }
 
-    let(:image) { processor.crop(Vector2d(30, 20), Vector2d(50, 50)) }
+    let(:image) { processor.crop(Vector2d(50, 50), Vector2d(30, 20)) }
 
     it { is_expected.to eq(Vector2d(50, 50)) }
 
     it "raises an error when width is out of bounds" do
       expect do
-        processor.crop(Vector2d(100, 100), Vector2d(300, 50))
+        processor.crop(Vector2d(300, 50), Vector2d(100, 100))
       end.to raise_error(DynamicImage::Errors::InvalidTransformation)
     end
 
     it "raises an error when height is out of bounds" do
       expect do
-        processor.crop(Vector2d(100, 100), Vector2d(50, 150))
+        processor.crop(Vector2d(50, 150), Vector2d(100, 100))
       end.to raise_error(DynamicImage::Errors::InvalidTransformation)
     end
 

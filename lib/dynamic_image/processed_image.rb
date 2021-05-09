@@ -81,8 +81,7 @@ module DynamicImage
 
     def crop_and_resize(size)
       normalized do |image|
-        crop_size, crop_start = image_sizing.crop_geometry(size)
-        image.crop(crop_start, crop_size).resize(size)
+        image.crop(*image_sizing.crop_geometry(size)).resize(size)
       end
     end
 
