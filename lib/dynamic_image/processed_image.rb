@@ -64,7 +64,7 @@ module DynamicImage
     def normalized
       require_valid_image!
 
-      image = DynamicImage::ImageProcessor.new(record.data).screen_profile
+      image = DynamicImage::ImageProcessor.new(record.data)
       image = yield(image) if block_given?
       image.convert(format).read
     end

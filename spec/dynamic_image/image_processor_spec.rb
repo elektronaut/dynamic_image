@@ -19,6 +19,50 @@ describe DynamicImage::ImageProcessor do
   let(:image) { processor }
   let(:reread) { described_class.new(image.read) }
 
+  describe "#new" do
+    let(:metadata) { DynamicImage::Metadata.new(image.read) }
+
+    context "when image is in CMYK" do
+      let(:file) { image_file("cmyk.jpg") }
+
+      it "converts the image to RGB" do
+        expect(metadata.colorspace).to eq("rgb")
+      end
+    end
+
+    context "when image is in CMYK with embedded profile" do
+      let(:file) { image_file("cmyk-profile.jpg") }
+
+      it "converts the image to RGB" do
+        expect(metadata.colorspace).to eq("rgb")
+      end
+    end
+
+    context "when image is in grayscale" do
+      let(:file) { image_file("gray.jpg") }
+
+      it "does not convert the image to RGB" do
+        expect(metadata.colorspace).to eq("gray")
+      end
+    end
+
+    context "when image is in grayscale with embedded profile" do
+      let(:file) { image_file("gray-profile.jpg") }
+
+      it "converts the image to RGB" do
+        expect(metadata.colorspace).to eq("gray")
+      end
+    end
+
+    context "when image is in Adobe RGB" do
+      let(:file) { image_file("adobe-rgb.jpg") }
+
+      it "converts the colors" do
+        expect(image.image.getpoint(0, 0)).to eq([0.0, 255.0, 1.0])
+      end
+    end
+  end
+
   describe "#convert" do
     let(:image) { processor.convert(format(:png)) }
     let(:metadata) { DynamicImage::Metadata.new(image.read) }
@@ -181,51 +225,6 @@ describe DynamicImage::ImageProcessor do
 
       it "rotates all frames" do
         expect(reread.frame(2).size).to eq(Vector2d(200, 320))
-      end
-    end
-  end
-
-  describe "#screen_profile" do
-    let(:image) { processor.screen_profile }
-    let(:metadata) { DynamicImage::Metadata.new(image.read) }
-
-    context "when image is in CMYK" do
-      let(:file) { image_file("cmyk.jpg") }
-
-      it "converts the image to RGB" do
-        expect(metadata.colorspace).to eq("rgb")
-      end
-    end
-
-    context "when image is in CMYK with embedded profile" do
-      let(:file) { image_file("cmyk-profile.jpg") }
-
-      it "converts the image to RGB" do
-        expect(metadata.colorspace).to eq("rgb")
-      end
-    end
-
-    context "when image is in grayscale" do
-      let(:file) { image_file("gray.jpg") }
-
-      it "does not convert the image to RGB" do
-        expect(metadata.colorspace).to eq("gray")
-      end
-    end
-
-    context "when image is in grayscale with embedded profile" do
-      let(:file) { image_file("gray-profile.jpg") }
-
-      it "converts the image to RGB" do
-        expect(metadata.colorspace).to eq("gray")
-      end
-    end
-
-    context "when image is in Adobe RGB" do
-      let(:file) { image_file("adobe-rgb.jpg") }
-
-      it "converts the colors" do
-        expect(image.image.getpoint(0, 0)).to eq([0.0, 255.0, 1.0])
       end
     end
   end

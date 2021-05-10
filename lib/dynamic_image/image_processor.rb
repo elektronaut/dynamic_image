@@ -13,7 +13,6 @@ module DynamicImage
   #
   #   DynamicImage::ImageProcessor
   #     .new(file)
-  #     .screen_profile
   #     .crop(crop_start, crop_size)
   #     .resize(size)
   #     .convert(:jpeg)
@@ -31,7 +30,7 @@ module DynamicImage
         @target_format = target_format
       else
         reader = DynamicImage::ImageReader.new(image)
-        @image = reader.read.autorot
+        @image = screen_profile(reader.read.autorot)
         @target_format = reader.format
       end
     end
