@@ -41,7 +41,7 @@ and enumeration attacks.
 Add the gem to your Gemfile and run `bundle install`.
 
 ```ruby
-gem "dynamic_image", "~> 2.0.0"
+gem "dynamic_image", "~> 3.0"
 ```
 
 Run the `dis:install` generator to set up your storage.
