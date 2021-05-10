@@ -28,12 +28,6 @@ describe DynamicImage::ImageSizing do
               crop_start_y: crop_start.y)
   end
 
-  describe "#crop_geometry_string" do
-    subject { sizing.crop_geometry_string(v(200, 200)) }
-
-    it { is_expected.to eq("200x200+60+0!") }
-  end
-
   describe "#crop_geometry (uncropped image)" do
     subject { crop_geometry(200, 200) }
 

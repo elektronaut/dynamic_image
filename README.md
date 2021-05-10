@@ -21,17 +21,16 @@ images will be converted to RGB, and RGB images will be converted to the sRGB
 colorspace for consistent appearance in all browsers.
 
 DynamicImage is built on [Dis](https://github.com/elektronaut/dis)
-and [MiniMagick](https://github.com/minimagick/minimagick).
+and [ruby-vips](https://github.com/libvips/ruby-vips).
 
 All URLs are signed with a HMAC to protect against denial of service
 and enumeration attacks.
 
 ## Requirements
 
-* Rails 5
-* Ruby 2.4+
-* ImageMagick command line tools
-* ExifTool
+* Rails 5+
+* Ruby 2.7+
+* libvips 8.8+
 
 ## Documentation
 

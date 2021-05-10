@@ -58,19 +58,11 @@ module DynamicImage
 
       module ClassMethods
         def allowed_colorspaces
-          %w[rgb
-             cmyk
-             gray]
+          %w[rgb cmyk gray]
         end
 
         def allowed_content_types
-          %w[image/bmp
-             image/gif
-             image/jpeg
-             image/pjpeg
-             image/png
-             image/tiff
-             image/webp]
+          DynamicImage::Format.content_types
         end
       end
 

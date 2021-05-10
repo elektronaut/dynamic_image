@@ -11,21 +11,8 @@ module DynamicImage
     def initialize(record, options = {})
       @record    = record
       @uncropped = options[:uncropped] ? true : false
-      @format    = options[:format].to_s.upcase if options[:format]
-      @format    = "JPEG" if defined?(@format) && @format == "JPG"
-    end
-
-    # Returns the content type of the processed image.
-    #
-    # ==== Example
-    #
-    #   image = Image.find(params[:id])
-    #   DynamicImage::ProcessedImage.new(image).content_type
-    #   # => 'image/png'
-    #   DynamicImage::ProcessedImage.new(image, :jpeg).content_type
-    #   # => 'image/jpeg'
-    def content_type
-      "image/#{format}".downcase
+      @format_name = options[:format].to_s.upcase if options[:format]
+      @format_name = "JPEG" if defined?(@format_name) && @format_name == "JPG"
     end
 
     # Crops and resizes the image. Normalization is performed as well.
@@ -56,6 +43,10 @@ module DynamicImage
       record.variants.find_by(variant_params(size))
     end
 
+    def format
+      DynamicImage::Format.find(@format_name) || record_format
+    end
+
     # Normalizes the image.
     #
     # * Applies EXIF rotation
@@ -72,62 +63,26 @@ module DynamicImage
     # Returns a binary string.
     def normalized
       require_valid_image!
-      process_data do |image|
-        image.combine_options do |combined|
-          combined.auto_orient
-          convert_to_srgb(image, combined)
-          yield(combined) if block_given?
-          optimize(combined)
-        end
-        image.format(format) if needs_format_conversion?
-      end
+
+      image = DynamicImage::ImageProcessor.new(record.data)
+      image = yield(image) if block_given?
+      image.convert(format).read
     end
 
     private
 
-    def coalesced(image)
-      gif? ? DynamicImage::ImageReader.new(image.coalesce.to_blob).read : image
-    end
-
-    def convert_to_srgb(image, combined)
-      if image.data["profiles"].present? &&
-         exif.colorspacedata&.strip&.downcase == record.colorspace
-        combined.profile(srgb_profile)
-      end
-      combined.colorspace("sRGB") if record.cmyk?
-    end
-
     def create_variant(size)
       record.variants.create(
         variant_params(size).merge(filename: record.filename,
-                                   content_type: content_type,
+                                   content_type: format.content_type,
                                    data: crop_and_resize(size))
       )
     end
 
     def crop_and_resize(size)
       normalized do |image|
-        next unless record.cropped? || size != record.size
-
-        image.crop(image_sizing.crop_geometry_string(size))
-        image.resize(size)
+        image.crop(*image_sizing.crop_geometry(size)).resize(size)
       end
-    end
-
-    def exif
-      @exif ||= DynamicImage::ImageReader.new(record.data).exif
-    end
-
-    def format
-      @format ||= record_format
-    end
-
-    def gif?
-      content_type == "image/gif"
-    end
-
-    def jpeg?
-      content_type == "image/jpeg"
     end
 
     def image_sizing
@@ -135,37 +90,12 @@ module DynamicImage
         DynamicImage::ImageSizing.new(record, uncropped: @uncropped)
     end
 
-    def needs_format_conversion?
-      format != record_format
-    end
-
-    def optimize(image)
-      image.layers "optimize" if gif?
-      image.strip
-      image.quality(85).sampling_factor("4:2:0").interlace("JPEG") if jpeg?
-      image
-    end
-
-    def process_data
-      image = coalesced(DynamicImage::ImageReader.new(record.data).read)
-      yield(image)
-      result = image.to_blob
-      image.destroy!
-      result
-    end
-
     def record_format
-      { "image/bmp" => "BMP", "image/png" => "PNG", "image/gif" => "GIF",
-        "image/jpeg" => "JPEG", "image/pjpeg" => "JPEG", "image/tiff" => "TIFF",
-        "image/webp" => "WEBP" }[record.content_type]
+      DynamicImage::Format.content_type(record.content_type)
     end
 
     def require_valid_image!
       raise DynamicImage::Errors::InvalidImage unless record.valid?
-    end
-
-    def srgb_profile
-      File.join(File.dirname(__FILE__), "profiles/sRGB_ICC_v4_Appearance.icc")
     end
 
     def variant_params(size)
@@ -174,7 +104,7 @@ module DynamicImage
       { width: size.x.round, height: size.y.round,
         crop_width: crop_size.x, crop_height: crop_size.y,
         crop_start_x: crop_start.x, crop_start_y: crop_start.y,
-        format: format }
+        format: format.name }
     end
   end
 end

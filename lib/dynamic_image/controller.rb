@@ -33,7 +33,7 @@ module DynamicImage
     end
 
     def download
-      render_raw_image(disposition: "attachment", filename: @record.filename)
+      render_raw_image(disposition: "attachment")
     end
 
     # Returns the requested size as a vector.
@@ -44,34 +44,31 @@ module DynamicImage
     private
 
     def cache_expiration_header
-      expires_in 1.year, public: true if response.status == 200
+      return unless response.status == 200
+
+      response.headers["Cache-Control"] = "max-age=#{1.year}, public"
+      expires_in 1.year, public: true
     end
 
     def find_record
       @record = model.find(params[:id])
     end
 
-    def process_and_send(image, options)
-      processed_image = DynamicImage::ProcessedImage.new(image, options)
-      if process_later?(processed_image, requested_size)
-        process_later(image, options, requested_size)
-        head 503, retry_after: 10
+    def filename(format = nil)
+      if format.is_a?(DynamicImage::Format)
+        File.basename(@record.filename, ".*") + format.extension
       else
-        send_image(processed_image, requested_size)
+        filename(DynamicImage::Format.find(format) ||
+                 DynamicImage::Format.content_type(@record.content_type))
       end
     end
 
-    def process_later(image, options, requested_size)
-      DynamicImage::Jobs::CreateVariant
-        .perform_later(image, options, requested_size.to_s)
-    end
-
-    def process_later?(processed_image, size)
-      return false unless DynamicImage.process_later_limit
-
-      image_size = processed_image.record.size.x * processed_image.record.size.y
-      image_size > DynamicImage.process_later_limit &&
-        !processed_image.find_variant(size)
+    def process_and_send(image, options)
+      processed_image = DynamicImage::ProcessedImage.new(image, options)
+      send_data(processed_image.cropped_and_resized(requested_size),
+                filename: filename(processed_image.format),
+                content_type: processed_image.format.content_type,
+                disposition: "inline")
     end
 
     def render_image(options)
@@ -88,7 +85,7 @@ module DynamicImage
       end
     end
 
-    def render_raw_image(disposition: "inline", filename: nil)
+    def render_raw_image(disposition: "inline")
       return unless stale?(@record)
 
       respond_to do |format|
@@ -103,12 +100,6 @@ module DynamicImage
 
     def requested_format
       params[:format]
-    end
-
-    def send_image(processed_image, requested_size)
-      send_data(processed_image.cropped_and_resized(requested_size),
-                content_type: processed_image.content_type,
-                disposition: "inline")
     end
 
     def verify_signed_params

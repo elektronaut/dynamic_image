@@ -4,18 +4,17 @@ require "spec_helper"
 
 describe DynamicImage::Model::Variants do
   def read_image(filename)
-    DynamicImage::ImageReader.new(
-      File.read(
-        File.expand_path("../../../support/fixtures/#{filename}", __FILE__)
-      )
-    ).read
+    File.open(
+      File.expand_path("../../../support/fixtures/#{filename}", __FILE__),
+      "rb"
+    )
   end
 
   let(:source_image) { read_image("image.png") }
   let(:jpeg_image) { read_image("image.jpg") }
 
   let(:image) do
-    Image.create(data: source_image.to_blob,
+    Image.create(data: source_image.read,
                  filename: "test.png")
   end
 
@@ -25,7 +24,7 @@ describe DynamicImage::Model::Variants do
     before { processed.cropped_and_resized(Vector2d.new(149, 149)) }
 
     it "clears variants when the data changes" do
-      expect { image.update(data: jpeg_image.to_blob) }.to(
+      expect { image.update(data: jpeg_image.read) }.to(
         change { image.variants.count }.by(-1)
       )
     end

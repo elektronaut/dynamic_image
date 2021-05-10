@@ -4,11 +4,9 @@ require "spec_helper"
 
 describe DynamicImage::Metadata do
   def read_image(filename)
-    DynamicImage::ImageReader.new(
-      File.read(
-        File.expand_path("../../support/fixtures/#{filename}", __FILE__)
-      )
-    ).read
+    File.open(
+      File.expand_path("../../support/fixtures/#{filename}", __FILE__)
+    )
   end
 
   subject(:meta_info) { described_class.new(image_data) }
@@ -18,7 +16,7 @@ describe DynamicImage::Metadata do
   let(:webp_image) { read_image("image.webp") }
 
   let(:image) { source_image }
-  let(:image_data) { image.to_blob }
+  let(:image_data) { image }
 
   describe "#colorspace" do
     subject { meta_info.colorspace }
@@ -127,6 +125,12 @@ describe DynamicImage::Metadata do
       let(:image_data) { "invalid" }
 
       it { is_expected.to be nil }
+    end
+
+    context "when image is an animated gif" do
+      let(:image) { read_image("animated.gif") }
+
+      it { is_expected.to eq(200) }
     end
   end
 
