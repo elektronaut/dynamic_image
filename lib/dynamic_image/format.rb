@@ -5,14 +5,17 @@ module DynamicImage
     attr_reader :name, :animated, :content_types, :extensions, :magic_bytes,
                 :save_options
 
-    def initialize(name, animated: false, content_type: [], extension: [],
-                   magic_bytes: [], save_options: {})
+    def initialize(name, options)
+      options = default_options.merge(options)
+
       @name = name
-      @animated = animated
-      @content_types = Array(content_type)
-      @extensions = Array(extension)
-      @magic_bytes = magic_bytes.map { |s| s.dup.force_encoding("binary") }
-      @save_options = save_options
+      @animated = options[:animated]
+      @content_types = Array(options[:content_type])
+      @extensions = Array(options[:extension])
+      @magic_bytes = options[:magic_bytes].map do |s|
+        s.dup.force_encoding("binary")
+      end
+      @save_options = options[:save_options]
     end
 
     def animated?
@@ -47,7 +50,7 @@ module DynamicImage
       end
 
       def register(name, **opts)
-        registered_formats[name] = new(name, **opts)
+        registered_formats[name] = new(name, opts)
       end
 
       def sniff(bytes)
@@ -66,6 +69,11 @@ module DynamicImage
       def registered_formats
         @registered_formats ||= {}
       end
+    end
+
+    def default_options
+      { animated: false, content_type: [], extension: [], magic_bytes: [],
+        save_options: {} }
     end
 
     register(
