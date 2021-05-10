@@ -28,9 +28,9 @@ and enumeration attacks.
 
 ## Requirements
 
-* Rails 5
-* Ruby 2.4+
-* libvips
+* Rails 5+
+* Ruby 2.7+
+* libvips 8.8+
 
 ## Documentation
 
