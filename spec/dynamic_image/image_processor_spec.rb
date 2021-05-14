@@ -117,6 +117,13 @@ describe DynamicImage::ImageProcessor do
         expect(last_frame.image.getpoint(0, 0)).to eq([0.0, 0.0, 255.0, 255.0])
       end
     end
+
+    context "when image is rotated" do
+      let(:file) { image_file("rotated.jpg") }
+      let(:image) { processor.crop(Vector2d(200, 320), Vector2d(0, 0)) }
+
+      it { is_expected.to eq(Vector2d(200, 320)) }
+    end
   end
 
   describe "#frame" do

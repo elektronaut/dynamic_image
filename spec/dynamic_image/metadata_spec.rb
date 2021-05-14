@@ -102,6 +102,12 @@ describe DynamicImage::Metadata do
 
       it { is_expected.to be nil }
     end
+
+    context "when image is rotated" do
+      let(:image) { read_image("rotated.jpg") }
+
+      it { is_expected.to eq(Vector2d.new(200, 320)) }
+    end
   end
 
   describe "#width" do
@@ -113,6 +119,12 @@ describe DynamicImage::Metadata do
       let(:image_data) { "invalid" }
 
       it { is_expected.to be nil }
+    end
+
+    context "when image is rotated" do
+      let(:image) { read_image("rotated.jpg") }
+
+      it { is_expected.to eq(200) }
     end
   end
 
@@ -131,6 +143,12 @@ describe DynamicImage::Metadata do
       let(:image) { read_image("animated.gif") }
 
       it { is_expected.to eq(200) }
+    end
+
+    context "when image is rotated" do
+      let(:image) { read_image("rotated.jpg") }
+
+      it { is_expected.to eq(320) }
     end
   end
 

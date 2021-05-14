@@ -61,9 +61,7 @@ module DynamicImage
     end
 
     def read_image
-      image = reader.read
-      image.autorot if image.respond_to?(:autorot)
-      yield image
+      yield reader.read.autorot
     end
 
     def reader
