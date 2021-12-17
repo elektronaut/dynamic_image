@@ -100,7 +100,7 @@ module DynamicImage
     # Includes a timestamp fingerprint in the URL param, so
     # that rendered images can be cached indefinitely.
     def to_param
-      [id, updated_at.utc.to_s(cache_timestamp_format)].join("-")
+      [id, updated_at.utc.to_formatted_s(cache_timestamp_format)].join("-")
     end
 
     private
