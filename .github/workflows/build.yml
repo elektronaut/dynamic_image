@@ -63,10 +63,9 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
       - name: Install system dependencies
-        run: sudo apt-get install -y libtiff5-dev libgsf-1-dev libgif-dev giflib-tools libwebp-dev libheif-dev
+        run: sudo apt-get install -y libtiff5-dev libgsf-1-dev libgif-dev giflib-tools libwebp-dev libheif-dev libimagequant-dev
       - name: Build libvips from source
         run: |
-          cd /
           wget https://github.com/libvips/libvips/releases/download/v${{ env.VIPS_VERSION }}/vips-${{ env.VIPS_VERSION }}.tar.gz
           tar xf vips-${{ env.VIPS_VERSION }}.tar.gz
           cd vips-${{ env.VIPS_VERSION }}
