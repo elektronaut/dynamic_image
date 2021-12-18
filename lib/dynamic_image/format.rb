@@ -88,9 +88,7 @@ module DynamicImage
       animated: true,
       content_type: %w[image/gif],
       extension: %w[.gif],
-      magic_bytes: %w[GIF87a GIF89a],
-      save_options: { optimize_gif_frames: true,
-                      optimize_gif_transparency: true }
+      magic_bytes: %w[GIF87a GIF89a]
     )
 
     register(
