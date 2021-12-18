@@ -68,6 +68,13 @@ jobs:
           sudo add-apt-repository ppa:lovell/cgif
           sudo apt-get update
           sudo apt-get install libcgif-dev
+      - name: Vips cache
+        uses: actions/cache@v1
+        with:
+          path: vips-${{ env.VIPS_VERSION }}
+          key: ${{ runner.os }}-vips-${{ env.VIPS_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-vips-
       - name: Build libvips from source
         run: |
           wget https://github.com/libvips/libvips/releases/download/v${{ env.VIPS_VERSION }}/vips-${{ env.VIPS_VERSION }}.tar.gz
