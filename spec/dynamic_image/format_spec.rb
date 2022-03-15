@@ -33,7 +33,7 @@ describe DynamicImage::Format do
     context "when byte sequence is invalid" do
       let(:bytes) { "invalid" }
 
-      it { is_expected.to eq(nil) }
+      it { is_expected.to be_nil }
     end
   end
 

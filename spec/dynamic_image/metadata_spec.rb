@@ -42,7 +42,7 @@ describe DynamicImage::Metadata do
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
   end
 
@@ -88,7 +88,7 @@ describe DynamicImage::Metadata do
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
   end
 
@@ -100,7 +100,7 @@ describe DynamicImage::Metadata do
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "when image is rotated" do
@@ -118,7 +118,7 @@ describe DynamicImage::Metadata do
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "when image is rotated" do
@@ -136,7 +136,7 @@ describe DynamicImage::Metadata do
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "when image is an animated gif" do
@@ -194,7 +194,7 @@ describe DynamicImage::Metadata do
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
   end
 

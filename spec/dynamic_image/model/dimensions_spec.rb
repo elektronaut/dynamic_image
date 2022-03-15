@@ -9,7 +9,7 @@ describe DynamicImage::Model::Dimensions do
     subject { image.crop_gravity }
 
     context "with no dimensions" do
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "when only real_size is set" do
@@ -77,7 +77,7 @@ describe DynamicImage::Model::Dimensions do
     subject { image.crop_size }
 
     context "with no dimensions" do
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "with dimensions" do
@@ -191,7 +191,7 @@ describe DynamicImage::Model::Dimensions do
     subject { image.real_size }
 
     context "with no dimensions" do
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "with dimensions" do
@@ -225,7 +225,7 @@ describe DynamicImage::Model::Dimensions do
     subject { image.size }
 
     context "with no dimensions" do
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "when not cropped" do

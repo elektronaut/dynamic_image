@@ -23,7 +23,7 @@ describe DynamicImage::BelongsTo do
     context "with nil" do
       let(:argument) { nil }
 
-      it { is_expected.to be nil }
+      it { is_expected.to be_nil }
     end
 
     context "with an existing image" do

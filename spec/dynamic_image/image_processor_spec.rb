@@ -256,7 +256,7 @@ describe DynamicImage::ImageProcessor do
     it "writes the image to a file" do
       image.write(filename)
       reader = DynamicImage::ImageReader.new(File.open(filename, "rb"))
-      expect(reader.valid_header?).to eq(true)
+      expect(reader.valid_header?).to be(true)
     end
   end
 end

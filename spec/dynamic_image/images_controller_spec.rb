@@ -63,9 +63,9 @@ describe ImagesController, type: :controller do
 
     context "with If-Modified-Since header" do
       before do
-        request.env["HTTP_IF_MODIFIED_SINCE"] = (
-          Time.zone.now + 10.minutes
-        ).httpdate
+        request.env["HTTP_IF_MODIFIED_SINCE"] =
+          10.minutes.from_now
+            .httpdate
         get(:show, params: digested(:show,
                                     id: image.id,
                                     size: "100x100",
@@ -85,7 +85,7 @@ describe ImagesController, type: :controller do
       end
 
       it "responds with success" do
-        expect(response.successful?).to eq(true)
+        expect(response.successful?).to be(true)
       end
 
       it "finds the record" do
@@ -114,7 +114,7 @@ describe ImagesController, type: :controller do
       end
 
       it "responds with success" do
-        expect(response.successful?).to eq(true)
+        expect(response.successful?).to be(true)
       end
 
       it "sets the content disposition" do
@@ -250,7 +250,7 @@ describe ImagesController, type: :controller do
       end
 
       it "responds with success" do
-        expect(response.successful?).to eq(true)
+        expect(response.successful?).to be(true)
       end
 
       it "finds the record" do
@@ -300,7 +300,7 @@ describe ImagesController, type: :controller do
       end
 
       it "responds with success" do
-        expect(response.successful?).to eq(true)
+        expect(response.successful?).to be(true)
       end
 
       it "finds the record" do
@@ -347,7 +347,7 @@ describe ImagesController, type: :controller do
     end
 
     it "responds with success" do
-      expect(response.successful?).to eq(true)
+      expect(response.successful?).to be(true)
     end
 
     it "finds the record" do
