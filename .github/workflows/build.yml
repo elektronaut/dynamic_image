@@ -64,9 +64,9 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
       - name: Install system dependencies
         run: |
+          sudo apt-get update
           sudo apt-get install -y libtiff5-dev libgsf-1-dev libgif-dev giflib-tools libwebp-dev libheif-dev libimagequant-dev
           sudo add-apt-repository ppa:lovell/cgif
-          sudo apt-get update
           sudo apt-get install libcgif-dev
       - name: Vips cache
         uses: actions/cache@v1

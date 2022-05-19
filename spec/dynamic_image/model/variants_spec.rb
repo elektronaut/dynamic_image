@@ -30,8 +30,8 @@ describe DynamicImage::Model::Variants do
     end
 
     it "doesn't clear variants when the data remains the same" do
-      expect { image.update(crop_width: 100) }.to(
-        change { image.variants.count }.by(0)
+      expect { image.update(crop_width: 100) }.not_to(
+        change { image.variants.count }
       )
     end
   end

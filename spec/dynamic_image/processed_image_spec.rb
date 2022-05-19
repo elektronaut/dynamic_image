@@ -28,7 +28,7 @@ describe DynamicImage::ProcessedImage do
       it { is_expected.to eq(size) }
 
       it "creates a variant" do
-        expect { normalized }.to change { DynamicImage::Variant.count }.by(1)
+        expect { normalized }.to change(DynamicImage::Variant, :count).by(1)
       end
     end
 
@@ -36,7 +36,7 @@ describe DynamicImage::ProcessedImage do
       it { is_expected.to eq(size) }
 
       it "doesn't create a variant" do
-        expect { normalized }.to change { DynamicImage::Variant.count }.by(0)
+        expect { normalized }.not_to change(DynamicImage::Variant, :count)
       end
     end
   end
