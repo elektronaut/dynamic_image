@@ -19,8 +19,8 @@ module DynamicImage
                     "#{file_name.pluralize}_controller.rb"),
           after: "ApplicationController\n"
         ) do
-          "  include DynamicImage::Controller\n\n  private\n\n" \
-            "  def model\n    #{class_name}\n  end\n"
+          "  include DynamicImage::Controller\n\n  private\n\n  " \
+            "def model\n    #{class_name}\n  end\n"
         end
       end
 

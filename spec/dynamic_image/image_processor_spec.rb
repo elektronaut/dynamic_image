@@ -251,7 +251,7 @@ describe DynamicImage::ImageProcessor do
   describe "#write" do
     let(:filename) { "output.png" }
 
-    after { File.unlink(filename) if File.exist?(filename) }
+    after { FileUtils.rm_rf(filename) }
 
     it "writes the image to a file" do
       image.write(filename)
