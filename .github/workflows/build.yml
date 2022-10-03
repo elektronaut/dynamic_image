@@ -4,7 +4,7 @@ env:
   POSTGRES_PASSWORD: postgres
   POSTGRES_DB: dynamic_image_test
   CC_TEST_REPORTER_ID: 05e44f79bfab91587e3081a5b09b11f8a81c5e133fa326c4877cc95b26a59b32
-  VIPS_VERSION: 8.12.1
+  VIPS_VERSION: 8.13.2
 
 name: Build
 on:
