@@ -30,7 +30,7 @@ Layout/LineLength:
   Max: 80
 
 Metrics/BlockLength:
-  IgnoredMethods:
+  AllowedMethods:
     - "included"
   Exclude:
     - "*.gemspec"
