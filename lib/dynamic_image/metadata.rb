@@ -77,7 +77,7 @@ module DynamicImage
                  end
 
         { width: image.get("width"),
-          height: height,
+          height:,
           colorspace: image.get("interpretation") }
       end
     end

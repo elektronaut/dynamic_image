@@ -77,7 +77,7 @@ module DynamicImage
     private
 
     def apply(new_image)
-      self.class.new(new_image, target_format: target_format)
+      self.class.new(new_image, target_format:)
     end
 
     def blank_image

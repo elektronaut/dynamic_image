@@ -34,7 +34,7 @@ describe ImagesController, type: :controller do
       end
 
       it "raises an error" do
-        expect { get(:show, params: params) }.to(
+        expect { get(:show, params:) }.to(
           raise_error(DynamicImage::Errors::InvalidSignature)
         )
       end

@@ -35,7 +35,7 @@ module DynamicImage
 
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)
-      html_options = { size: size }.merge(options)
+      html_options = { size: }.merge(options)
 
       image_tag(dynamic_image_path_with_size(record_or_array,
                                              size,
@@ -143,7 +143,7 @@ module DynamicImage
         routing_type: :url,
         action: nil,
         format: default_format_for_image(record),
-        size: size
+        size:
       }.merge(options)
       options[:digest] =
         dynamic_image_digest(record, options[:action], options[:size])
@@ -179,7 +179,7 @@ module DynamicImage
 
     def image_sizing(record, size_opts, uncropped)
       ImageSizing
-        .new(record, uncropped: uncropped)
+        .new(record, uncropped:)
         .fit(size_opts[:size], size_opts).floor.to_s
     end
   end

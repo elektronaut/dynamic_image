@@ -77,7 +77,7 @@ module DynamicImage
       respond_to do |format|
         format.html do
           render(template: "dynamic_image/images/show",
-                 layout: false, locals: { options: options })
+                 layout: false, locals: { options: })
         end
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
           process_and_send(@record, options)
@@ -91,9 +91,9 @@ module DynamicImage
       respond_to do |format|
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
           send_data(@record.data,
-                    filename: filename,
+                    filename:,
                     content_type: @record.content_type,
-                    disposition: disposition)
+                    disposition:)
         end
       end
     end
