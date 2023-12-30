@@ -4,6 +4,8 @@ log/*.log
 pkg/
 spec/internal/db/*.sqlite3
 spec/internal/db/*.sqlite3-journal
+spec/internal/db/*.sqlite3-shm
+spec/internal/db/*.sqlite3-wal
 spec/internal/db/dis/
 spec/internal/log/*.log
 spec/internal/tmp/
