@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 gem "mime-types"
-gem "rails", "~> 7.1.0"
+gem "rails", "~> 7.1.3"
 
 gemspec
 
