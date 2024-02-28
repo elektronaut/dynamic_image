@@ -8,6 +8,10 @@ module DynamicImage
     class CreateVariant < ActiveJob::Base
       queue_as :dis
 
+      discard_on Dis::Errors::NotFoundError
+
+      retry_on StandardError, attempts: 10, wait: :polynomially_longer
+
       def perform(record, options, size)
         size_v = Vector2d.parse(size)
         DynamicImage::ProcessedImage.new(record, options)
