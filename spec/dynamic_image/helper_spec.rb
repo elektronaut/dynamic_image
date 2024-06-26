@@ -38,8 +38,7 @@ describe DynamicImage::Helper, type: :helper do
 
       it do
         expect(tag).to eq(
-          "<img alt=\"My uploaded file\" src=\"#{path}\" width=\"100\" " \
-          'height="62" />'
+          "<img src=\"#{path}\" width=\"100\" height=\"62\" />"
         )
       end
     end
@@ -64,8 +63,7 @@ describe DynamicImage::Helper, type: :helper do
 
       it do
         expect(tag).to eq(
-          "<img alt=\"My uploaded file\" src=\"#{host}#{path}\" " \
-          'width="100" height="62" />'
+          "<img src=\"#{host}#{path}\" width=\"100\" height=\"62\" />"
         )
       end
     end
@@ -204,8 +202,7 @@ describe DynamicImage::Helper, type: :helper do
 
     it do
       expect(tag).to eq(
-        "<img alt=\"My uploaded file\" src=\"#{path}\" width=\"100\" " \
-        'height="62" />'
+        "<img src=\"#{path}\" width=\"100\" height=\"62\" />"
       )
     end
   end

@@ -26,13 +26,10 @@ module DynamicImage
     #
     #   image = Image.find(params[:id])
     #   dynamic_image_tag(image)
-    #   # => <img alt="My file" height="200" src="..." width="320" />
+    #   # => <img height="200" src="..." width="320" />
     #   dynamic_image_tag(image, size: "100x100", alt="Avatar")
     #   # => <img alt="Avatar" height="62" src="..." width="100" />
     def dynamic_image_tag(record_or_array, options = {})
-      record = extract_dynamic_image_record(record_or_array)
-      options = { alt: filename_to_alt(record.filename) }.merge(options)
-
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)
       html_options = { size: }.merge(options)
