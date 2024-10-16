@@ -7,8 +7,8 @@ module DynamicImage
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def belongs_to_image(name, scope = nil, **options)
-        belongs_to(name, scope, **options)
+      def belongs_to_image(name, scope = nil, **)
+        belongs_to(name, scope, **)
 
         define_method "#{name}=" do |new_image|
           if new_image.present? && !new_image.is_a?(DynamicImage::Model)
