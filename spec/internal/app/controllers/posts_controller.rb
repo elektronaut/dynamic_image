@@ -23,9 +23,7 @@ class PostsController < ApplicationController
     @post.update(post_params)
   end
 
-  def destroy
-    @post.destroy
-  end
+  delegate :destroy, to: :@post
 
   private
 

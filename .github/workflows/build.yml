@@ -22,7 +22,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          ruby-version: 3.3
+          ruby-version: 3.4
       - name: Check code
         run: bundle exec rubocop
 
@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ruby: ['3.2', '3.3']
+        ruby: ['3.3', '3.4']
     services:
       postgres:
         image: postgres:latest
