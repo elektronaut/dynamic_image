@@ -2,7 +2,7 @@ env:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: postgres
   POSTGRES_DB: dynamic_image_test
-  VIPS_VERSION: 8.13.2
+  VIPS_VERSION: 8.16.0
 
 name: Build
 on:
@@ -59,7 +59,7 @@ jobs:
           sudo add-apt-repository ppa:lovell/cgif
           sudo apt-get install libcgif-dev
       - name: Vips cache
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: vips-${{ env.VIPS_VERSION }}
           key: ${{ runner.os }}-vips-${{ env.VIPS_VERSION }}
