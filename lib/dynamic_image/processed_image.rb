@@ -40,7 +40,11 @@ module DynamicImage
     def find_variant(size)
       return nil unless record.persisted?
 
-      record.variants.find_by(variant_params(size))
+      variant = record.variants.find_by(variant_params(size))
+      variant&.tap(&:data)
+    rescue Dis::Errors::NotFoundError
+      variant.destroy
+      nil
     end
 
     def format
