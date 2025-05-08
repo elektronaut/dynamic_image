@@ -168,7 +168,7 @@ module DynamicImage
       action = options[:action].try(:to_s)
       size_opts = options.extract!(:size, :crop, :upscale)
       if size_opts[:size]
-        image_sizing(record, size_opts, (action == "uncropped"))
+        image_sizing(record, size_opts, action == "uncropped")
       else
         (action == "original" ? record.real_size : record.size).floor.to_s
       end

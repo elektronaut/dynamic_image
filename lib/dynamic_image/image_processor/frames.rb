@@ -22,7 +22,7 @@ module DynamicImage
       end
 
       def extract_frame(index)
-        image.extract_area(0, (index * size.y), size.x, size.y)
+        image.extract_area(0, index * size.y, size.x, size.y)
       end
 
       def frames

@@ -37,7 +37,7 @@ module DynamicImage
     def read_file_header
       data_stream = stream
       header = data_stream.read(8)
-      data_stream.seek((0 - header.length), IO::SEEK_CUR) if header
+      data_stream.seek(0 - header.length, IO::SEEK_CUR) if header
       header
     end
 
