@@ -8,6 +8,7 @@ plugins:
 
 AllCops:
   NewCops: enable
+  TargetRailsVersion: 7.2
   TargetRubyVersion: 3.2
   Exclude:
     - 'spec/internal/config/**/*'

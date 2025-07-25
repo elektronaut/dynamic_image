@@ -108,14 +108,13 @@ module DynamicImage
     def read_image_metadata
       metadata = DynamicImage::Metadata.new(data)
       @valid_image = false
-      if metadata.valid?
-        self.colorspace = metadata.colorspace
-        self.real_width = metadata.width
-        self.real_height = metadata.height
-        self.content_type = metadata.content_type
-        @valid_image = true
-      end
-      true
+      return unless metadata.valid?
+
+      self.colorspace = metadata.colorspace
+      self.real_width = metadata.width
+      self.real_height = metadata.height
+      self.content_type = metadata.content_type
+      @valid_image = true
     end
 
     def valid_image?

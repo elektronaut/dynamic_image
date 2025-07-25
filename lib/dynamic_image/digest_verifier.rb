@@ -38,7 +38,7 @@ module DynamicImage
 
     private
 
-    def secure_compare(str, other)
+    def secure_compare?(str, other)
       return false unless str.bytesize == other.bytesize
 
       l = str.unpack "C#{str.bytesize}"
@@ -60,7 +60,7 @@ module DynamicImage
     def valid_digest?(data, digest)
       data.present? &&
         digest.present? &&
-        secure_compare(digest, generate_digest(data))
+        secure_compare?(digest, generate_digest(data))
     end
   end
 end
