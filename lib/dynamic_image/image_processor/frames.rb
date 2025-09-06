@@ -15,6 +15,12 @@ module DynamicImage
 
       private
 
+      def blank_image
+        image.draw_rect([0.0] * image.bands,
+                        0, 0, image.get("width"), image.get("height"),
+                        fill: true)
+      end
+
       def each_frame(&block)
         return apply(block.call(image)) unless frame_count > 1
 

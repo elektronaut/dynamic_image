@@ -79,11 +79,5 @@ module DynamicImage
     def apply(new_image)
       self.class.new(new_image, target_format:)
     end
-
-    def blank_image
-      image.draw_rect([0.0, 0.0, 0.0, 0.0],
-                      0, 0, image.get("width"), image.get("height"),
-                      fill: true)
-    end
   end
 end
