@@ -3,8 +3,6 @@
 require "spec_helper"
 
 describe DynamicImage::BelongsTo do
-  storage_root = Rails.root.join("tmp/spec")
-
   let(:file) do
     File.open(File.expand_path("../support/fixtures/image.png", __dir__))
   end
@@ -12,7 +10,7 @@ describe DynamicImage::BelongsTo do
   let(:image) { Image.create(file: uploaded_file) }
 
   after do
-    FileUtils.rm_rf(storage_root)
+    FileUtils.rm_rf(Rails.root.join("tmp/spec"))
   end
 
   describe "assignment" do
