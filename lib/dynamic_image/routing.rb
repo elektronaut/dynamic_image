@@ -16,7 +16,7 @@ module DynamicImage
         only: %i[show]
       }.merge(options)
 
-      resources resource_name, options do
+      resources resource_name, **options do
         get :uncropped, on: :member
         get :original, on: :member
         get :download, on: :member
