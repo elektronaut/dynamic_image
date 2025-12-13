@@ -1,7 +1,5 @@
 [![Version](https://img.shields.io/gem/v/dynamic_image.svg?style=flat)](https://rubygems.org/gems/dynamic_image)
 ![Build](https://github.com/elektronaut/dynamic_image/workflows/Build/badge.svg)
-[![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/badges/gpa.svg)](https://codeclimate.com/github/elektronaut/dynamic_image)
-[![Code Climate](https://codeclimate.com/github/elektronaut/dynamic_image/badges/coverage.svg)](https://codeclimate.com/github/elektronaut/dynamic_image)
 
 # DynamicImage
 
