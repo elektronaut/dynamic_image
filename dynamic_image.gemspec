@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "dis", "~> 1.1", ">= 1.1.11"
   s.add_dependency "rails", "> 7.0"
-  s.add_dependency "ruby-vips", "~> 2.1.0"
+  s.add_dependency "ruby-vips", ">= 2.1", "< 2.4"
   s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
 
   s.metadata = {
