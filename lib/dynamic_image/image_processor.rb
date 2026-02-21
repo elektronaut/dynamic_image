@@ -49,14 +49,8 @@ module DynamicImage
 
     # Returns the image data as a binary string.
     def read
-      tempfile = Tempfile.new(["dynamic_image", target_format.extension],
-                              binmode: true)
-      tempfile.close
-      write(tempfile.path)
-      tempfile.open
-      tempfile.read
-    ensure
-      tempfile.close
+      image.write_to_buffer(target_format.extension,
+                            **target_format.save_options)
     end
 
     # Returns the image size as a Vector2d.
