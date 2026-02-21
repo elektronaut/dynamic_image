@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dynamic_image (3.0.6)
+    dynamic_image (3.0.7)
       dis (~> 1.2)
       rails (> 7.0)
       ruby-vips (>= 2.1, < 2.4)
