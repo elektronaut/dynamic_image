@@ -41,10 +41,24 @@ module DynamicImage
       return nil unless record.persisted?
 
       variant = record.variants.find_by(variant_params(size))
-      variant&.tap(&:data)
-    rescue Dis::Errors::NotFoundError
-      variant.destroy
-      nil
+      return nil unless variant
+
+      if Dis::Storage.exists?(variant.class.dis_type, variant.content_hash)
+        variant
+      else
+        variant.destroy
+        nil
+      end
+    end
+
+    # Find or create a variant for the given size, returning the variant
+    # record (not data). Returns nil if the record is not persisted.
+    def variant_for(size)
+      return nil unless record.persisted?
+
+      find_or_create_variant(size)
+    rescue ActiveRecord::RecordNotUnique
+      find_variant(size)
     end
 
     def format

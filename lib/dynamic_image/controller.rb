@@ -64,11 +64,16 @@ module DynamicImage
     end
 
     def process_and_send(image, options)
-      processed_image = DynamicImage::ProcessedImage.new(image, options)
-      send_data(processed_image.cropped_and_resized(requested_size),
-                filename: filename(processed_image.format),
-                content_type: processed_image.format.content_type,
-                disposition: "inline")
+      processed = DynamicImage::ProcessedImage.new(image, options)
+      variant = processed.variant_for(requested_size)
+      send_opts = { filename: filename(processed.format),
+                    content_type: processed.format.content_type,
+                    disposition: "inline" }
+      if variant
+        send_file(variant.data_file_path, **send_opts)
+      else
+        send_data(processed.cropped_and_resized(requested_size), **send_opts)
+      end
     end
 
     def render_image(options)
@@ -90,7 +95,7 @@ module DynamicImage
 
       respond_to do |format|
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
-          send_data(@record.data,
+          send_file(@record.data_file_path,
                     filename:,
                     content_type: @record.content_type,
                     disposition:)
