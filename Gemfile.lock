@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     dynamic_image (3.0.6)
-      dis (~> 1.1, >= 1.1.11)
+      dis (~> 1.2)
       rails (> 7.0)
       ruby-vips (>= 2.1, < 2.4)
       vector2d (~> 2.2, >= 2.2.1)
@@ -98,7 +98,7 @@ GEM
     date (3.5.1)
     debug_inspector (1.2.0)
     diff-lcs (1.6.2)
-    dis (1.1.21)
+    dis (1.2.0)
       benchmark
       fog-core (>= 2.1.2, < 2.7.0)
       fog-local
