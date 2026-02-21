@@ -16,7 +16,8 @@ module DynamicImage
       if @data.is_a?(String)
         Vips::Image.new_from_buffer(@data, option_string)
       else
-        Vips::Image.new_from_file(@data.path + option_string, access: :random)
+        path = @data.is_a?(Pathname) ? @data.to_s : @data.path
+        Vips::Image.new_from_file(path + option_string, access: :random)
       end
     end
 
@@ -35,10 +36,14 @@ module DynamicImage
     end
 
     def read_file_header
-      data_stream = stream
-      header = data_stream.read(8)
-      data_stream.seek(0 - header.length, IO::SEEK_CUR) if header
-      header
+      if @data.is_a?(Pathname)
+        File.binread(@data.to_s, 8)
+      else
+        data_stream = stream
+        header = data_stream.read(8)
+        data_stream.seek(0 - header.length, IO::SEEK_CUR) if header
+        header
+      end
     end
 
     def stream

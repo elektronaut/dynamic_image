@@ -76,7 +76,7 @@ module DynamicImage
 
       def transform_image(&block)
         read_image_metadata if data_changed?
-        self.data = block.call(DynamicImage::ImageProcessor.new(data)).read
+        self.data = block.call(DynamicImage::ImageProcessor.new(Pathname(data_file_path))).read
         read_image_metadata
         self
       end
