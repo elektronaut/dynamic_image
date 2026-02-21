@@ -3,8 +3,7 @@
 module DynamicImage
   # = DynamicImage Metadata
   #
-  # Parses metadata from an image. Expects to receive image data as a
-  # binary string.
+  # Parses metadata from an image. Accepts a Pathname, IO, or binary string.
   class Metadata
     def initialize(data)
       @data = data
@@ -60,26 +59,35 @@ module DynamicImage
       @metadata ||= read_metadata
     end
 
-    def read_image
-      yield reader.read.autorot
-    end
-
     def reader
       @reader ||= DynamicImage::ImageReader.new(@data)
     end
 
     def read_metadata
-      read_image do |image|
-        height = if image.get_fields.include?("page-height")
-                   image.get("page-height")
-                 else
-                   image.get("height")
-                 end
+      image = reader.read
 
-        { width: image.get("width"),
-          height:,
-          colorspace: image.get("interpretation") }
-      end
+      width = image.get("width")
+      height = if image.get_fields.include?("page-height")
+                 image.get("page-height")
+               else
+                 image.get("height")
+               end
+
+      width, height = height, width if rotated?(image)
+
+      { width:, height:, colorspace: image.get("interpretation") }
+    end
+
+    def orientation(image)
+      return 1 unless image.get_fields.include?("orientation")
+
+      image.get("orientation")
+    rescue Vips::Error
+      1
+    end
+
+    def rotated?(image)
+      orientation(image).between?(5, 8)
     end
   end
 end

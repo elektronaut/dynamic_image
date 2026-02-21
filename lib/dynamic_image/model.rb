@@ -106,7 +106,7 @@ module DynamicImage
     private
 
     def read_image_metadata
-      metadata = DynamicImage::Metadata.new(data)
+      metadata = DynamicImage::Metadata.new(Pathname(data_file_path))
       @valid_image = false
       return unless metadata.valid?
 
