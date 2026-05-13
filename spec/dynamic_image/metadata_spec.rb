@@ -210,5 +210,16 @@ describe DynamicImage::Metadata do
 
       it { is_expected.to be false }
     end
+
+    context "when the header sniffs as valid but vips fails to load it" do
+      before do
+        reader = instance_double(DynamicImage::ImageReader, valid_header?: true)
+        allow(reader).to receive(:read)
+          .and_raise(Vips::Error.new("not a known file format"))
+        allow(DynamicImage::ImageReader).to receive(:new).and_return(reader)
+      end
+
+      it { is_expected.to be false }
+    end
   end
 end

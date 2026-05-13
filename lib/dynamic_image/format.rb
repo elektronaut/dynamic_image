@@ -3,7 +3,7 @@
 module DynamicImage
   class Format
     attr_reader :name, :animated, :content_types, :extensions, :magic_bytes,
-                :save_options
+                :save_options, :signature
 
     def initialize(name, options)
       options = default_options.merge(options)
@@ -15,11 +15,18 @@ module DynamicImage
       @magic_bytes = options[:magic_bytes].map do |s|
         s.dup.force_encoding("binary")
       end
+      @signature = options[:signature]
       @save_options = options[:save_options]
     end
 
     def animated?
       animated
+    end
+
+    def matches?(bytes)
+      return false unless magic_bytes.any? { |b| bytes.start_with?(b) }
+
+      signature.nil? || signature.call(bytes)
     end
 
     def content_type
@@ -56,12 +63,7 @@ module DynamicImage
       def sniff(bytes)
         return unless bytes
 
-        formats.each do |format|
-          format.magic_bytes.each do |b|
-            return format if bytes.start_with?(b)
-          end
-        end
-        nil
+        formats.find { |format| format.matches?(bytes) }
       end
 
       private
@@ -73,7 +75,7 @@ module DynamicImage
 
     def default_options
       { animated: false, content_type: [], extension: [], magic_bytes: [],
-        save_options: {} }
+        signature: nil, save_options: {} }
     end
 
     register(
@@ -119,6 +121,7 @@ module DynamicImage
       content_type: %w[image/webp],
       extension: %w[.webp],
       magic_bytes: ["\x52\x49\x46\x46"],
+      signature: ->(bytes) { bytes.bytesize >= 12 && bytes[8, 4] == "WEBP" },
       save_options: { Q: 90, strip: true }
     )
   end

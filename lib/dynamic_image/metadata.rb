@@ -65,17 +65,21 @@ module DynamicImage
 
     def read_metadata
       image = reader.read
+      width, height = dimensions_from(image)
+      width, height = height, width if rotated?(image)
+      { width:, height:, colorspace: image.get("interpretation") }
+    rescue Vips::Error
+      :invalid
+    end
 
+    def dimensions_from(image)
       width = image.get("width")
       height = if image.get_fields.include?("page-height")
                  image.get("page-height")
                else
                  image.get("height")
                end
-
-      width, height = height, width if rotated?(image)
-
-      { width:, height:, colorspace: image.get("interpretation") }
+      [width, height]
     end
 
     def orientation(image)
