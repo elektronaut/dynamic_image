@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.8](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.0.7...dynamic_image/v3.0.8) (2026-05-13)
+
+
+### Bug Fixes
+
+* install libvips in publish workflow job ([01fff8c](https://github.com/elektronaut/dynamic_image/commit/01fff8cc8943ed01f578a7b907f55743a00dbf6d))
+* reject non-WEBP RIFF uploads and rescue Vips::Error in metadata ([#86](https://github.com/elektronaut/dynamic_image/issues/86)) ([6c2cf35](https://github.com/elektronaut/dynamic_image/commit/6c2cf35392cab5b06f0fc2197f2a36ef2adfb3c6))
+
 ## [3.0.7](https://github.com/elektronaut/dynamic_image/compare/dynamic_image-v3.0.6...dynamic_image/v3.0.7) (2026-02-21)
 
 
