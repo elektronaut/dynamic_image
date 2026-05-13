@@ -2,6 +2,8 @@
 
 module DynamicImage
   class ImageReader
+    HEADER_BYTES = 12
+
     def initialize(data)
       @data = data
     end
@@ -37,10 +39,10 @@ module DynamicImage
 
     def read_file_header
       if @data.is_a?(Pathname)
-        File.binread(@data.to_s, 8)
+        File.binread(@data.to_s, HEADER_BYTES)
       else
         data_stream = stream
-        header = data_stream.read(8)
+        header = data_stream.read(HEADER_BYTES)
         data_stream.seek(0 - header.length, IO::SEEK_CUR) if header
         header
       end

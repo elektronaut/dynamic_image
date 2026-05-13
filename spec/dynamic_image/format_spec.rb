@@ -35,6 +35,24 @@ describe DynamicImage::Format do
 
       it { is_expected.to be_nil }
     end
+
+    context "when byte sequence is a non-WEBP RIFF container (e.g. WAV)" do
+      let(:bytes) { "RIFF\x24\x00\x00\x00WAVEfmt ".b }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when byte sequence is a valid WEBP header" do
+      let(:bytes) { "RIFF\x24\x00\x00\x00WEBPVP8 ".b }
+
+      it { is_expected.to eq(find_format("WEBP")) }
+    end
+
+    context "when byte sequence is RIFF but truncated below 12 bytes" do
+      let(:bytes) { "RIFF\x24\x00\x00".b }
+
+      it { is_expected.to be_nil }
+    end
   end
 
   describe "#content_type" do
