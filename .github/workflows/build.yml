@@ -23,7 +23,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
     steps:
       - uses: actions/checkout@v6.0.3
-      - uses: ruby/setup-ruby@v1.310.0
+      - uses: ruby/setup-ruby@v1.313.0
         with:
           bundler-cache: true
           ruby-version: "4.0"
@@ -52,7 +52,7 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v6.0.3
-      - uses: ruby/setup-ruby@v1.310.0
+      - uses: ruby/setup-ruby@v1.313.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6.0.3
-      - uses: ruby/setup-ruby@v1.310.0
+      - uses: ruby/setup-ruby@v1.313.0
         with:
           ruby-version: "4.0"
           bundler-cache: true
