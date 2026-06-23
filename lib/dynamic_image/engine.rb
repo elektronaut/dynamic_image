@@ -29,7 +29,7 @@ module DynamicImage
 
     initializer "dynamic_image.extensions", before: :load_active_support do
       ActiveSupport.on_load(:active_record) do
-        send :include, DynamicImage::BelongsTo
+        include DynamicImage::BelongsTo
       end
       ActionDispatch::Routing::Mapper.include DynamicImage::Routing
 
