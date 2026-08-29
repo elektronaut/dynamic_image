@@ -6,6 +6,9 @@ require "rspec/core/rake_task"
 APP_RAKEFILE = "spec/internal/Rakefile"
 load "rails/tasks/engine.rake"
 
+# release-please creates the tag and the release commit.
+Rake::Task["release:source_control_push"].clear
+
 RSpec::Core::RakeTask.new
 
 task default: :spec
