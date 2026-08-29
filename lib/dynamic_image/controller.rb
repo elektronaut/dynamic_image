@@ -9,6 +9,7 @@ module DynamicImage
   # As a bonus, this also prevents unauthorized URL enumeration.
   module Controller
     extend ActiveSupport::Concern
+    include Dis::Controller
 
     included do
       before_action :verify_signed_params
@@ -70,7 +71,7 @@ module DynamicImage
                     content_type: processed.format.content_type,
                     disposition: "inline" }
       if variant
-        send_file(variant.data_file_path, **send_opts)
+        send_dis_data(variant, **send_opts)
       else
         send_data(processed.cropped_and_resized(requested_size), **send_opts)
       end
@@ -95,10 +96,10 @@ module DynamicImage
 
       respond_to do |format|
         format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
-          send_file(@record.data_file_path,
-                    filename:,
-                    content_type: @record.content_type,
-                    disposition:)
+          send_dis_data(@record,
+                        filename:,
+                        content_type: @record.content_type,
+                        disposition:)
         end
       end
     end
