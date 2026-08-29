@@ -82,9 +82,11 @@ module DynamicImage
     def normalized
       require_valid_image!
 
-      image = DynamicImage::ImageProcessor.new(Pathname(record.data_file_path))
-      image = yield(image) if block_given?
-      image.convert(format).read
+      record.with_data_file do |path|
+        image = DynamicImage::ImageProcessor.new(path)
+        image = yield(image) if block_given?
+        image.convert(format).read
+      end
     end
 
     private
