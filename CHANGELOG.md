@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.9](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.0.8...dynamic_image/v3.0.9) (2026-08-29)
+
+
+### Bug Fixes
+
+* replace data_file_path with the dis 2.1 data access API ([390c715](https://github.com/elektronaut/dynamic_image/commit/390c715f5d37fb50938847a6b730d1b826355812))
+* replace data_file_path with the dis 2.1 data access API ([ecf3e34](https://github.com/elektronaut/dynamic_image/commit/ecf3e347c5aac50b863fdf7c1c7b6a8344932f5a))
+
 ## [3.0.8](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.0.7...dynamic_image/v3.0.8) (2026-05-13)
 
 
