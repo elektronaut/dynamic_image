@@ -42,20 +42,5 @@ module DynamicImage
     INDEXES = [
       { columns: %i[content_hash], unique: false }
     ].freeze
-
-    class << self
-      # The expected columns in the <tt>"name:type"</tt> form Rails
-      # generators take as arguments. Nullability is not expressible
-      # this way.
-      #
-      # @return [Array<String>] the attribute arguments
-      #
-      # @example
-      #   DynamicImage::Schema.generator_arguments.first
-      #   # => "content_hash:string"
-      def generator_arguments
-        ATTRIBUTES.map { |name, options| "#{name}:#{options[:type]}" }
-      end
-    end
   end
 end

@@ -31,15 +31,4 @@ describe DynamicImage::Schema do
       expect(indexes).to include(columns: %i[content_hash], unique: false)
     end
   end
-
-  describe ".generator_arguments" do
-    subject(:arguments) { described_class.generator_arguments }
-
-    it { is_expected.to include("content_hash:string") }
-    it { is_expected.to include("real_width:integer") }
-
-    it "covers every expected attribute" do
-      expect(arguments.length).to eq(described_class::ATTRIBUTES.length)
-    end
-  end
 end

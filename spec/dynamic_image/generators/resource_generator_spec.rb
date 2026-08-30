@@ -47,11 +47,18 @@ describe DynamicImage::Generators::ResourceGenerator do
       expect(migrations.length).to eq(1)
     end
 
-    it "adds the columns DynamicImage needs", :aggregate_failures do
-      expect(migration).to include("t.string :content_hash")
-      expect(migration).to include("t.string :colorspace")
-      expect(migration).to include("t.integer :real_width")
-      expect(migration).to include("t.integer :crop_gravity_y")
+    it "requires the columns metadata is read into", :aggregate_failures do
+      expect(migration).to include("t.string :content_hash, null: false")
+      expect(migration).to include("t.string :colorspace, null: false")
+      expect(migration).to include("t.integer :real_width, null: false")
+    end
+
+    it "leaves the crop columns nullable" do
+      expect(migration).to include("t.integer :crop_width\n")
+    end
+
+    it "indexes content_hash" do
+      expect(migration).to include("add_index :pictures, :content_hash\n")
     end
 
     it "includes the model extension" do
@@ -83,7 +90,7 @@ describe DynamicImage::Generators::ResourceGenerator do
     end
 
     it "still carries the DynamicImage columns" do
-      expect(migration).to include("t.string :content_hash")
+      expect(migration).to include("t.string :content_hash, null: false")
     end
   end
 end
