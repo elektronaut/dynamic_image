@@ -17,12 +17,9 @@ module DynamicImage
       # @return [self]
       def resize(max_size)
         transform_image do |image|
-          new_size = real_size.constrain_both(max_size)
-          scale = new_size.x / real_size.x
-          crop_attributes.each do |attr|
-            self[attr] = self[attr] * scale if self[attr]
-          end
-          image.resize(new_size)
+          resized = image.resize(real_size.constrain_both(max_size))
+          scale_crop(resized.size)
+          resized
         end
       end
 
@@ -55,9 +52,33 @@ module DynamicImage
 
       private
 
-      def crop_attributes
-        %i[crop_width crop_height crop_start_x crop_start_y
-           crop_gravity_x crop_gravity_y]
+      def scale_crop(new_size)
+        scale = new_size.to_f_vector / real_size
+
+        scale_crop_start(scale, new_size)
+        scale_crop_size(scale, new_size)
+        scale_crop_gravity(scale, new_size)
+      end
+
+      def scale_crop_start(scale, new_size)
+        return unless crop_start?
+
+        self.crop_start_x, self.crop_start_y =
+          (crop_start * scale).floor.clamp(0, new_size - 1).to_a
+      end
+
+      def scale_crop_size(scale, new_size)
+        return unless crop_size?
+
+        self.crop_width, self.crop_height =
+          (crop_size * scale).round.clamp(1, new_size - crop_start).to_a
+      end
+
+      def scale_crop_gravity(scale, new_size)
+        return unless crop_gravity?
+
+        self.crop_gravity_x, self.crop_gravity_y =
+          (crop_gravity * scale).round.clamp(1, new_size).to_a
       end
 
       def rotate_dimensions(width, height, degrees)
