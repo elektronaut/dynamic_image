@@ -148,6 +148,19 @@ describe DynamicImage::Model do
       end
     end
 
+    context "when the image is a still with transparency" do
+      let(:file_path) { "../../support/fixtures/transparent.webp" }
+      let(:content_type) { "image/webp" }
+
+      it "counts a single frame" do
+        expect(image.frame_count).to eq(1)
+      end
+
+      it "records the alpha channel" do
+        expect(image.alpha).to be(true)
+      end
+    end
+
     context "when the table predates the columns" do
       let(:image) { LegacyImage.new(file: uploaded_file) }
 

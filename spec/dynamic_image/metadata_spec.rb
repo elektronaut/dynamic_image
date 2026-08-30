@@ -191,6 +191,12 @@ describe DynamicImage::Metadata do
       it { is_expected.to be(true) }
     end
 
+    context "when image is a still with an alpha channel" do
+      let(:image) { read_image("transparent.webp") }
+
+      it { is_expected.to be(true) }
+    end
+
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
