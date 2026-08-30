@@ -81,17 +81,22 @@ hold the image metadata and crop.
 
 ```ruby
 create_table :images do |t|
-  t.string  :content_hash
-  t.string  :content_type
-  t.integer :content_length
-  t.string  :filename
-  t.string  :colorspace
-  t.integer :real_width, :real_height
+  t.string  :content_hash, null: false
+  t.string  :content_type, null: false
+  t.integer :content_length, null: false
+  t.string  :filename, null: false
+  t.string  :colorspace, null: false
+  t.integer :real_width, null: false
+  t.integer :real_height, null: false
+  t.integer :frame_count
+  t.boolean :alpha
   t.integer :crop_width, :crop_height
   t.integer :crop_start_x, :crop_start_y
   t.integer :crop_gravity_x, :crop_gravity_y
   t.timestamps
 end
+
+add_index :images, :content_hash
 ```
 
 The controller needs `DynamicImage::Controller` and a `model` method
@@ -410,6 +415,35 @@ front. Here are a few options:
 
 It's perfectly safe to cache images indefinitely. The URL is
 timestamped, and will change if the object changes.
+
+## Upgrading
+
+DynamicImage can't migrate your image table for you: it's named whatever
+you called it, and you may have several. When a release changes the
+schema, you generate the migration. Most releases don't.
+
+### 3.1
+
+Adds `frame_count` and `alpha`, and an index on `content_hash`. Run this
+once per image model.
+
+```sh
+bin/rails generate dynamic_image:upgrade Image
+bin/rails db:migrate
+bin/rails dynamic_image:backfill MODELS=Image
+```
+
+The backfill reads every image back from storage, so it takes a while on
+a large library. It's safe to interrupt and re-run, and it leaves
+`updated_at` alone, so existing URLs and cached variants stay valid.
+
+`add_index` locks the table while it builds. On a large table, move it
+into its own migration with `algorithm: :concurrently`.
+
+If your table was created by an older generator, its columns are all
+nullable and the generator will list the ones that should be `NOT NULL`.
+Correcting them is optional and left to you, since `change_column_null`
+fails if any row holds a `NULL`.
 
 ## Documentation
 
