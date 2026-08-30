@@ -75,9 +75,12 @@ module DynamicImage
     #   instead of fitting it. Both dimensions are required.
     # @option options [Boolean] :upscale By default images are only
     #   scaled down, never up. Pass true to force upscaling.
-    # @option options [Symbol] :format Render in a different format.
-    #   Defaults to the format the image was uploaded in, as long as
-    #   browsers handle it; anything else renders as JPEG.
+    # @option options [Symbol, Array<Symbol>] :format Render in a
+    #   different format. Defaults to the format the image was uploaded
+    #   in, as long as browsers handle it; anything else renders as
+    #   JPEG. A symbol forces that format. An array says any of them
+    #   will do, and the best fit is chosen — see
+    #   {DynamicImage::FormatNegotiator}.
     # @return [String] the URL
     # @raise [DynamicImage::Errors::InvalidSizeOptions] if
     #   <tt>crop: true</tt> is given without both dimensions
@@ -181,8 +184,17 @@ module DynamicImage
          action routing_type ]
     end
 
-    def default_format_for_image(record)
-      Mime::Type.lookup(record.safe_content_type).to_sym
+    def dynamic_image_format(record, format)
+      case format
+      when nil then Mime::Type.lookup(record.safe_content_type).to_sym
+      when Array then negotiated_format_for_image(record, format)
+      else format
+      end
+    end
+
+    def negotiated_format_for_image(record, accepted)
+      format = DynamicImage::FormatNegotiator.new(record).negotiate(accepted)
+      Mime::Type.lookup(format.content_type).to_sym
     end
 
     def dynamic_image_digest(record, action, size = nil)
@@ -201,9 +213,9 @@ module DynamicImage
       options = {
         routing_type: :url,
         action: nil,
-        format: default_format_for_image(record),
         size:
       }.merge(options)
+      options[:format] = dynamic_image_format(record, options[:format])
       options[:digest] =
         dynamic_image_digest(record, options[:action], options[:size])
       polymorphic_url(record_or_array, options)

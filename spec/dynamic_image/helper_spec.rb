@@ -83,6 +83,39 @@ describe DynamicImage::Helper, type: :helper do
       end
     end
 
+    context "with an array of formats the source is in" do
+      let(:options) { { size: "100x100", format: %i[jpeg png gif] } }
+      let(:digest) { generate_digest("show-#{image.id}-100x62") }
+
+      it do
+        expect(url).to eq(
+          "#{host}/images/#{digest}/100x62/#{image.to_param}.png"
+        )
+      end
+    end
+
+    context "with an array of formats the source isn't in" do
+      let(:options) { { size: "100x100", format: %i[jpeg png gif] } }
+      let(:digest) { generate_digest("show-#{image.id}-100x62") }
+      let(:image) do
+        Image.create(
+          file: Rack::Test::UploadedFile.new(
+            File.open(
+              File.expand_path("../support/fixtures/transparent.webp", __dir__)
+            ),
+            "image/webp"
+          ),
+          filename: "my-uploaded-file.webp"
+        )
+      end
+
+      it do
+        expect(url).to eq(
+          "#{host}/images/#{digest}/100x62/#{image.to_param}.png"
+        )
+      end
+    end
+
     context "with size" do
       let(:options) { { size: "100x100" } }
       let(:digest) { generate_digest("show-#{image.id}-100x62") }

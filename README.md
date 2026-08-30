@@ -237,6 +237,18 @@ Pass `format:` to pick the format yourself.
 <%= dynamic_image_tag(image, size: "400x400", format: :webp) %>
 ```
 
+Pass an array when several formats will do, as when the markup is headed
+for an HTML email. The uploaded format is used if it's in the list;
+otherwise the closest fit wins, keeping animation before transparency.
+
+```erb
+<%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
+```
+
+Images stored before `frame_count` and `alpha` were recorded render as
+JPEG unless the uploaded format is in the list. See
+[Upgrading](#upgrading).
+
 The format is not part of the signature, so the same image can be served
 in several formats without any extra bookkeeping.
 
