@@ -4,13 +4,25 @@ module DynamicImage
   # = DynamicImage Metadata
   #
   # Parses metadata from an image. Accepts a Pathname, IO, or binary string.
+  #
+  # Every reader returns nil for data that isn't a readable image.
+  #
+  # @example
+  #   metadata = DynamicImage::Metadata.new(Pathname.new("image.jpg"))
+  #   metadata.valid?       # => true
+  #   metadata.content_type # => "image/jpeg"
+  #   metadata.dimensions   # => Vector2d(320, 200)
   class Metadata
+    # @param data [Pathname, IO, String] the image, as a path, an open
+    #   file or a binary string
     def initialize(data)
       @data = data
     end
 
     # Returns the color space of the image as a string. The result will be one
     # of the following: "rgb", "cmyk", "gray".
+    #
+    # @return [String, nil] the colorspace
     def colorspace
       return unless valid?
 
@@ -25,30 +37,46 @@ module DynamicImage
     end
 
     # Returns the content type of the image.
+    #
+    # @return [String, nil] the content type
     def content_type
       reader.format.content_type if valid?
     end
 
+    # Returns the name of the detected format.
+    #
+    # @return [String, nil] the format name, such as "JPEG"
     def format
       reader.format.name if valid?
     end
 
-    # Returns the dimensions of the image as a vector.
+    # Returns the dimensions of the image as a vector. EXIF rotation is
+    # taken into account, so these are the dimensions the image will
+    # have once it has been normalized.
+    #
+    # @return [Vector2d, nil] the dimensions
     def dimensions
       Vector2d.new(metadata[:width], metadata[:height]) if valid?
     end
 
     # Returns the width of the image.
+    #
+    # @return [Integer, nil] the width in pixels
     def width
       metadata[:width] if valid?
     end
 
     # Returns the height of the image.
+    #
+    # @return [Integer, nil] the height in pixels
     def height
       metadata[:height] if valid?
     end
 
-    # Returns true if the image is valid.
+    # Returns true if the data is a readable image in a supported
+    # format.
+    #
+    # @return [Boolean]
     def valid?
       @data && reader.valid_header? && metadata != :invalid
     end

@@ -7,6 +7,10 @@ module DynamicImage
     # Validates that all necessary attributes are valid. All of these are
     # managed by +DynamicImage::Model+, so this is mostly for enforcing
     # integrity.
+    #
+    # The two that can fail on ordinary input are the image itself,
+    # which is rejected if the data isn't readable in a supported
+    # format, and the crop, which has to fit within the image.
     module Validations
       extend ActiveSupport::Concern
 
@@ -52,10 +56,17 @@ module DynamicImage
       end
 
       module ClassMethods
+        # Colorspaces an image is allowed to be in.
+        #
+        # @return [Array<String>] the colorspace names
         def allowed_colorspaces
           %w[rgb cmyk gray]
         end
 
+        # Content types an image is allowed to have, taken from the
+        # registered formats.
+        #
+        # @return [Array<String>] the content types
         def allowed_content_types
           DynamicImage::Format.content_types
         end

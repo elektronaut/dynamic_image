@@ -3,10 +3,30 @@
 module DynamicImage
   # = DynamicImage Controller
   #
+  # Serves images. Include it in a controller and define a +model+
+  # method returning the class to serve, then declare the routes with
+  # {DynamicImage::Routing#image_resources}.
+  #
+  #   class ImagesController < ApplicationController
+  #     include DynamicImage::Controller
+  #
+  #     private
+  #
+  #     def model
+  #       Image
+  #     end
+  #   end
+  #
   # Generating images is rather expensive, so all requests must be
   # signed with a HMAC digest in order to avoid denial of service attacks.
   # The methods in +DynamicImage::Helper+ handles this transparently.
   # As a bonus, this also prevents unauthorized URL enumeration.
+  #
+  # Responses are cached for a year and answer +If-Modified-Since+. The
+  # URL carries a timestamp, so a changed image is a changed URL.
+  #
+  # @see DynamicImage::Helper
+  # @see DynamicImage::Routing
   module Controller
     extend ActiveSupport::Concern
     include Dis::Controller
@@ -18,31 +38,52 @@ module DynamicImage
       helper_method :requested_size
     end
 
-    # Renders the image.
+    # Renders the image, cropped and resized to the requested size.
+    #
+    # Responds to the image formats, and to HTML with a page showing the
+    # image and its metadata.
+    #
+    # @return [void]
     def show
       render_image(format: requested_format)
     end
 
     # Same as +show+, but renders the image without any pre-cropping applied.
+    #
+    # @return [void]
     def uncropped
       render_image(format: requested_format, uncropped: true)
     end
 
     # Renders the original image data, without any processing.
+    #
+    # @return [void]
     def original
       render_raw_image
     end
 
+    # Same as +original+, but served as an attachment so the browser
+    # downloads the file rather than displaying it.
+    #
+    # @return [void]
     def download
       render_raw_image(disposition: "attachment")
     end
 
     # Returns the requested size as a vector.
+    #
+    # @return [Vector2d] the size from the URL
     def requested_size
       Vector2d.parse(params[:size])
     end
 
     private
+
+    # Override in your controller to return the class being served.
+    # Required.
+    #
+    # @!method model
+    #   @return [Class] the model class
 
     def cache_expiration_header
       return unless response.status == 200
@@ -51,10 +92,14 @@ module DynamicImage
       expires_in 1.year, public: true
     end
 
+    # Finds the record being served. Override to scope the lookup.
     def find_record
       @record = model.find(params[:id])
     end
 
+    # The filename the image is served as, the record's own filename
+    # with the extension of the rendered format. Override to name
+    # downloads something else.
     def filename(format = nil)
       if format.is_a?(DynamicImage::Format)
         File.basename(@record.filename, ".*") + format.extension

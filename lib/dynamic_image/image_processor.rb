@@ -9,8 +9,16 @@ module DynamicImage
   #
   # This is the image processing pipeline.
   #
-  # ==== Example:
+  # Every operation returns a new processor rather than modifying the
+  # one it was called on, so they chain. Images are converted to sRGB
+  # and EXIF rotation is applied when the processor is built, so the
+  # pipeline always starts from a normalized image.
   #
+  # @see DynamicImage::ImageProcessor::Colors
+  # @see DynamicImage::ImageProcessor::Frames
+  # @see DynamicImage::ImageProcessor::Transform
+  #
+  # @example
   #   DynamicImage::ImageProcessor
   #     .new(file)
   #     .crop(crop_start, crop_size)
@@ -22,8 +30,17 @@ module DynamicImage
     include DynamicImage::ImageProcessor::Frames
     include DynamicImage::ImageProcessor::Transform
 
+    # @!attribute [r] image
+    #   @return [Vips::Image] the image being processed
+    # @!attribute [r] target_format
+    #   @return [DynamicImage::Format] the format it will be written in
     attr_reader :image, :target_format
 
+    # @param image [Vips::Image, Pathname, IO, String] the image, either
+    #   an already loaded vips image or something
+    #   {DynamicImage::ImageReader} can read
+    # @param target_format [DynamicImage::Format, nil] the format to
+    #   write in, defaulting to the format the image was read from
     def initialize(image, target_format: nil)
       if image.is_a?(Vips::Image)
         @image = image
@@ -36,6 +53,13 @@ module DynamicImage
     end
 
     # Convert the image to a different format.
+    #
+    # Converting a multi-frame image to a format that doesn't support
+    # animation keeps the first frame.
+    #
+    # @param new_format [DynamicImage::Format, Symbol, String] the
+    #   format to convert to
+    # @return [DynamicImage::ImageProcessor] a new processor
     def convert(new_format)
       unless new_format.is_a?(DynamicImage::Format)
         new_format = DynamicImage::Format.find(new_format)
@@ -48,12 +72,18 @@ module DynamicImage
     end
 
     # Returns the image data as a binary string.
+    #
+    # @return [String] the encoded image
     def read
       image.write_to_buffer(target_format.extension,
                             **target_format.save_options)
     end
 
-    # Returns the image size as a Vector2d.
+    # Returns the image size as a Vector2d. For multi-frame images this
+    # is the size of a single frame, not of the filmstrip vips holds
+    # them in.
+    #
+    # @return [Vector2d] the size
     def size
       Vector2d.new(
         image.get("width"),
@@ -64,6 +94,9 @@ module DynamicImage
     end
 
     # Write the image to a file.
+    #
+    # @param path [String] the path to write to
+    # @return [void]
     def write(path)
       image.write_to_file(path, **target_format.save_options)
     end

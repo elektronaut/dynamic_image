@@ -60,6 +60,11 @@ module DynamicImage
   # by setting +crop_gravity_x+ and +crop_gravity_y+. DynamicImage will make
   # sure the pixel referred to by these coordinates are present in the cropped
   # image, and as close to the center as possible without zooming in.
+  #
+  # @see DynamicImage::Model::Dimensions
+  # @see DynamicImage::Model::Transformations
+  # @see DynamicImage::Model::Validations
+  # @see DynamicImage::Model::Variants
   module Model
     extend ActiveSupport::Concern
     include Dis::Model
@@ -72,23 +77,31 @@ module DynamicImage
       before_validation :read_image_metadata, if: :data_changed?
     end
 
-    # Returns true if the image is in the CMYK colorspace
+    # Returns true if the image is in the CMYK colorspace.
+    #
+    # @return [Boolean]
     def cmyk?
       colorspace == "cmyk"
     end
 
-    # Returns true if the image is in the grayscale colorspace
+    # Returns true if the image is in the grayscale colorspace.
+    #
+    # @return [Boolean]
     def gray?
       colorspace == "gray"
     end
 
-    # Returns true if the image is in the RGB colorspace
+    # Returns true if the image is in the RGB colorspace.
+    #
+    # @return [Boolean]
     def rgb?
       colorspace == "rgb"
     end
 
     # Finds a web safe content type. GIF, JPEG and PNG images are allowed,
     # any other formats should be converted to JPEG.
+    #
+    # @return [String] the content type
     def safe_content_type
       if safe_content_types.include?(content_type)
         content_type
@@ -99,6 +112,8 @@ module DynamicImage
 
     # Includes a timestamp fingerprint in the URL param, so
     # that rendered images can be cached indefinitely.
+    #
+    # @return [String] the id and an +updated_at+ fingerprint
     def to_param
       [id, updated_at.utc.to_fs(cache_timestamp_format)].join("-")
     end

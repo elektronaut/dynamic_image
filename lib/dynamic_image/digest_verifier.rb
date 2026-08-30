@@ -3,33 +3,48 @@
 module DynamicImage
   # = DynamicImage Digest Verifier
   #
-  # ==== Usage
+  # Signs and verifies the digests embedded in image URLs. The instance
+  # used by the application is set up by the engine and available as
+  # <tt>DynamicImage.digest_verifier</tt>; the helpers sign with it and
+  # the controller verifies with it, so there's rarely a reason to use
+  # this directly.
   #
-  #   verifier = DynamicImage::DigestVerifier.new("super secret!")
-  #
-  #   digest = verifier.generate("foo")
-  #
-  #   digest.verify("foo", digest)
-  #   # => true
-  #   digest.verify("bar", digest)
-  #   # => raises DynamicImage::Errors::InvalidSignature
-  #
-  # Credit where credit is due: adapted and simplified from
+  # This has been adapted and simplified from
   # +ActiveSupport::MessageVerifier+, since we don't need to handle
   # arbitrary data structures and ship the serialized data to the client.
+  #
+  # @example
+  #   verifier = DynamicImage::DigestVerifier.new("super secret!")
+  #   digest = verifier.generate("foo")
+  #
+  #   verifier.verify("foo", digest)
+  #   # => true
+  #   verifier.verify("bar", digest)
+  #   # => raises DynamicImage::Errors::InvalidSignature
   class DigestVerifier
+    # @param secret [String] the secret to sign with
+    # @param options [Hash]
+    # @option options [String] :digest the OpenSSL digest to use,
+    #   defaults to "SHA1"
     def initialize(secret, options = {})
       @secret = secret
       @digest = options[:digest] || "SHA1"
     end
 
     # Generates a digest for a string.
+    #
+    # @param data [String] the string to sign
+    # @return [String] the hex digest
     def generate(data)
       generate_digest(data)
     end
 
     # Verifies that <tt>digest</tt> is valid for <tt>data</tt>.
-    # Raises a +DynamicImage::Errors::InvalidSignature+ error if not.
+    #
+    # @param data [String] the signed string
+    # @param digest [String] the digest to check against
+    # @return [true] if the digest is valid
+    # @raise [DynamicImage::Errors::InvalidSignature] if it isn't
     def verify(data, digest)
       return true if valid_digest?(data, digest)
 

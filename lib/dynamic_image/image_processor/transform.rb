@@ -2,8 +2,18 @@
 
 module DynamicImage
   class ImageProcessor
+    # = ImageProcessor::Transform
+    #
+    # Cropping, resizing and rotation. Each operation is applied to
+    # every frame of an animated image.
     module Transform
-      # Crops the image
+      # Crops the image.
+      #
+      # @param crop_size [Vector2d] the size of the crop
+      # @param crop_start [Vector2d] its top left corner
+      # @return [DynamicImage::ImageProcessor] a new processor
+      # @raise [DynamicImage::Errors::InvalidTransformation] if the crop
+      #   falls outside the image
       def crop(crop_size, crop_start)
         return self if crop_start == Vector2d(0, 0) && crop_size == size
 
@@ -17,7 +27,11 @@ module DynamicImage
         end
       end
 
-      # Resize the image to a new size.
+      # Resize the image to a new size. The aspect ratio is not
+      # preserved; crop first if that matters.
+      #
+      # @param new_size [Vector2d] the size to resize to
+      # @return [DynamicImage::ImageProcessor] a new processor
       def resize(new_size)
         new_size = Vector2d(new_size)
         apply image.thumbnail_image(new_size.x.to_i,
@@ -27,6 +41,11 @@ module DynamicImage
       end
 
       # Rotates the image. The rotation must be a multiple of 90 degrees.
+      #
+      # @param degrees [Integer] the angle
+      # @return [DynamicImage::ImageProcessor] a new processor
+      # @raise [DynamicImage::Errors::InvalidTransformation] if the
+      #   angle isn't a multiple of 90
       def rotate(degrees)
         degrees = degrees.to_i % 360
         return self if degrees.zero?

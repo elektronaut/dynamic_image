@@ -4,31 +4,53 @@ module DynamicImage
   # = DynamicImage Helper
   #
   # Provides helper methods for rendering and linking to images.
+  #
+  # Every URL these helpers generate carries an HMAC digest of the
+  # action, the record id and the size. The controller rejects anything
+  # that doesn't match, so URLs have to be built here.
+  #
+  # Each variation comes in three flavours: +_tag+ renders an image tag,
+  # +_path+ returns a relative path and +_url+ an absolute one.
+  #
+  # @see DynamicImage::ImageSizing for how sizes are calculated
   module Helper
-    # Returns the path for a DynamicImage::Model record.
-    # Takes the same options as +dynamic_image_url+
+    # Returns the path for a {DynamicImage::Model} record. Takes the
+    # same options as {#dynamic_image_url}.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record, or
+    #   an array of records for a nested route
+    # @param options [Hash] sizing and routing options
+    # @return [String] the path
     def dynamic_image_path(record_or_array, options = {})
       dynamic_image_url(record_or_array, { routing_type: :path }.merge(options))
     end
 
-    # Returns an HTML image tag for the record. If no size is given, it will
+    # Returns an HTML image tag for the record, with +width+ and
+    # +height+ set to the rendered size. If no size is given, it will
     # render at the original size.
     #
-    # ==== Options
-    # * <tt>:alt</tt>: If no alt text is given, it will default to the
-    #   filename of the uploaded image.
+    # No +alt+ attribute is generated; pass one as you would to
+    # +image_tag+. See {#dynamic_image_url} for sizing and cropping.
+    # Options supported by +polymorphic_url+ will be passed to the
+    # router, and any others are added as HTML attributes.
     #
-    # See +dynamic_image_url+ for info on how to size and cropping. Options
-    # supported by +polymorphic_url+ will be passed to the router. Any other
-    # options will be added as HTML attributes.
+    # @param record_or_array [DynamicImage::Model, Array] the record, or
+    #   an array of records for a nested route
+    # @param options [Hash] sizing options, routing options and HTML
+    #   attributes
+    # @return [String] the image tag
     #
-    # ==== Examples
-    #
+    # @example
     #   image = Image.find(params[:id])
+    #
     #   dynamic_image_tag(image)
-    #   # => <img height="200" src="..." width="320" />
-    #   dynamic_image_tag(image, size: "100x100", alt="Avatar")
-    #   # => <img alt="Avatar" height="62" src="..." width="100" />
+    #   # => <img src="..." width="320" height="200" />
+    #
+    #   dynamic_image_tag(image, size: "100x100", alt: "Avatar")
+    #   # => <img alt="Avatar" src="..." width="100" height="62" />
+    #
+    # @example Responsive markup
+    #   dynamic_image_tag(image, size: "800x", srcset: srcset, sizes: "50vw")
     def dynamic_image_tag(record_or_array, options = {})
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)
@@ -40,26 +62,37 @@ module DynamicImage
                 html_options)
     end
 
-    # Returns the URL for a DynamicImage::Model record.
+    # Returns the URL for a {DynamicImage::Model} record.
     #
-    # ==== Options
-    #
-    # * <tt>:size</tt> - Desired image size, supplied as "{width}x{height}".
-    #   The image will be scaled to fit. A partial size like "100x" or "x100"
-    #   can be given, if you want a fixed width or height.
-    # * <tt>:crop</tt> - If true, the image will be cropped to the given size.
-    # * <tt>:upscale</tt> - By default, DynamicImage only scale images down,
-    #   never up. Pass <tt>upscale: true</tt> to force upscaling.
+    # @param record_or_array [DynamicImage::Model, Array] the record, or
+    #   an array of records for a nested route
+    # @param options [Hash] sizing and routing options
+    # @option options [String] :size Desired image size, as
+    #   <tt>"{width}x{height}"</tt>. The image is scaled to fit. A
+    #   partial size like <tt>"100x"</tt> or <tt>"x100"</tt> can be
+    #   given for a fixed width or height.
+    # @option options [Boolean] :crop Crop the image to the given size
+    #   instead of fitting it. Both dimensions are required.
+    # @option options [Boolean] :upscale By default images are only
+    #   scaled down, never up. Pass true to force upscaling.
+    # @option options [Symbol] :format Render in a different format.
+    #   Defaults to the format the image was uploaded in, as long as
+    #   browsers handle it; anything else renders as JPEG.
+    # @return [String] the URL
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if
+    #   <tt>crop: true</tt> is given without both dimensions
     #
     # Any options supported by +polymorphic_url+ are also accepted.
     #
-    # ==== Examples
-    #
+    # @example
     #   image = Image.find(params[:id])
+    #
     #   dynamic_image_url(image)
     #   # => "http://example.com/images/96...d1/300x187/1-2014062020...00.jpg"
+    #
     #   dynamic_image_url(image, size: '100x100')
     #   # => "http://example.com/images/72...c2/100x62/1-2014062020...00.jpg"
+    #
     #   dynamic_image_url(image, size: '100x100', crop: true)
     #   # => "http://example.com/images/a4...6b/100x100/1-2014062020...00.jpg"
     def dynamic_image_url(record_or_array, options = {})
@@ -67,46 +100,75 @@ module DynamicImage
       dynamic_image_url_with_size(record_or_array, size, options)
     end
 
-    # Returns a path to the original uploaded file for download,
-    # without any processing applied. Sizing options are not
-    # supported.
+    # Returns a path to the original uploaded file, served as an
+    # attachment so the browser downloads it. No processing is applied
+    # and sizing options are not supported.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] routing options
+    # @return [String] the path
     def download_dynamic_image_path(record_or_array, options = {})
       dynamic_image_path(record_or_array, { action: :download }.merge(options))
     end
 
-    # Returns a URL to the original uploaded file for download,
-    # without any processing applied. Sizing options are not
-    # supported.
+    # Same as {#download_dynamic_image_path}, but returns an absolute
+    # URL.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] routing options
+    # @return [String] the URL
     def download_dynamic_image_url(record_or_array, options = {})
       dynamic_image_url(record_or_array, { action: :download }.merge(options))
     end
 
-    # Returns a path to the original uploaded file, without any processing
-    # applied. Sizing options are not supported.
+    # Returns a path to the original uploaded file, exactly as it was
+    # uploaded. No processing is applied and sizing options are not
+    # supported.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] routing options
+    # @return [String] the path
     def original_dynamic_image_path(record_or_array, options = {})
       dynamic_image_path(record_or_array, { action: :original }.merge(options))
     end
 
-    # Returns a URL to the original uploaded file, without any processing
-    # applied. Sizing options are not supported.
+    # Same as {#original_dynamic_image_path}, but returns an absolute
+    # URL.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] routing options
+    # @return [String] the URL
     def original_dynamic_image_url(record_or_array, options = {})
       dynamic_image_url(record_or_array, { action: :original }.merge(options))
     end
 
-    # Same as +dynamic_image_path+, but points to an image with any
+    # Same as {#dynamic_image_path}, but points to an image with any
     # pre-cropping disabled.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] sizing and routing options
+    # @return [String] the path
     def uncropped_dynamic_image_path(record_or_array, options = {})
       dynamic_image_path(record_or_array, { action: :uncropped }.merge(options))
     end
 
-    # Same as +dynamic_image_tag+, but renders an image with any
+    # Same as {#dynamic_image_tag}, but renders an image with any
     # pre-cropping disabled.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] sizing options, routing options and HTML
+    #   attributes
+    # @return [String] the image tag
     def uncropped_dynamic_image_tag(record_or_array, options = {})
       dynamic_image_tag(record_or_array, { action: :uncropped }.merge(options))
     end
 
-    # Same as +dynamic_image_url+, but points to an image with any
+    # Same as {#dynamic_image_url}, but points to an image with any
     # pre-cropping disabled.
+    #
+    # @param record_or_array [DynamicImage::Model, Array] the record
+    # @param options [Hash] sizing and routing options
+    # @return [String] the URL
     def uncropped_dynamic_image_url(record_or_array, options = {})
       dynamic_image_url(record_or_array, { action: :uncropped }.merge(options))
     end

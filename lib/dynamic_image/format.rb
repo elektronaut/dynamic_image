@@ -1,10 +1,44 @@
 # frozen_string_literal: true
 
 module DynamicImage
+  # = DynamicImage Format
+  #
+  # A registry of the image formats DynamicImage understands. Each
+  # format knows its content types, extensions, the magic bytes that
+  # identify it, the options it is saved with, and whether it can hold
+  # more than one frame.
+  #
+  # Formats are looked up by name, by content type, or by sniffing the
+  # first bytes of a file. Uploads are always identified by sniffing,
+  # never by the content type the client claims.
+  #
+  # @example
+  #   DynamicImage::Format.find("jpg")           # => the JPEG format
+  #   DynamicImage::Format.content_type("image/png")
+  #   DynamicImage::Format.sniff(File.binread(path, 12))
   class Format
+    # @!attribute [r] name
+    #   @return [String] the format name, such as "JPEG"
+    # @!attribute [r] animated
+    #   @return [Boolean] whether the format holds more than one frame
+    # @!attribute [r] content_types
+    #   @return [Array<String>] the content types, canonical one first
+    # @!attribute [r] extensions
+    #   @return [Array<String>] the file extensions, preferred one first
+    # @!attribute [r] magic_bytes
+    #   @return [Array<String>] byte sequences identifying the format
+    # @!attribute [r] save_options
+    #   @return [Hash] options passed to vips when writing
+    # @!attribute [r] signature
+    #   @return [Proc, nil] an extra check against the header, for when
+    #     the magic bytes alone are ambiguous
     attr_reader :name, :animated, :content_types, :extensions, :magic_bytes,
                 :save_options, :signature
 
+    # @param name [String] the format name
+    # @param options [Hash] the format definition, as passed to
+    #   {Format.register}
+    # @see Format.register
     def initialize(name, options)
       options = default_options.merge(options)
 
@@ -19,47 +53,89 @@ module DynamicImage
       @save_options = options[:save_options]
     end
 
+    # Returns true if the format supports multiple frames.
+    #
+    # @return [Boolean]
     def animated?
       animated
     end
 
+    # Returns true if the given header belongs to this format.
+    #
+    # @param bytes [String] the first bytes of the file
+    # @return [Boolean]
     def matches?(bytes)
       return false unless magic_bytes.any? { |b| bytes.start_with?(b) }
 
       signature.nil? || signature.call(bytes)
     end
 
+    # The canonical content type.
+    #
+    # @return [String] the content type
     def content_type
       content_types.first
     end
 
+    # The preferred file extension, leading dot included.
+    #
+    # @return [String] the extension
     def extension
       extensions.first
     end
 
     class << self
+      # Finds the format for a content type.
+      #
+      # @param type [String] the content type
+      # @return [DynamicImage::Format, nil] the format
       def content_type(type)
         formats.filter { |f| f.content_types.include?(type) }.first
       end
 
+      # Every content type of every registered format.
+      #
+      # @return [Array<String>] the content types
       def content_types
         formats.flat_map(&:content_types)
       end
 
+      # Finds a format by name. Case insensitive, and "JPG" is
+      # understood as an alias for "JPEG".
+      #
+      # @param name [String, Symbol] the format name
+      # @return [DynamicImage::Format, nil] the format
       def find(name)
         key = name.to_s.upcase
         key = "JPEG" if key == "JPG"
         registered_formats[key]
       end
 
+      # All registered formats.
+      #
+      # @return [Array<DynamicImage::Format>] the formats
       def formats
         registered_formats.map { |_, f| f }
       end
 
+      # Registers a format.
+      #
+      # Each option sets the attribute of the same name, except
+      # +content_type+ and +extension+, which are singular here and
+      # accept either one value or a list. Anything left out falls back
+      # to {Format#default_options}.
+      #
+      # @param name [String] the format name, uppercase by convention
+      # @param opts [Hash] the format definition
+      # @return [DynamicImage::Format] the registered format
       def register(name, **opts)
         registered_formats[name] = new(name, opts)
       end
 
+      # Identifies a format from the first bytes of a file.
+      #
+      # @param bytes [String, nil] the file header
+      # @return [DynamicImage::Format, nil] the format, if recognized
       def sniff(bytes)
         return unless bytes
 
@@ -73,6 +149,9 @@ module DynamicImage
       end
     end
 
+    # Defaults every format definition is merged over.
+    #
+    # @return [Hash] the default options
     def default_options
       { animated: false, content_type: [], extension: [], magic_bytes: [],
         signature: nil, save_options: {} }

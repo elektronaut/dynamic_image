@@ -4,9 +4,14 @@ module DynamicImage
   module Model
     # = DynamicImage Model Variants
     #
-    # Validates that all necessary attributes are valid. All of these are
-    # managed by +DynamicImage::Model+, so this is mostly for enforcing
-    # integrity.
+    # Associates the image with its cached renderings.
+    #
+    # Each processed size is stored as a {DynamicImage::Variant}, so the
+    # work of cropping and resizing is done once. They are destroyed
+    # with the image, and cleared whenever its data changes, so a
+    # replaced image never serves a stale rendering.
+    #
+    # @see DynamicImage::ProcessedImage
     module Variants
       extend ActiveSupport::Concern
 

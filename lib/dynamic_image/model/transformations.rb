@@ -4,8 +4,17 @@ module DynamicImage
   module Model
     # = DynamicImage Model Transformations
     #
+    # Transformations that rewrite the stored file, as opposed to the
+    # processing done per request, which never touches it.
+    #
+    # Both methods replace the data and update the stored dimensions,
+    # adjusting the crop to match. Neither saves the record.
     module Transformations
-      # Resizes the image
+      # Resizes the image, replacing the stored file with a smaller one.
+      # The crop is scaled along with it.
+      #
+      # @param max_size [Vector2d] the size to scale down to
+      # @return [self]
       def resize(max_size)
         transform_image do |image|
           new_size = real_size.constrain_both(max_size)
@@ -17,7 +26,17 @@ module DynamicImage
         end
       end
 
-      # Rotates the image
+      # Rotates the image, taking the crop and crop gravity with it.
+      #
+      # @param degrees [Integer] the angle, which must be a multiple of
+      #   90. Rotating by 0 is a no-op.
+      # @return [self]
+      # @raise [DynamicImage::Errors::InvalidTransformation] if the
+      #   angle isn't a multiple of 90
+      #
+      # @example
+      #   image.rotate(90)
+      #   image.save
       def rotate(degrees = 90)
         degrees = degrees.to_i % 360
 

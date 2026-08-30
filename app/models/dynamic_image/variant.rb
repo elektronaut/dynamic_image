@@ -1,6 +1,19 @@
 # frozen_string_literal: true
 
 module DynamicImage
+  # = DynamicImage Variant
+  #
+  # A cached rendering of an image at one particular size, crop and
+  # format. Variants are created on demand by
+  # {DynamicImage::ProcessedImage} and destroyed when the image they
+  # belong to changes or is destroyed, so there is rarely a reason to
+  # work with them directly.
+  #
+  # Data is stored in Dis under its own type, keeping it separate from
+  # the originals.
+  #
+  # @see DynamicImage::ProcessedImage
+  # @see DynamicImage::Model::Variants
   class Variant < ApplicationRecord
     include Dis::Model
 

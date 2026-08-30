@@ -4,7 +4,19 @@ require "rails/generators"
 require "rails/generators/rails/resource/resource_generator"
 
 module DynamicImage
+  # Generators for setting up DynamicImage in an application.
   module Generators
+    # Creates a DynamicImage resource: a model including
+    # {DynamicImage::Model}, a controller including
+    # {DynamicImage::Controller}, a migration with the columns
+    # DynamicImage needs, and an +image_resources+ route.
+    #
+    #   bin/rails generate dynamic_image:resource image
+    #
+    # Additional attributes are passed through to the migration, so a
+    # resource can carry fields of its own.
+    #
+    #   bin/rails generate dynamic_image:resource photo caption:string
     class ResourceGenerator < Rails::Generators::ResourceGenerator
       desc "Creates a DynamicImage resource"
 
