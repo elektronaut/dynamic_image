@@ -1,5 +1,5 @@
 [![Version](https://img.shields.io/gem/v/dynamic_image.svg?style=flat)](https://rubygems.org/gems/dynamic_image)
-![Build](https://github.com/elektronaut/dynamic_image/workflows/Build/badge.svg)
+[![Build](https://github.com/elektronaut/dynamic_image/actions/workflows/build.yml/badge.svg)](https://github.com/elektronaut/dynamic_image/actions/workflows/build.yml)
 
 # DynamicImage
 
@@ -133,9 +133,14 @@ play well with others. Here's a few options:
 It's perfectly safe to cache images indefinitely. The URL is
 timestamped, and will change if the object changes.
 
+## Contributing
+
+Bug reports and pull requests are welcome on
+[GitHub](https://github.com/elektronaut/dynamic_image). See
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to run the tests and how
+commits are formatted, and note that this project ships with a
+[code of conduct](CODE_OF_CONDUCT.md).
+
 ## License
 
-Copyright 2006-2016 Inge Jørgensen
-
-DynamicImage is released under the
-[MIT License](http://www.opensource.org/licenses/MIT).
+Released under the [MIT License](MIT-LICENSE).

@@ -32,6 +32,10 @@ Gem::Specification.new do |s|
   s.add_dependency "vector2d", "~> 2.2", ">= 2.2.1"
 
   s.metadata = {
-    "rubygems_mfa_required" => "true"
+    "bug_tracker_uri" => "https://github.com/elektronaut/dynamic_image/issues",
+    "changelog_uri" => "https://github.com/elektronaut/dynamic_image/blob/main/CHANGELOG.md",
+    "documentation_uri" => "https://www.rubydoc.info/gems/dynamic_image",
+    "rubygems_mfa_required" => "true",
+    "source_code_uri" => "https://github.com/elektronaut/dynamic_image"
   }
 end
