@@ -19,6 +19,10 @@ module DynamicImage
     # migration. Each is described by its migration type and whether it
     # accepts +NULL+.
     #
+    # +frame_count+ and +alpha+ are nullable because NULL means the
+    # image predates them being recorded, which is not the same as
+    # knowing an image is a still or opaque.
+    #
     # @return [Hash{Symbol => Hash}]
     ATTRIBUTES = {
       content_hash: { type: :string, null: false },
@@ -28,6 +32,8 @@ module DynamicImage
       colorspace: { type: :string, null: false },
       real_width: { type: :integer, null: false },
       real_height: { type: :integer, null: false },
+      frame_count: { type: :integer, null: true },
+      alpha: { type: :boolean, null: true },
       crop_width: { type: :integer, null: true },
       crop_height: { type: :integer, null: true },
       crop_start_x: { type: :integer, null: true },

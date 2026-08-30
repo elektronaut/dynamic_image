@@ -119,11 +119,44 @@ describe DynamicImage::Model do
       expect(image.real_size).to eq(Vector2d.new(320, 200))
     end
 
+    it "sets the frame count" do
+      expect(image.frame_count).to eq(1)
+    end
+
+    it "sets the alpha channel flag" do
+      expect(image.alpha).to be(false)
+    end
+
     context "when the upload has incorrect content type" do
       let(:content_type) { "image/jpeg" }
 
       it "sets the content type based on image data" do
         expect(image.content_type).to eq("image/png")
+      end
+    end
+
+    context "when the image is animated" do
+      let(:file_path) { "../../support/fixtures/animated.webp" }
+      let(:content_type) { "image/webp" }
+
+      it "counts the frames" do
+        expect(image.frame_count).to eq(3)
+      end
+
+      it "records the alpha channel" do
+        expect(image.alpha).to be(true)
+      end
+    end
+
+    context "when the table predates the columns" do
+      let(:image) { LegacyImage.new(file: uploaded_file) }
+
+      it "reads the rest of the metadata" do
+        expect(image.colorspace).to eq("rgb")
+      end
+
+      it "accepts the image" do
+        expect(image).to be_valid
       end
     end
   end

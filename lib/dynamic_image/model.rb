@@ -135,6 +135,8 @@ module DynamicImage
       self.real_width = metadata.width
       self.real_height = metadata.height
       self.content_type = metadata.content_type
+      self.frame_count = metadata.frame_count if has_attribute?(:frame_count)
+      self.alpha = metadata.alpha? if has_attribute?(:alpha)
       @valid_image = true
     end
 

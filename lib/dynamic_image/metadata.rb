@@ -73,6 +73,26 @@ module DynamicImage
       metadata[:height] if valid?
     end
 
+    # Returns the number of frames. Animated formats can have more
+    # than one; everything else has a single frame.
+    #
+    # @return [Integer, nil] the number of frames
+    def frame_count
+      metadata[:frame_count] if valid?
+    end
+
+    # Returns true if the image has an alpha channel.
+    #
+    # This is the presence of the channel, not of actual transparency:
+    # an image can carry a fully opaque alpha channel. Reading it costs
+    # nothing, where scanning the channel for transparency would mean
+    # decoding every pixel.
+    #
+    # @return [Boolean, nil] true if the image has an alpha channel
+    def alpha?
+      metadata[:alpha] if valid?
+    end
+
     # Returns true if the data is a readable image in a supported
     # format.
     #
@@ -95,9 +115,18 @@ module DynamicImage
       image = reader.read
       width, height = dimensions_from(image)
       width, height = height, width if rotated?(image)
-      { width:, height:, colorspace: image.get("interpretation") }
+      { width:, height:,
+        colorspace: image.get("interpretation"),
+        frame_count: frame_count_from(image),
+        alpha: image.has_alpha? }
     rescue Vips::Error
       :invalid
+    end
+
+    def frame_count_from(image)
+      return 1 unless image.get_fields.include?("n-pages")
+
+      image.get("n-pages")
     end
 
     def dimensions_from(image)
