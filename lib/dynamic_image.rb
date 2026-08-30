@@ -4,6 +4,7 @@ require "dis"
 require "vector2d"
 require "vips"
 
+require "dynamic_image/backfill"
 require "dynamic_image/belongs_to"
 require "dynamic_image/controller"
 require "dynamic_image/digest_verifier"
