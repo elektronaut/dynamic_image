@@ -6,6 +6,13 @@ expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Getting started
 
+The test suite needs [libvips](https://www.libvips.org), which is
+available from most package managers:
+
+```sh
+brew install vips
+```
+
 Install the dependencies and run the test suite:
 
 ```sh
@@ -13,7 +20,8 @@ bundle install
 bundle exec rspec
 ```
 
-The specs run against an internal Rails app in `spec/internal`.
+The specs run against an internal Rails app in `spec/internal`, backed
+by SQLite locally and PostgreSQL in CI.
 
 Check style before pushing:
 
