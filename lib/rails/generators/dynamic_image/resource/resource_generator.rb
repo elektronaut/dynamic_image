@@ -18,18 +18,18 @@ module DynamicImage
     #
     #   bin/rails generate dynamic_image:resource photo caption:string
     class ResourceGenerator < Rails::Generators::ResourceGenerator
-      desc "Creates a DynamicImage resource"
+      source_root File.expand_path("templates", __dir__)
 
       def initialize(args, *options)
         super(inject_dynamic_image_attributes(args), *options)
       end
 
       def add_controller_extension
-        inject_into_file(
+        inject_into_class(
           File.join("app/controllers",
                     class_path,
                     "#{file_name.pluralize}_controller.rb"),
-          after: "ApplicationController\n"
+          "#{class_name.pluralize}Controller"
         ) do
           "  include DynamicImage::Controller\n\n  private\n\n  " \
             "def model\n    #{class_name}\n  end\n"
@@ -37,9 +37,9 @@ module DynamicImage
       end
 
       def add_model_extension
-        inject_into_file(
+        inject_into_class(
           File.join("app/models", class_path, "#{file_name}.rb"),
-          after: "ActiveRecord::Base\n"
+          class_name
         ) do
           "  include DynamicImage::Model\n"
         end
