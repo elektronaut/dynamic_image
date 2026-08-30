@@ -41,7 +41,7 @@ Helpers in `DynamicImage::Helper` generate the digest, which is why URLs can onl
 
 `ImageReader` sniffs the header and hands off to vips. `ImageProcessor` wraps a `Vips::Image` and is immutable — every operation returns a new instance, so it chains: `.crop(...).resize(...).convert(...).read`. Its behavior is split across `ImageProcessor::Colors` (sRGB conversion, profile handling), `::Frames` (animated GIF/WebP) and `::Transform` (crop, resize, rotate).
 
-`DynamicImage::Format` is a registry of the supported formats, holding magic bytes for sniffing, content types, extensions, save options and whether the format is animated. Formats are registered at the bottom of the class body.
+`DynamicImage::Format` is a registry of the supported formats, holding magic bytes for sniffing, content types, extensions, save options and whether the format can hold animation or an alpha channel. Formats are registered at the bottom of the class body.
 
 Cropping always happens before resizing. `ImageSizing` computes both: `crop_geometry` returns the crop rect scaled to the source image, and `fit` computes the final dimensions honoring `:crop` and `:upscale`.
 

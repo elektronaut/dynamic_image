@@ -53,7 +53,7 @@ module DynamicImage
   # safe.
   #
   # @return [Array<Symbol>] the format names, most preferred first
-  mattr_accessor :default_formats, default: %i[jpeg png gif]
+  mattr_accessor :default_formats, default: %i[jpeg png gif webp]
 
   # The formats a mailer view accepts when it doesn't pass
   # <tt>format:</tt>. Classic Outlook renders through the Word engine,

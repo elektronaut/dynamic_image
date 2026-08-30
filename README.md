@@ -12,8 +12,8 @@ on demand. It handles cropping, resizing, format and colorspace
 conversion.
 
 Supported formats at the moment are JPEG, PNG, GIF, BMP, WebP and TIFF.
-BMP, WebP and TIFF images will automatically be converted to JPG. CMYK
-images will be converted to RGB, and RGB images will be converted to the sRGB
+BMP and TIFF images will automatically be converted. CMYK images will be
+converted to RGB, and RGB images will be converted to the sRGB
 colorspace for consistent appearance in all browsers.
 
 DynamicImage is built on [Dis](https://github.com/elektronaut/dis)
@@ -228,14 +228,14 @@ take the same sizing options.
 ### Formats
 
 Images are served in the format they were uploaded in, as long as it's
-one that renders everywhere: PNG, GIF and JPEG. Anything else, including
-WebP and TIFF, is converted to the closest fit — animation is kept
-before transparency, and a photograph becomes JPEG.
+one that renders everywhere: JPEG, PNG, GIF and WebP. Anything else,
+BMP and TIFF, is converted to the closest fit — animation is kept before
+transparency, and a photograph becomes JPEG.
 
 Both lists are configurable, most preferred format first:
 
 ```ruby
-DynamicImage.default_formats = %i[jpeg png gif]
+DynamicImage.default_formats = %i[jpeg png gif webp]
 DynamicImage.mailer_formats = %i[jpeg png gif]
 ```
 
@@ -454,8 +454,13 @@ schema, you generate the migration. Most releases don't.
 
 ### 3.1
 
-Adds `frame_count` and `alpha`, and an index on `content_hash`. Run this
-once per image model.
+Uploaded WebP is now served as WebP instead of being converted to JPEG,
+so URLs and cached variants for WebP images change. Mailer views still
+get JPEG, PNG or GIF. Set `DynamicImage.default_formats` back to
+`%i[jpeg png gif]` to keep the old behaviour.
+
+This release also adds `frame_count` and `alpha`, and an index on
+`content_hash`. Run this once per image model.
 
 ```sh
 bin/rails generate dynamic_image:upgrade Image

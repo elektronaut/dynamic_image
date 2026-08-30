@@ -17,24 +17,22 @@ describe DynamicImage::Helper::Formats, type: :helper do
     )
   end
 
-  context "when the uploaded format isn't accepted by default" do
-    it { is_expected.to end_with(".jpeg") }
+  it { is_expected.to end_with(".webp") }
+
+  it "renders a mailer view in a format the mailer accepts" do
+    expect(PhotoMailer.photo(photo).body.to_s).to include(".jpeg")
   end
 
-  context "when the uploaded format is accepted by default" do
+  it "keeps a format the mailer can't render out of a mailer view" do
+    expect(PhotoMailer.photo(photo).body.to_s).not_to include(".webp")
+  end
+
+  context "when the uploaded format isn't accepted" do
     before do
       allow(DynamicImage).to receive(:default_formats)
-        .and_return(%i[jpeg png gif webp])
+        .and_return(%i[jpeg png gif])
     end
 
-    it { is_expected.to end_with(".webp") }
-
-    it "renders a mailer view in a format the mailer accepts" do
-      expect(PhotoMailer.photo(photo).body.to_s).to include(".jpeg")
-    end
-
-    it "keeps a format the mailer can't render out of a mailer view" do
-      expect(PhotoMailer.photo(photo).body.to_s).not_to include(".webp")
-    end
+    it { is_expected.to end_with(".jpeg") }
   end
 end

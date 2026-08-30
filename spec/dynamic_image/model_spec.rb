@@ -102,7 +102,7 @@ describe DynamicImage::Model do
     context "when image is WEBP" do
       let(:image) { Image.new(content_type: "image/webp") }
 
-      it { is_expected.to eq("image/jpeg") }
+      it { is_expected.to eq("image/webp") }
     end
   end
 
