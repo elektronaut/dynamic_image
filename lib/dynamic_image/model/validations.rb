@@ -30,18 +30,13 @@ module DynamicImage
                   length: { maximum: 255 }
 
         validates :real_width, :real_height,
-                  numericality: { greater_than: 0, only_integer: true }
-
-        validates :real_width, :real_height,
+                  presence: true,
                   numericality: { greater_than: 0, only_integer: true }
 
         validates :crop_width, :crop_height,
                   :crop_gravity_x, :crop_gravity_y,
                   numericality: { greater_than: 0, only_integer: true },
                   allow_nil: true
-
-        validates :real_width, :real_height,
-                  presence: true
 
         validates :crop_width, presence: true, if: :crop_height?
         validates :crop_height, presence: true, if: :crop_width?
