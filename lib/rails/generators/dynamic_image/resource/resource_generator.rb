@@ -3,6 +3,8 @@
 require "rails/generators"
 require "rails/generators/rails/resource/resource_generator"
 
+require "dynamic_image/schema"
+
 module DynamicImage
   # Generators for setting up DynamicImage in an application.
   module Generators
@@ -57,21 +59,11 @@ module DynamicImage
 
       def inject_dynamic_image_attributes(args)
         if args.any?
-          [args[0]] + dynamic_image_attributes + args[1..args.length]
+          [args[0]] + DynamicImage::Schema.generator_arguments +
+            args[1..args.length]
         else
           args
         end
-      end
-
-      def dynamic_image_attributes
-        %w[content_hash:string content_type:string
-           content_length:integer
-           filename:string
-           colorspace:string
-           real_width:integer real_height:integer
-           crop_width:integer crop_height:integer
-           crop_start_x:integer crop_start_y:integer
-           crop_gravity_x:integer crop_gravity_y:integer]
       end
     end
   end

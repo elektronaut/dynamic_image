@@ -18,6 +18,7 @@ require "dynamic_image/metadata"
 require "dynamic_image/model"
 require "dynamic_image/processed_image"
 require "dynamic_image/routing"
+require "dynamic_image/schema"
 
 # DynamicImage handles image uploads in Rails. Rather than building a
 # fixed set of derivatives when a file is uploaded, it stores the

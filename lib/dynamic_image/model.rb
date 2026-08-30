@@ -9,7 +9,8 @@ module DynamicImage
   # = DynamicImage Model
   #
   # ActiveModel extension for the model holding image data. It assumes your
-  # database table has at least the following attributes:
+  # database table has at least the attributes in
+  # {DynamicImage::Schema::ATTRIBUTES}:
   #
   #   create_table :images do |t|
   #     t.string  :content_hash
