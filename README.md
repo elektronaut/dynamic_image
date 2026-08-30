@@ -22,17 +22,14 @@ and [ruby-vips](https://github.com/libvips/ruby-vips).
 All URLs are signed with a HMAC to protect against denial of service
 and enumeration attacks.
 
-## Requirements
-
-* Rails 5+
-* Ruby 2.7+
-* libvips 8.8+
-
-## Documentation
-
-[Documentation is available on RubyDoc.info](http://rdoc.info/gems/dynamic_image)
-
 ## Installation
+
+DynamicImage requires [libvips](https://www.libvips.org), which is
+available from most package managers.
+
+```sh
+brew install vips
+```
 
 Add the gem to your Gemfile and run `bundle install`.
 
@@ -46,8 +43,8 @@ Run the `dis:install` generator to set up your storage.
 bin/rails generate dis:install
 ```
 
-You can edit the generated initializer to configure your storage, by default it
-will store files in `db/dis`. See the
+You can edit the generated initializer to configure your storage. By
+default it will store files in `db/dis`. See the
 [Dis](https://github.com/elektronaut/dis) documentation for more
 information.
 
@@ -62,21 +59,41 @@ bin/rails generate dynamic_image:resource image
 This will create an `Image` model and a controller, along with a migration and
 the necessary routes.
 
-Note that in this case, the route with collide with any static images stored
-in `public/images`. You can customize the path if you want in the route
-declaration.
+Note that in this case, the route will collide with any static images
+stored in `public/images`. You can customize the path if you want in the
+route declaration.
 
 ```ruby
 image_resources :images, path: "dynamic_images/:digest(/:size)"
 ```
 
+Run the migrations when you're done. This creates the table for your
+resource, along with the table DynamicImage uses to cache processed
+images.
+
+```sh
+bin/rails db:migrate
+```
+
 ## Storing an image
 
-To save an image, simply assign the file attribute to your uploaded file.
+To save an image, simply assign the file attribute to your uploaded
+file.
 
 ```ruby
-image_params = params.require(:image).permit(:file)
-Image.create(image_params)
+Image.create(params.expect(image: [:file]))
+```
+
+Other models can refer to images with `belongs_to_image`. It works like
+`belongs_to`, but also accepts an uploaded file directly, creating the
+image record for you.
+
+```ruby
+class User < ActiveRecord::Base
+  belongs_to_image :avatar, class_name: "Image"
+end
+
+User.create(params.expect(user: [:name, :avatar]))
 ```
 
 ## Rendering images in your views
@@ -84,7 +101,7 @@ Image.create(image_params)
 You should use the provided helpers for displaying images, this will ensure
 that the generated URLs are properly signed and timestamped.
 
-To display the image at it's original size, use `dynamic_image_tag` without
+To display the image at its original size, use `dynamic_image_tag` without
 any options.
 
 ```erb
@@ -119,12 +136,14 @@ helpers.
 
 ## Caching
 
-Generating images on the fly is expensive. This is less of a problem
-in development mode, as DynamicImage respects the If-Modified-Since
-header. In production, you should absolutely cache the results.
+Generating images on the fly is expensive, so each processed size is
+stored as a variant, a separate record with its data in Dis, and reused
+on subsequent requests. Variants are discarded automatically when the
+image is replaced.
 
-DynamicImage doesn't do any caching on it's own, but it is designed to
-play well with others. Here's a few options:
+Responses are served with a far-future `Cache-Control` header and
+respect `If-Modified-Since`, so they play well with an HTTP cache in
+front. Here are a few options:
 
 * [CloudFlare](https://www.cloudflare.com)
 * [Rack::Cache](http://rtomayko.github.io/rack-cache/)
@@ -132,6 +151,11 @@ play well with others. Here's a few options:
 
 It's perfectly safe to cache images indefinitely. The URL is
 timestamped, and will change if the object changes.
+
+## Documentation
+
+See the [generated documentation on RubyDoc.info](https://www.rubydoc.info/gems/dynamic_image),
+and the [changelog](CHANGELOG.md) for release notes.
 
 ## Contributing
 
