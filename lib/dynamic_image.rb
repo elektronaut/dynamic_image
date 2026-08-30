@@ -47,4 +47,23 @@ module DynamicImage
   #
   # @return [DynamicImage::DigestVerifier] the verifier
   cattr_accessor :digest_verifier
+
+  # The formats a view accepts when it doesn't pass <tt>format:</tt>.
+  # Also decides what {DynamicImage::Model#safe_content_type} considers
+  # safe.
+  #
+  # @return [Array<Symbol>] the format names, most preferred first
+  mattr_accessor :default_formats, default: %i[jpeg png gif]
+
+  # The formats a mailer view accepts when it doesn't pass
+  # <tt>format:</tt>. Classic Outlook renders through the Word engine,
+  # which has no WebP support.
+  #
+  # Views rendered with <tt>ApplicationController.render</tt> build a
+  # real request and are indistinguishable from a browser render, so
+  # apps composing mail that way have to pass <tt>format:</tt>
+  # themselves.
+  #
+  # @return [Array<Symbol>] the format names, most preferred first
+  mattr_accessor :mailer_formats, default: %i[jpeg png gif]
 end

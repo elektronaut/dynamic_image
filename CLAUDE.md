@@ -35,7 +35,7 @@ Helpers in `DynamicImage::Helper` generate the digest, which is why URLs can onl
 
 `DynamicImage::Model` includes `Dis::Model` and four concerns: `Dimensions` (vector accessors over the `crop_*`/`real_*` columns), `Transformations` (`resize`, `rotate`), `Validations` and `Variants`. A `before_validation` hook reads metadata off the file whenever the data changes, so `colorspace`, `real_width`, `real_height` and `content_type` always come from the file itself, never from the client.
 
-`safe_content_type` limits what gets served in the original format to PNG, GIF and JPEG; everything else renders as JPEG unless the caller asks for a format.
+`safe_content_type` negotiates against `DynamicImage.default_formats`: an uploaded format in that list is served as-is, anything else converts to the closest fit that keeps the image's animation and transparency. Views resolve `format:` the same way through `DynamicImage::Helper::Formats`, except mailer views, which fall back to `DynamicImage.mailer_formats`.
 
 ### Processing pipeline
 
@@ -51,7 +51,7 @@ Each processed size is persisted as a `DynamicImage::Variant` — a `Dis::Model`
 
 ## Test environment
 
-Tests run against an internal Rails app at `spec/internal`, SQLite locally and PostgreSQL in CI (`DB=postgres`). Models: `Image` (includes `DynamicImage::Model`), `User` (`belongs_to_image :avatar`), `Post`. Fixtures in `spec/support/fixtures` cover each supported format plus the awkward cases — CMYK, grayscale, Adobe RGB, EXIF-rotated, animated GIF and WebP.
+Tests run against an internal Rails app at `spec/internal`, SQLite locally and PostgreSQL in CI (`DB=postgres`). Models: `Image` (includes `DynamicImage::Model`), `Photo` (the same, under a name that doesn't collide with the `image_path` asset helper), `LegacyImage` (a table predating `frame_count` and `alpha`), `User` (`belongs_to_image :avatar`), `Post`. Fixtures in `spec/support/fixtures` cover each supported format plus the awkward cases — CMYK, grayscale, Adobe RGB, EXIF-rotated, animated GIF and WebP.
 
 ## Rubocop
 

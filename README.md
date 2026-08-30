@@ -227,25 +227,43 @@ take the same sizing options.
 
 ### Formats
 
-By default, images are served in the format they were uploaded in, as
-long as that format is one browsers handle everywhere: PNG, GIF and
-JPEG. Anything else, including WebP and TIFF, is converted to JPEG.
+Images are served in the format they were uploaded in, as long as it's
+one that renders everywhere: PNG, GIF and JPEG. Anything else, including
+WebP and TIFF, is converted to the closest fit — animation is kept
+before transparency, and a photograph becomes JPEG.
 
-Pass `format:` to pick the format yourself.
+Both lists are configurable, most preferred format first:
+
+```ruby
+DynamicImage.default_formats = %i[jpeg png gif]
+DynamicImage.mailer_formats = %i[jpeg png gif]
+```
+
+Mailer views use `mailer_formats`. Classic Outlook renders through the
+Word engine, which has no WebP support. Mail composed with
+`ApplicationController.render` can't be told apart from a browser
+render, so pass `format:` yourself there.
+
+Mailer views only get `_url` helpers, so pass `routing_type: :url`:
+
+```erb
+<%= dynamic_image_tag(image, size: "400x400", routing_type: :url) %>
+```
+
+Pass `format:` to pick the format for a single tag.
 
 ```erb
 <%= dynamic_image_tag(image, size: "400x400", format: :webp) %>
 ```
 
-Pass an array when several formats will do, as when the markup is headed
-for an HTML email. The uploaded format is used if it's in the list;
-otherwise the closest fit wins, keeping animation before transparency.
+Pass an array when several formats will do. The uploaded format is used
+if it's in the list; otherwise the closest fit wins.
 
 ```erb
 <%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
 ```
 
-Images stored before `frame_count` and `alpha` were recorded render as
+Images stored before `frame_count` and `alpha` were recorded convert to
 JPEG unless the uploaded format is in the list. See
 [Upgrading](#upgrading).
 

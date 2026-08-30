@@ -99,16 +99,15 @@ module DynamicImage
       colorspace == "rgb"
     end
 
-    # Finds a web safe content type. GIF, JPEG and PNG images are allowed,
-    # any other formats should be converted to JPEG.
+    # Finds a web safe content type, negotiated against
+    # {DynamicImage.default_formats}. Views resolve the format the same
+    # way, except in a mailer.
     #
     # @return [String] the content type
+    # @see DynamicImage::FormatNegotiator
     def safe_content_type
-      if safe_content_types.include?(content_type)
-        content_type
-      else
-        "image/jpeg"
-      end
+      DynamicImage::FormatNegotiator
+        .new(self).negotiate(DynamicImage.default_formats).content_type
     end
 
     # Includes a timestamp fingerprint in the URL param, so
@@ -142,12 +141,6 @@ module DynamicImage
 
     def valid_image?
       @valid_image ? true : false
-    end
-
-    def safe_content_types
-      %w[image/png
-         image/gif
-         image/jpeg]
     end
   end
 end

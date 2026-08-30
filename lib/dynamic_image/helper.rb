@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "dynamic_image/helper/formats"
+
 module DynamicImage
   # = DynamicImage Helper
   #
@@ -13,7 +15,10 @@ module DynamicImage
   # +_path+ returns a relative path and +_url+ an absolute one.
   #
   # @see DynamicImage::ImageSizing for how sizes are calculated
+  # @see DynamicImage::Helper::Formats for how the format is chosen
   module Helper
+    include DynamicImage::Helper::Formats
+
     # Returns the path for a {DynamicImage::Model} record. Takes the
     # same options as {#dynamic_image_url}.
     #
@@ -76,11 +81,11 @@ module DynamicImage
     # @option options [Boolean] :upscale By default images are only
     #   scaled down, never up. Pass true to force upscaling.
     # @option options [Symbol, Array<Symbol>] :format Render in a
-    #   different format. Defaults to the format the image was uploaded
-    #   in, as long as browsers handle it; anything else renders as
-    #   JPEG. A symbol forces that format. An array says any of them
-    #   will do, and the best fit is chosen — see
-    #   {DynamicImage::FormatNegotiator}.
+    #   different format. A symbol forces that format. An array says any
+    #   of them will do, and the best fit is chosen — see
+    #   {DynamicImage::FormatNegotiator}. Defaults to
+    #   {DynamicImage.default_formats}, or {DynamicImage.mailer_formats}
+    #   in a mailer view.
     # @return [String] the URL
     # @raise [DynamicImage::Errors::InvalidSizeOptions] if
     #   <tt>crop: true</tt> is given without both dimensions
@@ -182,19 +187,6 @@ module DynamicImage
       %i[format only_path protocol host subdomain domain
          tld_length port anchor trailing_slash script_name
          action routing_type ]
-    end
-
-    def dynamic_image_format(record, format)
-      case format
-      when nil then Mime::Type.lookup(record.safe_content_type).to_sym
-      when Array then negotiated_format_for_image(record, format)
-      else format
-      end
-    end
-
-    def negotiated_format_for_image(record, accepted)
-      format = DynamicImage::FormatNegotiator.new(record).negotiate(accepted)
-      Mime::Type.lookup(format.content_type).to_sym
     end
 
     def dynamic_image_digest(record, action, size = nil)

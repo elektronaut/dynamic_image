@@ -71,6 +71,26 @@ ActiveRecord::Schema.define(version: 2019_06_20_160500) do
     t.datetime "updated_at"
   end
 
+  create_table "photos", force: :cascade do |t|
+    t.string "content_hash", null: false
+    t.string "content_type", null: false
+    t.integer "content_length", null: false
+    t.string "filename", null: false
+    t.string "colorspace", null: false
+    t.integer "real_width", null: false
+    t.integer "real_height", null: false
+    t.integer "frame_count"
+    t.boolean "alpha"
+    t.integer "crop_width"
+    t.integer "crop_height"
+    t.integer "crop_start_x"
+    t.integer "crop_start_y"
+    t.integer "crop_gravity_x"
+    t.integer "crop_gravity_y"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "posts", force: :cascade do |t|
     t.string "name"
     t.integer "image_id"
