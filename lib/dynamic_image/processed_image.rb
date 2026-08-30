@@ -34,7 +34,7 @@ module DynamicImage
     # @param size [Vector2d] the size to render, in pixels
     # @return [String] the image data as a binary string
     # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a
-    #   valid image
+    #   valid image, or if the stored data can't be processed
     #
     # @example
     #   processed = DynamicImage::ProcessedImage.new(image)
@@ -51,7 +51,7 @@ module DynamicImage
     # @param size [Vector2d] the size to render, in pixels
     # @return [DynamicImage::Variant] the variant
     # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a
-    #   valid image
+    #   valid image, or if the stored data can't be processed
     def find_or_create_variant(size)
       find_variant(size) || create_variant(size)
     rescue ActiveRecord::RecordNotUnique
@@ -117,7 +117,7 @@ module DynamicImage
     #   processor
     # @return [String] the image data as a binary string
     # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a
-    #   valid image
+    #   valid image, or if the stored data can't be processed
     #
     # @example
     #   processed = DynamicImage::ProcessedImage.new(image, format: :jpeg)
@@ -130,6 +130,8 @@ module DynamicImage
         image = yield(image) if block_given?
         image.convert(format).read
       end
+    rescue Vips::Error => e
+      raise DynamicImage::Errors::InvalidImage, e.message
     end
 
     private

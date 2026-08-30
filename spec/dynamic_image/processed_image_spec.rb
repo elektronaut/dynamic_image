@@ -52,5 +52,16 @@ describe DynamicImage::ProcessedImage do
         expect { normalized }.to raise_error(DynamicImage::Errors::InvalidImage)
       end
     end
+
+    context "when vips fails to process the data" do
+      before do
+        allow(DynamicImage::ImageProcessor)
+          .to receive(:new).and_raise(Vips::Error, "unable to read")
+      end
+
+      it "raises an error" do
+        expect { normalized }.to raise_error(DynamicImage::Errors::InvalidImage)
+      end
+    end
   end
 end
