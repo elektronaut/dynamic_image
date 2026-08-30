@@ -1,0 +1,17 @@
+Description:
+    Creates a DynamicImage resource: a model including
+    DynamicImage::Model, a controller including DynamicImage::Controller,
+    a migration with the columns DynamicImage needs, and an
+    image_resources route.
+
+    Additional attributes are passed through to the migration, so a
+    resource can carry fields of its own.
+
+Example:
+    bin/rails generate dynamic_image:resource image
+
+        creates an Image model, an ImagesController and a migration.
+
+    bin/rails generate dynamic_image:resource photo caption:string
+
+        adds a caption column to the migration.
