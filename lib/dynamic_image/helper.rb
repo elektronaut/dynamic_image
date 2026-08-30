@@ -218,13 +218,6 @@ module DynamicImage
       end
     end
 
-    def filename_to_alt(str)
-      File.basename(str, ".*")
-          .sub(/-[[:xdigit:]]{32,64}\z/, "")
-          .tr("-_", " ")
-          .capitalize
-    end
-
     def fit_size!(record_or_array, options)
       record = extract_dynamic_image_record(record_or_array)
       action = options[:action].try(:to_s)
