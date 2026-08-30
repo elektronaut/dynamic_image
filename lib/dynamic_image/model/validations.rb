@@ -42,6 +42,11 @@ module DynamicImage
                   numericality: { greater_than: 0, only_integer: true },
                   allow_nil: true
 
+        validates :crop_start_x, :crop_start_y,
+                  numericality: { greater_than_or_equal_to: 0,
+                                  only_integer: true },
+                  allow_nil: true
+
         validates :crop_width, presence: true, if: :crop_height?
         validates :crop_height, presence: true, if: :crop_width?
 

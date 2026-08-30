@@ -5,7 +5,7 @@ PATH
       dis (~> 2.1)
       rails (> 7.0)
       ruby-vips (>= 2.1, < 2.4)
-      vector2d (~> 2.2, >= 2.2.1)
+      vector2d (~> 2.3)
 
 GEM
   remote: https://rubygems.org/
@@ -315,7 +315,7 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
-    vector2d (2.2.4)
+    vector2d (2.3.0)
     websocket-driver (0.8.2)
       base64
       websocket-extensions (>= 0.1.0)

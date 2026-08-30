@@ -209,6 +209,18 @@ describe DynamicImage::Model::Validations do
       it { is_expected.to include("can't be blank") }
     end
 
+    context "when negative" do
+      let(:image) { Image.new(crop_start_x: -1) }
+
+      it { is_expected.to include("must be greater than or equal to 0") }
+    end
+
+    context "when fractional" do
+      let(:image) { Image.new(crop_start_x: 1.5) }
+
+      it { is_expected.to include("must be an integer") }
+    end
+
     context "when non-zero" do
       let(:image) { Image.new(crop_start_x: 2048) }
 
@@ -227,6 +239,18 @@ describe DynamicImage::Model::Validations do
       let(:image) { Image.new(crop_start_x: 100) }
 
       it { is_expected.to include("can't be blank") }
+    end
+
+    context "when negative" do
+      let(:image) { Image.new(crop_start_y: -1) }
+
+      it { is_expected.to include("must be greater than or equal to 0") }
+    end
+
+    context "when fractional" do
+      let(:image) { Image.new(crop_start_y: 1.5) }
+
+      it { is_expected.to include("must be an integer") }
     end
 
     context "when non-zero" do
