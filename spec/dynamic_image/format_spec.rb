@@ -66,4 +66,18 @@ describe DynamicImage::Format do
 
     it { is_expected.to eq(".jpg") }
   end
+
+  describe "#alpha?" do
+    context "when the format carries an alpha channel" do
+      subject { find_format("PNG").alpha? }
+
+      it { is_expected.to be(true) }
+    end
+
+    context "when the format carries no alpha channel" do
+      subject { format.alpha? }
+
+      it { is_expected.to be(false) }
+    end
+  end
 end

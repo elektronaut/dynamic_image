@@ -21,6 +21,8 @@ module DynamicImage
     #   @return [String] the format name, such as "JPEG"
     # @!attribute [r] animated
     #   @return [Boolean] whether the format holds more than one frame
+    # @!attribute [r] alpha
+    #   @return [Boolean] whether the format holds an alpha channel
     # @!attribute [r] content_types
     #   @return [Array<String>] the content types, canonical one first
     # @!attribute [r] extensions
@@ -32,8 +34,8 @@ module DynamicImage
     # @!attribute [r] signature
     #   @return [Proc, nil] an extra check against the header, for when
     #     the magic bytes alone are ambiguous
-    attr_reader :name, :animated, :content_types, :extensions, :magic_bytes,
-                :save_options, :signature
+    attr_reader :name, :animated, :alpha, :content_types, :extensions,
+                :magic_bytes, :save_options, :signature
 
     # @param name [String] the format name
     # @param options [Hash] the format definition, as passed to
@@ -44,11 +46,10 @@ module DynamicImage
 
       @name = name
       @animated = options[:animated]
+      @alpha = options[:alpha]
       @content_types = Array(options[:content_type])
       @extensions = Array(options[:extension])
-      @magic_bytes = options[:magic_bytes].map do |s|
-        s.dup.force_encoding("binary")
-      end
+      @magic_bytes = options[:magic_bytes].map(&:b)
       @signature = options[:signature]
       @save_options = options[:save_options]
     end
@@ -58,6 +59,13 @@ module DynamicImage
     # @return [Boolean]
     def animated?
       animated
+    end
+
+    # Returns true if the format supports an alpha channel.
+    #
+    # @return [Boolean]
+    def alpha?
+      alpha
     end
 
     # Returns true if the given header belongs to this format.
@@ -153,8 +161,8 @@ module DynamicImage
     #
     # @return [Hash] the default options
     def default_options
-      { animated: false, content_type: [], extension: [], magic_bytes: [],
-        signature: nil, save_options: {} }
+      { animated: false, alpha: false, content_type: [], extension: [],
+        magic_bytes: [], signature: nil, save_options: {} }
     end
 
     register(
@@ -167,6 +175,7 @@ module DynamicImage
     register(
       "GIF",
       animated: true,
+      alpha: true,
       content_type: %w[image/gif],
       extension: %w[.gif],
       magic_bytes: %w[GIF87a GIF89a]
@@ -182,6 +191,7 @@ module DynamicImage
 
     register(
       "PNG",
+      alpha: true,
       content_type: %w[image/png],
       extension: %w[.png],
       magic_bytes: ["\x89\x50\x4e\x47\x0d\x0a\x1a\x0a"]
@@ -189,6 +199,7 @@ module DynamicImage
 
     register(
       "TIFF",
+      alpha: true,
       content_type: %w[image/tiff],
       extension: %w[.tiff .tif],
       magic_bytes: ["\x49\x49\x2a\x00", "\x4d\x4d\x00\x2a"]
@@ -197,6 +208,7 @@ module DynamicImage
     register(
       "WEBP",
       animated: true,
+      alpha: true,
       content_type: %w[image/webp],
       extension: %w[.webp],
       magic_bytes: ["\x52\x49\x46\x46"],
