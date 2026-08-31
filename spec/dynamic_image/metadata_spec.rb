@@ -152,6 +152,58 @@ describe DynamicImage::Metadata do
     end
   end
 
+  describe "#frame_count" do
+    subject { meta_info.frame_count }
+
+    context "when image is a still" do
+      it { is_expected.to eq(1) }
+    end
+
+    context "when image is an animated GIF" do
+      let(:image) { read_image("animated.gif") }
+
+      it { is_expected.to eq(3) }
+    end
+
+    context "when image is an animated WebP" do
+      let(:image) { read_image("animated.webp") }
+
+      it { is_expected.to eq(3) }
+    end
+
+    context "with invalid data" do
+      let(:image_data) { "invalid" }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
+  describe "#alpha?" do
+    subject { meta_info.alpha? }
+
+    context "when image has no alpha channel" do
+      it { is_expected.to be(false) }
+    end
+
+    context "when image has an alpha channel" do
+      let(:image) { read_image("animated.webp") }
+
+      it { is_expected.to be(true) }
+    end
+
+    context "when image is a still with an alpha channel" do
+      let(:image) { read_image("transparent.webp") }
+
+      it { is_expected.to be(true) }
+    end
+
+    context "with invalid data" do
+      let(:image_data) { "invalid" }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   describe "#format" do
     subject { meta_info.format }
 

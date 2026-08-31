@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "dynamic_image/helper/formats"
+
 module DynamicImage
   # = DynamicImage Helper
   #
@@ -13,7 +15,10 @@ module DynamicImage
   # +_path+ returns a relative path and +_url+ an absolute one.
   #
   # @see DynamicImage::ImageSizing for how sizes are calculated
+  # @see DynamicImage::Helper::Formats for how the format is chosen
   module Helper
+    include DynamicImage::Helper::Formats
+
     # Returns the path for a {DynamicImage::Model} record. Takes the
     # same options as {#dynamic_image_url}.
     #
@@ -75,9 +80,12 @@ module DynamicImage
     #   instead of fitting it. Both dimensions are required.
     # @option options [Boolean] :upscale By default images are only
     #   scaled down, never up. Pass true to force upscaling.
-    # @option options [Symbol] :format Render in a different format.
-    #   Defaults to the format the image was uploaded in, as long as
-    #   browsers handle it; anything else renders as JPEG.
+    # @option options [Symbol, Array<Symbol>] :format Render in a
+    #   different format. A symbol forces that format. An array says any
+    #   of them will do, and the best fit is chosen — see
+    #   {DynamicImage::FormatNegotiator}. Defaults to
+    #   {DynamicImage.default_formats}, or {DynamicImage.mailer_formats}
+    #   in a mailer view.
     # @return [String] the URL
     # @raise [DynamicImage::Errors::InvalidSizeOptions] if
     #   <tt>crop: true</tt> is given without both dimensions
@@ -181,10 +189,6 @@ module DynamicImage
          action routing_type ]
     end
 
-    def default_format_for_image(record)
-      Mime::Type.lookup(record.safe_content_type).to_sym
-    end
-
     def dynamic_image_digest(record, action, size = nil)
       key = [action || "show", record.id, size].compact.join("-")
       DynamicImage.digest_verifier.generate(key)
@@ -198,12 +202,9 @@ module DynamicImage
 
     def dynamic_image_url_with_size(record_or_array, size = nil, options = {})
       record = extract_dynamic_image_record(record_or_array)
-      options = {
-        routing_type: :url,
-        action: nil,
-        format: default_format_for_image(record),
-        size:
-      }.merge(options)
+      options = { routing_type: :url, action: nil, size: }.merge(options)
+      options[:routing_type] = :url if mailer_view?
+      options[:format] = dynamic_image_format(record, options[:format])
       options[:digest] =
         dynamic_image_digest(record, options[:action], options[:size])
       polymorphic_url(record_or_array, options)

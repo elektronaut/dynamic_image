@@ -12,8 +12,8 @@ on demand. It handles cropping, resizing, format and colorspace
 conversion.
 
 Supported formats at the moment are JPEG, PNG, GIF, BMP, WebP and TIFF.
-BMP, WebP and TIFF images will automatically be converted to JPG. CMYK
-images will be converted to RGB, and RGB images will be converted to the sRGB
+BMP and TIFF images will automatically be converted. CMYK images will be
+converted to RGB, and RGB images will be converted to the sRGB
 colorspace for consistent appearance in all browsers.
 
 DynamicImage is built on [Dis](https://github.com/elektronaut/dis)
@@ -81,17 +81,22 @@ hold the image metadata and crop.
 
 ```ruby
 create_table :images do |t|
-  t.string  :content_hash
-  t.string  :content_type
-  t.integer :content_length
-  t.string  :filename
-  t.string  :colorspace
-  t.integer :real_width, :real_height
+  t.string  :content_hash, null: false
+  t.string  :content_type, null: false
+  t.integer :content_length, null: false
+  t.string  :filename, null: false
+  t.string  :colorspace, null: false
+  t.integer :real_width, null: false
+  t.integer :real_height, null: false
+  t.integer :frame_count
+  t.boolean :alpha
   t.integer :crop_width, :crop_height
   t.integer :crop_start_x, :crop_start_y
   t.integer :crop_gravity_x, :crop_gravity_y
   t.timestamps
 end
+
+add_index :images, :content_hash
 ```
 
 The controller needs `DynamicImage::Controller` and a `model` method
@@ -222,22 +227,35 @@ take the same sizing options.
 
 ### Formats
 
-By default, images are served in the format they were uploaded in, as
-long as that format is one browsers handle everywhere: PNG, GIF and
-JPEG. Anything else, including WebP and TIFF, is converted to JPEG.
+Images are served in the format they were uploaded in, as long as it's
+one that renders everywhere: JPEG, PNG, GIF and WebP. Anything else,
+BMP and TIFF, is converted to the closest fit.
 
-Pass `format:` to pick the format yourself.
+The preferred format lists are configurable, most preferred format first:
+
+```ruby
+DynamicImage.default_formats = %i[jpeg png gif webp]
+DynamicImage.mailer_formats = %i[jpeg png gif]
+```
+
+Pass `format:` to pick the format for a single tag.
 
 ```erb
 <%= dynamic_image_tag(image, size: "400x400", format: :webp) %>
 ```
 
+Pass an array when several formats will do. The uploaded format is used
+if it's in the list; otherwise the closest fit wins.
+
+```erb
+<%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
+```
+
 The format is not part of the signature, so the same image can be served
 in several formats without any extra bookkeeping.
 
-Animated GIF and WebP images stay animated when converted between those
-two formats. Converting an animated image to a still format renders the
-first frame.
+Converting an animated image to a format that doesn't support animation
+renders the first frame.
 
 ### Responsive images
 
@@ -410,6 +428,40 @@ front. Here are a few options:
 
 It's perfectly safe to cache images indefinitely. The URL is
 timestamped, and will change if the object changes.
+
+## Upgrading
+
+DynamicImage can't migrate your image table for you: it's named whatever
+you called it, and you may have several. When a release changes the
+schema, you generate the migration. Most releases don't.
+
+### 3.1
+
+Uploaded WebP is now served as WebP instead of being converted to JPEG,
+so URLs and cached variants for WebP images change. Mailer views still
+get JPEG, PNG or GIF. Set `DynamicImage.default_formats` back to
+`%i[jpeg png gif]` to keep the old behaviour.
+
+This release also adds `frame_count` and `alpha`, and an index on
+`content_hash`. Run this once per image model.
+
+```sh
+bin/rails generate dynamic_image:upgrade Image
+bin/rails db:migrate
+bin/rails dynamic_image:backfill MODELS=Image
+```
+
+The backfill reads every image back from storage, so it takes a while on
+a large library. It's safe to interrupt and re-run, and it leaves
+`updated_at` alone, so existing URLs and cached variants stay valid.
+
+`add_index` locks the table while it builds. On a large table, move it
+into its own migration with `algorithm: :concurrently`.
+
+If your table was created by an older generator, its columns are all
+nullable and the generator will list the ones that should be `NOT NULL`.
+Correcting them is optional and left to you, since `change_column_null`
+fails if any row holds a `NULL`.
 
 ## Documentation
 

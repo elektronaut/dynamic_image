@@ -9,7 +9,8 @@ module DynamicImage
   # = DynamicImage Model
   #
   # ActiveModel extension for the model holding image data. It assumes your
-  # database table has at least the following attributes:
+  # database table has at least the attributes in
+  # {DynamicImage::Schema::ATTRIBUTES}:
   #
   #   create_table :images do |t|
   #     t.string  :content_hash
@@ -98,16 +99,14 @@ module DynamicImage
       colorspace == "rgb"
     end
 
-    # Finds a web safe content type. GIF, JPEG and PNG images are allowed,
-    # any other formats should be converted to JPEG.
+    # Finds a web safe content type, negotiated against
+    # {DynamicImage.default_formats}.
     #
     # @return [String] the content type
+    # @see DynamicImage::FormatNegotiator
     def safe_content_type
-      if safe_content_types.include?(content_type)
-        content_type
-      else
-        "image/jpeg"
-      end
+      DynamicImage::FormatNegotiator
+        .new(self).negotiate(DynamicImage.default_formats).content_type
     end
 
     # Includes a timestamp fingerprint in the URL param, so
@@ -134,17 +133,13 @@ module DynamicImage
       self.real_width = metadata.width
       self.real_height = metadata.height
       self.content_type = metadata.content_type
+      self.frame_count = metadata.frame_count if has_attribute?(:frame_count)
+      self.alpha = metadata.alpha? if has_attribute?(:alpha)
       @valid_image = true
     end
 
     def valid_image?
       @valid_image ? true : false
-    end
-
-    def safe_content_types
-      %w[image/png
-         image/gif
-         image/jpeg]
     end
   end
 end

@@ -22,6 +22,15 @@ Rails:
 Rails/ApplicationJob:
   Enabled: false
 
+Rails/SkipsModelValidations:
+  Exclude:
+    - "lib/dynamic_image/backfill.rb"
+    - "spec/dynamic_image/backfill_spec.rb"
+
+Metrics/ClassLength:
+  Exclude:
+    - "lib/dynamic_image/format.rb"
+
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 

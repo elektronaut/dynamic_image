@@ -1,0 +1,17 @@
+Description:
+    Brings an existing DynamicImage table up to date with the schema the
+    installed version of the gem expects. Compares the table against
+    DynamicImage::Schema and writes a migration containing only what is
+    missing. If nothing is missing, no migration is written.
+
+    Only additive changes are generated. Columns are added nullable, and
+    columns whose nullability differs from the expected schema are
+    reported rather than altered: change_column_null fails on existing
+    NULLs, and only you can know whether the data allows it.
+
+    Run it once per DynamicImage model.
+
+Example:
+    bin/rails generate dynamic_image:upgrade Image
+
+        creates db/migrate/XXX_add_frame_count_and_alpha_to_images.rb

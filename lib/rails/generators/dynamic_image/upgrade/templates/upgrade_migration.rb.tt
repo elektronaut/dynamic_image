@@ -1,0 +1,10 @@
+class <%= migration_class_name %> < ActiveRecord::Migration[<%= ActiveRecord::Migration.current_version %>]
+  def change
+<% missing_columns.each do |name, column| -%>
+    add_column :<%= table_name %>, :<%= name %>, :<%= column[:type] %>
+<% end -%>
+<% missing_indexes.each do |index| -%>
+    add_index :<%= table_name %>, <%= index_columns(index) %><%= ", unique: true" if index[:unique] %>
+<% end -%>
+  end
+end
