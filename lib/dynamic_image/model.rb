@@ -100,8 +100,7 @@ module DynamicImage
     end
 
     # Finds a web safe content type, negotiated against
-    # {DynamicImage.default_formats}. Views resolve the format the same
-    # way, except in a mailer.
+    # {DynamicImage.default_formats}.
     #
     # @return [String] the content type
     # @see DynamicImage::FormatNegotiator

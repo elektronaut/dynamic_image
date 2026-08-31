@@ -56,13 +56,7 @@ module DynamicImage
   mattr_accessor :default_formats, default: %i[jpeg png gif webp]
 
   # The formats a mailer view accepts when it doesn't pass
-  # <tt>format:</tt>. Classic Outlook renders through the Word engine,
-  # which has no WebP support.
-  #
-  # Views rendered with <tt>ApplicationController.render</tt> build a
-  # real request and are indistinguishable from a browser render, so
-  # apps composing mail that way have to pass <tt>format:</tt>
-  # themselves.
+  # <tt>format:</tt>.
   #
   # @return [Array<Symbol>] the format names, most preferred first
   mattr_accessor :mailer_formats, default: %i[jpeg png gif]

@@ -229,25 +229,13 @@ take the same sizing options.
 
 Images are served in the format they were uploaded in, as long as it's
 one that renders everywhere: JPEG, PNG, GIF and WebP. Anything else,
-BMP and TIFF, is converted to the closest fit — animation is kept before
-transparency, and a photograph becomes JPEG.
+BMP and TIFF, is converted to the closest fit.
 
-Both lists are configurable, most preferred format first:
+The preferred format lists are configurable, most preferred format first:
 
 ```ruby
 DynamicImage.default_formats = %i[jpeg png gif webp]
 DynamicImage.mailer_formats = %i[jpeg png gif]
-```
-
-Mailer views use `mailer_formats`. Classic Outlook renders through the
-Word engine, which has no WebP support. Mail composed with
-`ApplicationController.render` can't be told apart from a browser
-render, so pass `format:` yourself there.
-
-Mailer views only get `_url` helpers, so pass `routing_type: :url`:
-
-```erb
-<%= dynamic_image_tag(image, size: "400x400", routing_type: :url) %>
 ```
 
 Pass `format:` to pick the format for a single tag.
@@ -263,16 +251,11 @@ if it's in the list; otherwise the closest fit wins.
 <%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
 ```
 
-Images stored before `frame_count` and `alpha` were recorded convert to
-JPEG unless the uploaded format is in the list. See
-[Upgrading](#upgrading).
-
 The format is not part of the signature, so the same image can be served
 in several formats without any extra bookkeeping.
 
-Animated GIF and WebP images stay animated when converted between those
-two formats. Converting an animated image to a still format renders the
-first frame.
+Converting an animated image to a format that doesn't support animation
+renders the first frame.
 
 ### Responsive images
 
