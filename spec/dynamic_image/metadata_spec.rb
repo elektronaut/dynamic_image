@@ -171,6 +171,12 @@ describe DynamicImage::Metadata do
       it { is_expected.to eq(3) }
     end
 
+    context "when image is an animated AVIF" do
+      let(:image) { read_image("animated.avif") }
+
+      it { is_expected.to eq(3) }
+    end
+
     context "with invalid data" do
       let(:image_data) { "invalid" }
 
@@ -193,6 +199,12 @@ describe DynamicImage::Metadata do
 
     context "when image is a still with an alpha channel" do
       let(:image) { read_image("transparent.webp") }
+
+      it { is_expected.to be(true) }
+    end
+
+    context "when image is a transparent AVIF" do
+      let(:image) { read_image("transparent.avif") }
 
       it { is_expected.to be(true) }
     end

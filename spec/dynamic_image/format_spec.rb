@@ -30,6 +30,48 @@ describe DynamicImage::Format do
       it { is_expected.to eq(find_format("TIFF")) }
     end
 
+    context "when byte sequence is an AVIF header" do
+      let(:bytes) { "\x00\x00\x00\x1cftypavif\x00\x00\x00\x00mif1avifmiaf".b }
+
+      it { is_expected.to eq(find_format("AVIF")) }
+    end
+
+    context "when byte sequence is a HEIC header" do
+      let(:bytes) { "\x00\x00\x00\x1cftypheic\x00\x00\x00\x00mif1heicmiaf".b }
+
+      it { is_expected.to eq(find_format("HEIC")) }
+    end
+
+    context "when an AVIF only declares its brand as compatible" do
+      let(:bytes) { "\x00\x00\x00\x1cftypmif1\x00\x00\x00\x00mif1avifmiaf".b }
+
+      it { is_expected.to eq(find_format("AVIF")) }
+    end
+
+    context "when an ISO base media file only claims the generic brand" do
+      let(:bytes) { "\x00\x00\x00\x1cftypmif1\x00\x00\x00\x00mif1miafMiHB".b }
+
+      it { is_expected.to eq(find_format("HEIC")) }
+    end
+
+    context "when an ISO base media file is neither" do
+      let(:bytes) { "\x00\x00\x00\x1cftypisom\x00\x00\x00\x00isomiso2mp41".b }
+
+      it { is_expected.to be_nil }
+    end
+
+    context "when byte sequence is a JXL container" do
+      let(:bytes) { "\x00\x00\x00\x0cJXL \r\n\x87\n\x00\x00\x00\x14".b }
+
+      it { is_expected.to eq(find_format("JXL")) }
+    end
+
+    context "when byte sequence is a naked JXL codestream" do
+      let(:bytes) { "\xff\x0a\x00\x10\x00\x00\x00\x00".b }
+
+      it { is_expected.to eq(find_format("JXL")) }
+    end
+
     context "when byte sequence is invalid" do
       let(:bytes) { "invalid" }
 

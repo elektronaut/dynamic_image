@@ -229,6 +229,36 @@ describe ImagesController, type: :controller do
         expect(metadata.format).to eq("WEBP")
       end
     end
+
+    context "when format is JPEG XL" do
+      before do
+        get(
+          :show,
+          params: digested(:show, id: image.id, size: "100x100", format: :jxl)
+        )
+      end
+
+      it "sets the content type" do
+        expect(response.media_type).to eq("image/jxl")
+      end
+
+      it "returns a JPEG XL image" do
+        expect(metadata.format).to eq("JXL")
+      end
+    end
+
+    context "when format is one that is only ever read" do
+      subject(:request) do
+        get(
+          :show,
+          params: digested(:show, id: image.id, size: "100x100", format: :avif)
+        )
+      end
+
+      it "refuses to render it" do
+        expect { request }.to raise_error(ActionController::UnknownFormat)
+      end
+    end
   end
 
   describe "GET uncropped" do
@@ -282,6 +312,30 @@ describe ImagesController, type: :controller do
   end
 
   describe "GET original" do
+    context "with a format that is never rendered" do
+      subject(:content_type) { response.media_type }
+
+      let(:image) do
+        Image.create(
+          file: Rack::Test::UploadedFile.new(
+            File.open(File.expand_path("../support/fixtures/image.heic",
+                                       __dir__)),
+            "image/heic"
+          )
+        )
+      end
+
+      before do
+        get(:original,
+            params: digested(:original,
+                             id: image.id,
+                             size: "320x200",
+                             format: :heic))
+      end
+
+      it { is_expected.to eq("image/heic") }
+    end
+
     context "with a nonexistant record" do
       it "raises an error" do
         expect do

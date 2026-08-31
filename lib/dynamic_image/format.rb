@@ -182,6 +182,17 @@ module DynamicImage
     end
 
     register(
+      "AVIF",
+      animated: true,
+      alpha: true,
+      content_type: %w[image/avif],
+      extension: %w[.avif],
+      offset: 4,
+      magic_bytes: %w[ftyp],
+      signature: ->(bytes) { iso_brands(bytes).intersect?(%w[avif avis]) }
+    )
+
+    register(
       "BMP",
       content_type: %w[image/bmp],
       extension: %w[.bmp],
@@ -198,11 +209,35 @@ module DynamicImage
     )
 
     register(
+      "HEIC",
+      animated: true,
+      alpha: true,
+      content_type: %w[image/heic image/heif],
+      extension: %w[.heic .heif],
+      offset: 4,
+      magic_bytes: %w[ftyp],
+      signature: lambda { |bytes|
+        iso_brands(bytes).intersect?(
+          %w[heic heix hevc hevx heim heis hevm hevs mif1 msf1]
+        )
+      }
+    )
+
+    register(
       "JPEG",
       content_type: %w[image/jpeg image/pjpeg],
       extension: %w[.jpg .jpeg],
       magic_bytes: ["\xff\xd8"],
       save_options: { Q: 90, strip: true, background: [255.0, 255.0, 255.0] }
+    )
+
+    register(
+      "JXL",
+      alpha: true,
+      content_type: %w[image/jxl],
+      extension: %w[.jxl],
+      magic_bytes: ["\xff\x0a", "\x00\x00\x00\x0cJXL \r\n\x87\n"],
+      save_options: { Q: 75, effort: 3, strip: true }
     )
 
     register(

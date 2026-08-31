@@ -15,6 +15,22 @@ describe DynamicImage::ProcessedImage do
   let(:image) { read_image("image.png") }
   let(:record) { Image.new(data: image.read, filename: "test.png") }
 
+  describe "rendering an animated AVIF" do
+    subject(:frames) do
+      DynamicImage::Metadata.new(
+        described_class.new(record, format: :gif)
+                       .cropped_and_resized(Vector2d.new(100, 100))
+      ).frame_count
+    end
+
+    let(:record) do
+      Image.create(data: read_image("animated.avif").read,
+                   filename: "animated.avif")
+    end
+
+    it { is_expected.to eq(3) }
+  end
+
   describe "#cropped_and_resized" do
     subject(:dimensions) { metadata.dimensions }
 

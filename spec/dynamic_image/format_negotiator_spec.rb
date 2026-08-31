@@ -105,8 +105,42 @@ describe DynamicImage::FormatNegotiator do
     it { is_expected.to eq(find_format("JPEG")) }
   end
 
+  context "when JPEG XL is accepted for a transparent image" do
+    let(:accepted) { %i[jpeg jxl] }
+    let(:image) do
+      Image.new(content_type: "image/webp", frame_count: 1, alpha: true)
+    end
+
+    it { is_expected.to eq(find_format("JXL")) }
+  end
+
+  context "when JPEG XL is accepted for an animated image" do
+    let(:accepted) { %i[jxl gif] }
+    let(:image) do
+      Image.new(content_type: "image/webp", frame_count: 3, alpha: false)
+    end
+
+    it { is_expected.to eq(find_format("GIF")) }
+  end
+
+  context "when the source is an opaque AVIF" do
+    let(:image) do
+      Image.new(content_type: "image/avif", frame_count: 1, alpha: false)
+    end
+
+    it { is_expected.to eq(find_format("JPEG")) }
+  end
+
+  context "when the source is a transparent AVIF" do
+    let(:image) do
+      Image.new(content_type: "image/avif", frame_count: 1, alpha: true)
+    end
+
+    it { is_expected.to eq(find_format("PNG")) }
+  end
+
   context "when the accepted list holds unknown names" do
-    let(:accepted) { %i[avif png] }
+    let(:accepted) { %i[svg png] }
     let(:image) do
       Image.new(content_type: "image/webp", frame_count: 1, alpha: true)
     end

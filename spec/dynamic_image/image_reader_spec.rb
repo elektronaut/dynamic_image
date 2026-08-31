@@ -7,6 +7,35 @@ describe DynamicImage::ImageReader do
     File.expand_path("../support/fixtures/image.png", __dir__)
   end
 
+  describe "with an ISO base media or JPEG XL file" do
+    subject(:reader) { described_class.new(Pathname(path)) }
+
+    let(:path) do
+      File.expand_path("../support/fixtures/image.#{extension}", __dir__)
+    end
+
+    context "with a HEIC" do
+      let(:extension) { "heic" }
+
+      it { expect(reader.format.name).to eq("HEIC") }
+      it { expect(reader.read.width).to eq(320) }
+    end
+
+    context "with an AVIF" do
+      let(:extension) { "avif" }
+
+      it { expect(reader.format.name).to eq("AVIF") }
+      it { expect(reader.read.width).to eq(320) }
+    end
+
+    context "with a JPEG XL" do
+      let(:extension) { "jxl" }
+
+      it { expect(reader.format.name).to eq("JXL") }
+      it { expect(reader.read.width).to eq(320) }
+    end
+  end
+
   describe "with a Pathname" do
     subject(:reader) { described_class.new(Pathname(fixture_path)) }
 

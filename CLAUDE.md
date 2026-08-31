@@ -41,7 +41,9 @@ Helpers in `DynamicImage::Helper` generate the digest, which is why URLs can onl
 
 `ImageReader` sniffs the header and hands off to vips. `ImageProcessor` wraps a `Vips::Image` and is immutable — every operation returns a new instance, so it chains: `.crop(...).resize(...).convert(...).read`. Its behavior is split across `ImageProcessor::Colors` (sRGB conversion, profile handling), `::Frames` (animated GIF/WebP) and `::Transform` (crop, resize, rotate).
 
-`DynamicImage::Format` is a registry of the supported formats, holding magic bytes for sniffing, content types, extensions, save options and whether the format can hold animation or an alpha channel. Formats are registered at the bottom of the class body.
+`DynamicImage::Format` is a registry of the supported formats, holding magic bytes for sniffing, content types, extensions, save options and whether the format can hold animation or an alpha channel. Magic bytes can sit at an offset, which is how the ISO base media formats are told apart: AVIF and HEIC share an `ftyp` box and are separated by their brands, so AVIF is registered first and `Format.iso_brands` reads the list. Formats are registered at the bottom of the class body.
+
+What gets served is decided in two places, not by a per-format flag. `DynamicImage.default_formats` decides what negotiation will pick, and `DynamicImage::Controller::PROCESSED_FORMATS` / `STORED_FORMATS` gate what the actions respond to. HEIC and AVIF are in neither default list and only in `STORED_FORMATS`, so they are read and downloadable but never rendered.
 
 Cropping always happens before resizing. `ImageSizing` computes both: `crop_geometry` returns the crop rect scaled to the source image, and `fit` computes the final dimensions honoring `:crop` and `:upscale`.
 
@@ -51,7 +53,7 @@ Each processed size is persisted as a `DynamicImage::Variant` — a `Dis::Model`
 
 ## Test environment
 
-Tests run against an internal Rails app at `spec/internal`, SQLite locally and PostgreSQL in CI (`DB=postgres`). Models: `Image` (includes `DynamicImage::Model`), `LegacyImage` (a table predating `frame_count` and `alpha`), `User` (`belongs_to_image :avatar`), `Post`. `ImageMailer` covers the mailer render path. Fixtures in `spec/support/fixtures` cover each supported format plus the awkward cases — CMYK, grayscale, Adobe RGB, EXIF-rotated, animated GIF and WebP.
+Tests run against an internal Rails app at `spec/internal`, SQLite locally and PostgreSQL in CI (`DB=postgres`). Models: `Image` (includes `DynamicImage::Model`), `LegacyImage` (a table predating `frame_count` and `alpha`), `User` (`belongs_to_image :avatar`), `Post`. `ImageMailer` covers the mailer render path. Fixtures in `spec/support/fixtures` cover each supported format plus the awkward cases — CMYK, grayscale, Adobe RGB, EXIF-rotated, animated GIF and WebP, transparent and animated AVIF.
 
 ## Rubocop
 
