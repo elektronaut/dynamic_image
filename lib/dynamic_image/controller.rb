@@ -34,9 +34,8 @@ module DynamicImage
     # Formats +show+ and +uncropped+ will render.
     PROCESSED_FORMATS = %i[gif jpeg jpg jxl png tiff webp].freeze
 
-    # Formats +original+ and +download+ will serve. Wider than
-    # {PROCESSED_FORMATS}, since the stored file is streamed as it is.
-    STORED_FORMATS = (PROCESSED_FORMATS + %i[avif heic]).freeze
+    # Additional formats +original+ and +download+ will serve.
+    STORED_FORMATS = (PROCESSED_FORMATS + %i[avif bmp heic]).freeze
 
     included do
       before_action :verify_signed_params

@@ -13,6 +13,22 @@ describe ImagesController, type: :controller do
     { digest: digest(key) }.merge(options)
   end
 
+  def stored_image(format)
+    Image.create(
+      file: Rack::Test::UploadedFile.new(
+        File.open(
+          File.expand_path("../support/fixtures/image.#{format}", __dir__)
+        ),
+        "image/#{format}"
+      )
+    )
+  end
+
+  def get_original(image, format)
+    get(:original,
+        params: digested(:original, id: image.id, size: "320x200", format:))
+  end
+
   let(:image) do
     Image.create(
       file: Rack::Test::UploadedFile.new(
@@ -312,28 +328,34 @@ describe ImagesController, type: :controller do
   end
 
   describe "GET original" do
-    context "with a format that is never rendered" do
-      subject(:content_type) { response.media_type }
+    context "with a HEIC, which is never rendered" do
+      subject { response.media_type }
 
-      let(:image) do
-        Image.create(
-          file: Rack::Test::UploadedFile.new(
-            File.open(File.expand_path("../support/fixtures/image.heic",
-                                       __dir__)),
-            "image/heic"
-          )
-        )
-      end
+      let(:image) { stored_image("heic") }
 
-      before do
-        get(:original,
-            params: digested(:original,
-                             id: image.id,
-                             size: "320x200",
-                             format: :heic))
-      end
+      before { get_original(image, "heic") }
 
       it { is_expected.to eq("image/heic") }
+    end
+
+    context "with a BMP, which is never rendered" do
+      subject { response.media_type }
+
+      let(:image) { stored_image("bmp") }
+
+      before { get_original(image, "bmp") }
+
+      it { is_expected.to eq("image/bmp") }
+    end
+
+    context "with an AVIF, which is never rendered" do
+      subject { response.media_type }
+
+      let(:image) { stored_image("avif") }
+
+      before { get_original(image, "avif") }
+
+      it { is_expected.to eq("image/avif") }
     end
 
     context "with a nonexistant record" do
