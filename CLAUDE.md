@@ -51,7 +51,7 @@ Each processed size is persisted as a `DynamicImage::Variant` — a `Dis::Model`
 
 ## Test environment
 
-Tests run against an internal Rails app at `spec/internal`, SQLite locally and PostgreSQL in CI (`DB=postgres`). Models: `Image` (includes `DynamicImage::Model`), `Photo` (the same, under a name that doesn't collide with the `image_path` asset helper), `LegacyImage` (a table predating `frame_count` and `alpha`), `User` (`belongs_to_image :avatar`), `Post`. Fixtures in `spec/support/fixtures` cover each supported format plus the awkward cases — CMYK, grayscale, Adobe RGB, EXIF-rotated, animated GIF and WebP.
+Tests run against an internal Rails app at `spec/internal`, SQLite locally and PostgreSQL in CI (`DB=postgres`). Models: `Image` (includes `DynamicImage::Model`), `LegacyImage` (a table predating `frame_count` and `alpha`), `User` (`belongs_to_image :avatar`), `Post`. `ImageMailer` covers the mailer render path. Fixtures in `spec/support/fixtures` cover each supported format plus the awkward cases — CMYK, grayscale, Adobe RGB, EXIF-rotated, animated GIF and WebP.
 
 ## Rubocop
 

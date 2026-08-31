@@ -202,11 +202,8 @@ module DynamicImage
 
     def dynamic_image_url_with_size(record_or_array, size = nil, options = {})
       record = extract_dynamic_image_record(record_or_array)
-      options = {
-        routing_type: :url,
-        action: nil,
-        size:
-      }.merge(options)
+      options = { routing_type: :url, action: nil, size: }.merge(options)
+      options[:routing_type] = :url if mailer_view?
       options[:format] = dynamic_image_format(record, options[:format])
       options[:digest] =
         dynamic_image_digest(record, options[:action], options[:size])

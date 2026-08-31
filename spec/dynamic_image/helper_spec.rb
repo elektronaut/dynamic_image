@@ -69,6 +69,14 @@ describe DynamicImage::Helper, type: :helper do
     end
   end
 
+  describe "rendering in a mailer" do
+    subject(:body) { ImageMailer.image(image).body.to_s }
+
+    it "builds an absolute URL, since mailer views have no path helpers" do
+      expect(body).to include(%(src="#{host}/images/))
+    end
+  end
+
   describe "#dynamic_image_url" do
     subject(:url) { helper.dynamic_image_url(image, options) }
 

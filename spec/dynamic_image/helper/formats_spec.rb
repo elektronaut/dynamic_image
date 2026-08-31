@@ -3,10 +3,10 @@
 require "spec_helper"
 
 describe DynamicImage::Helper::Formats, type: :helper do
-  subject(:url) { helper.dynamic_image_url(photo, size: "100x100") }
+  subject(:url) { helper.dynamic_image_url(image, size: "100x100") }
 
-  let(:photo) do
-    Photo.create(
+  let(:image) do
+    Image.create(
       file: Rack::Test::UploadedFile.new(
         File.open(
           File.expand_path("../../support/fixtures/image.webp", __dir__)
@@ -20,11 +20,11 @@ describe DynamicImage::Helper::Formats, type: :helper do
   it { is_expected.to end_with(".webp") }
 
   it "renders a mailer view in a format the mailer accepts" do
-    expect(PhotoMailer.photo(photo).body.to_s).to include(".jpeg")
+    expect(ImageMailer.image(image).body.to_s).to include(".jpeg")
   end
 
   it "keeps a format the mailer can't render out of a mailer view" do
-    expect(PhotoMailer.photo(photo).body.to_s).not_to include(".webp")
+    expect(ImageMailer.image(image).body.to_s).not_to include(".webp")
   end
 
   context "when the uploaded format isn't accepted" do
