@@ -31,6 +31,12 @@ module DynamicImage
     extend ActiveSupport::Concern
     include Dis::Controller
 
+    # Formats +show+ and +uncropped+ will render.
+    PROCESSED_FORMATS = %i[gif jpeg jpg jxl png tiff webp].freeze
+
+    # Additional formats +original+ and +download+ will serve.
+    STORED_FORMATS = (PROCESSED_FORMATS + %i[avif bmp heic]).freeze
+
     included do
       before_action :verify_signed_params
       before_action :find_record
@@ -130,7 +136,7 @@ module DynamicImage
           render(template: "dynamic_image/images/show",
                  layout: false, locals: { options: })
         end
-        format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
+        format.any(*PROCESSED_FORMATS) do
           process_and_send(@record, options)
         end
       end
@@ -140,7 +146,7 @@ module DynamicImage
       return unless stale?(@record)
 
       respond_to do |format|
-        format.any(:gif, :jpeg, :jpg, :png, :tiff, :webp) do
+        format.any(*STORED_FORMATS) do
           send_dis_data(@record,
                         filename:,
                         content_type: @record.content_type,

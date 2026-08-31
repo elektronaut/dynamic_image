@@ -18,10 +18,13 @@ module DynamicImage
     end
 
     initializer "dynamic_image.mime_types" do
+      Mime::Type.register "image/avif", :avif
       Mime::Type.register "image/bmp", :bmp
       Mime::Type.register "image/gif", :gif
+      Mime::Type.register "image/heic", :heic, %w[image/heif]
       Mime::Type.register "image/jpeg", :jpg
       Mime::Type.register "image/jpeg", :jpeg
+      Mime::Type.register "image/jxl", :jxl
       Mime::Type.register "image/png", :png
       Mime::Type.register "image/tiff", :tiff
       Mime::Type.register "image/webp", :webp

@@ -11,11 +11,6 @@ uploaded, DynamicImage stores the original file and generates images
 on demand. It handles cropping, resizing, format and colorspace
 conversion.
 
-Supported formats at the moment are JPEG, PNG, GIF, BMP, WebP and TIFF.
-BMP and TIFF images will automatically be converted. CMYK images will be
-converted to RGB, and RGB images will be converted to the sRGB
-colorspace for consistent appearance in all browsers.
-
 DynamicImage is built on [Dis](https://github.com/elektronaut/dis)
 and [ruby-vips](https://github.com/libvips/ruby-vips).
 
@@ -227,9 +222,15 @@ take the same sizing options.
 
 ### Formats
 
-Images are served in the format they were uploaded in, as long as it's
-one that renders everywhere: JPEG, PNG, GIF and WebP. Anything else,
-BMP and TIFF, is converted to the closest fit.
+Supported formats are JPEG, PNG, GIF, WebP, JPEG XL, HEIC, AVIF, BMP and
+TIFF. HEIC, AVIF, BMP and TIFF.
+
+A subset of these (JPEG, PNG, GIF and WebP) will be served by default,
+the others will be converted to the most appropriate format.
+A HEIC from a phone camera is served as JPEG, or PNG if it's transparent,
+and an animated AVIF as an animated GIF.
+
+BMP, HEIC and AVIF can be uploaded but aren't supported for output.
 
 The preferred format lists are configurable, most preferred format first:
 
@@ -238,14 +239,14 @@ DynamicImage.default_formats = %i[jpeg png gif webp]
 DynamicImage.mailer_formats = %i[jpeg png gif]
 ```
 
-Pass `format:` to pick the format for a single tag.
+Pass `format:` to force conversion to a specific format.
 
 ```erb
-<%= dynamic_image_tag(image, size: "400x400", format: :webp) %>
+<%= dynamic_image_tag(image, size: "400x400", format: :jxl) %>
 ```
 
-Pass an array when several formats will do. The uploaded format is used
-if it's in the list; otherwise the closest fit wins.
+Pass an array when several formats are acceptable, the most compatible
+one will be picked.
 
 ```erb
 <%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
@@ -256,6 +257,9 @@ in several formats without any extra bookkeeping.
 
 Converting an animated image to a format that doesn't support animation
 renders the first frame.
+
+All images will be converted to the sRGB colorspace for consistent
+appearance in all browsers.
 
 ### Responsive images
 

@@ -13,6 +13,22 @@ describe ImagesController, type: :controller do
     { digest: digest(key) }.merge(options)
   end
 
+  def stored_image(format)
+    Image.create(
+      file: Rack::Test::UploadedFile.new(
+        File.open(
+          File.expand_path("../support/fixtures/image.#{format}", __dir__)
+        ),
+        "image/#{format}"
+      )
+    )
+  end
+
+  def get_original(image, format)
+    get(:original,
+        params: digested(:original, id: image.id, size: "320x200", format:))
+  end
+
   let(:image) do
     Image.create(
       file: Rack::Test::UploadedFile.new(
@@ -229,6 +245,36 @@ describe ImagesController, type: :controller do
         expect(metadata.format).to eq("WEBP")
       end
     end
+
+    context "when format is JPEG XL" do
+      before do
+        get(
+          :show,
+          params: digested(:show, id: image.id, size: "100x100", format: :jxl)
+        )
+      end
+
+      it "sets the content type" do
+        expect(response.media_type).to eq("image/jxl")
+      end
+
+      it "returns a JPEG XL image" do
+        expect(metadata.format).to eq("JXL")
+      end
+    end
+
+    context "when format is one that is only ever read" do
+      subject(:request) do
+        get(
+          :show,
+          params: digested(:show, id: image.id, size: "100x100", format: :avif)
+        )
+      end
+
+      it "refuses to render it" do
+        expect { request }.to raise_error(ActionController::UnknownFormat)
+      end
+    end
   end
 
   describe "GET uncropped" do
@@ -282,6 +328,36 @@ describe ImagesController, type: :controller do
   end
 
   describe "GET original" do
+    context "with a HEIC, which is never rendered" do
+      subject { response.media_type }
+
+      let(:image) { stored_image("heic") }
+
+      before { get_original(image, "heic") }
+
+      it { is_expected.to eq("image/heic") }
+    end
+
+    context "with a BMP, which is never rendered" do
+      subject { response.media_type }
+
+      let(:image) { stored_image("bmp") }
+
+      before { get_original(image, "bmp") }
+
+      it { is_expected.to eq("image/bmp") }
+    end
+
+    context "with an AVIF, which is never rendered" do
+      subject { response.media_type }
+
+      let(:image) { stored_image("avif") }
+
+      before { get_original(image, "avif") }
+
+      it { is_expected.to eq("image/avif") }
+    end
+
     context "with a nonexistant record" do
       it "raises an error" do
         expect do

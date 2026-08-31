@@ -104,6 +104,30 @@ describe DynamicImage::Model do
 
       it { is_expected.to eq("image/webp") }
     end
+
+    context "when image is an opaque HEIC" do
+      let(:image) do
+        Image.new(content_type: "image/heic", frame_count: 1, alpha: false)
+      end
+
+      it { is_expected.to eq("image/jpeg") }
+    end
+
+    context "when image is a transparent AVIF" do
+      let(:image) do
+        Image.new(content_type: "image/avif", frame_count: 1, alpha: true)
+      end
+
+      it { is_expected.to eq("image/png") }
+    end
+
+    context "when image is an animated AVIF" do
+      let(:image) do
+        Image.new(content_type: "image/avif", frame_count: 3, alpha: true)
+      end
+
+      it { is_expected.to eq("image/gif") }
+    end
   end
 
   describe "metadata parsing" do
