@@ -110,7 +110,8 @@ module DynamicImage
 
     # Returns a path to the original uploaded file, served as an
     # attachment so the browser downloads it. No processing is applied
-    # and sizing options are not supported.
+    # and sizing options are not supported. The URL carries the stored
+    # format's extension; +:format+ has no effect.
     #
     # @param record_or_array [DynamicImage::Model, Array] the record
     # @param options [Hash] routing options
@@ -131,7 +132,8 @@ module DynamicImage
 
     # Returns a path to the original uploaded file, exactly as it was
     # uploaded. No processing is applied and sizing options are not
-    # supported.
+    # supported. The URL carries the stored format's extension;
+    # +:format+ has no effect.
     #
     # @param record_or_array [DynamicImage::Model, Array] the record
     # @param options [Hash] routing options
@@ -204,7 +206,8 @@ module DynamicImage
       record = extract_dynamic_image_record(record_or_array)
       options = { routing_type: :url, action: nil, size: }.merge(options)
       options[:routing_type] = :url if mailer_view?
-      options[:format] = dynamic_image_format(record, options[:format])
+      options[:format] = dynamic_image_format(record, options[:format],
+                                              options[:action])
       options[:digest] =
         dynamic_image_digest(record, options[:action], options[:size])
       polymorphic_url(record_or_array, options)

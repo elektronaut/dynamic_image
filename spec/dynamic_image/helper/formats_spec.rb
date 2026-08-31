@@ -35,4 +35,33 @@ describe DynamicImage::Helper::Formats, type: :helper do
 
     it { is_expected.to end_with(".jpeg") }
   end
+
+  context "when the stored format is never rendered" do
+    let(:image) do
+      Image.create(
+        file: Rack::Test::UploadedFile.new(
+          File.open(
+            File.expand_path("../../support/fixtures/image.bmp", __dir__)
+          ),
+          "image/bmp"
+        ),
+        filename: "my-uploaded-file.bmp"
+      )
+    end
+
+    it { is_expected.to end_with(".jpeg") }
+
+    it "links to the original as itself" do
+      expect(helper.original_dynamic_image_path(image)).to end_with(".bmp")
+    end
+
+    it "links to the download as itself" do
+      expect(helper.download_dynamic_image_path(image)).to end_with(".bmp")
+    end
+
+    it "ignores a format given for the original" do
+      expect(helper.original_dynamic_image_path(image, format: :jpeg))
+        .to end_with(".bmp")
+    end
+  end
 end
