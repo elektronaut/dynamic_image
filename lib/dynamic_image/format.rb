@@ -15,7 +15,7 @@ module DynamicImage
   # @example
   #   DynamicImage::Format.find("jpg")           # => the JPEG format
   #   DynamicImage::Format.content_type("image/png")
-  #   DynamicImage::Format.sniff(File.binread(path, 12))
+  #   DynamicImage::Format.sniff(File.binread(path, 32))
   class Format
     # @!attribute [r] name
     #   @return [String] the format name, such as "JPEG"
@@ -29,13 +29,15 @@ module DynamicImage
     #   @return [Array<String>] the file extensions, preferred one first
     # @!attribute [r] magic_bytes
     #   @return [Array<String>] byte sequences identifying the format
+    # @!attribute [r] offset
+    #   @return [Integer] where in the header the magic bytes sit
     # @!attribute [r] save_options
     #   @return [Hash] options passed to vips when writing
     # @!attribute [r] signature
     #   @return [Proc, nil] an extra check against the header, for when
     #     the magic bytes alone are ambiguous
     attr_reader :name, :animated, :alpha, :content_types, :extensions,
-                :magic_bytes, :save_options, :signature
+                :magic_bytes, :offset, :save_options, :signature
 
     # @param name [String] the format name
     # @param options [Hash] the format definition, as passed to
@@ -50,6 +52,7 @@ module DynamicImage
       @content_types = Array(options[:content_type])
       @extensions = Array(options[:extension])
       @magic_bytes = options[:magic_bytes].map(&:b)
+      @offset = options[:offset]
       @signature = options[:signature]
       @save_options = options[:save_options]
     end
@@ -73,7 +76,8 @@ module DynamicImage
     # @param bytes [String] the first bytes of the file
     # @return [Boolean]
     def matches?(bytes)
-      return false unless magic_bytes.any? { |b| bytes.start_with?(b) }
+      header = bytes.to_s[offset..].to_s
+      return false unless magic_bytes.any? { |b| header.start_with?(b) }
 
       signature.nil? || signature.call(bytes)
     end
@@ -150,6 +154,18 @@ module DynamicImage
         formats.find { |format| format.matches?(bytes) }
       end
 
+      # The brands declared by an ISO base media file, major brand
+      # first, followed by the compatible brands. Empty for anything
+      # that isn't an +ftyp+ box.
+      #
+      # @param bytes [String] the file header
+      # @return [Array<String>] the brands
+      def iso_brands(bytes)
+        return [] unless bytes.to_s.bytesize >= 12 && bytes[4, 4] == "ftyp".b
+
+        [bytes[8, 4]] + bytes[16...bytes.unpack1("N")].to_s.scan(/.{4}/m)
+      end
+
       private
 
       def registered_formats
@@ -162,7 +178,7 @@ module DynamicImage
     # @return [Hash] the default options
     def default_options
       { animated: false, alpha: false, content_type: [], extension: [],
-        magic_bytes: [], signature: nil, save_options: {} }
+        magic_bytes: [], offset: 0, signature: nil, save_options: {} }
     end
 
     register(

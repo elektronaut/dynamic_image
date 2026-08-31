@@ -55,6 +55,56 @@ describe DynamicImage::Format do
     end
   end
 
+  describe ".iso_brands" do
+    subject { described_class.iso_brands(bytes) }
+
+    context "when the header is an ftyp box" do
+      let(:bytes) { "\x00\x00\x00\x1cftypavif\x00\x00\x00\x00mif1avifmiaf".b }
+
+      it { is_expected.to eq(%w[avif mif1 avif miaf]) }
+    end
+
+    context "when the box ends before the compatible brands" do
+      let(:bytes) { "\x00\x00\x00\x10ftypavif\x00\x00\x00\x00mif1avifmiaf".b }
+
+      it { is_expected.to eq(%w[avif]) }
+    end
+
+    context "when the box claims to be longer than the header read" do
+      let(:bytes) { "\x00\x00\xff\xffftypavif\x00\x00\x00\x00mif1".b }
+
+      it { is_expected.to eq(%w[avif mif1]) }
+    end
+
+    context "when the header isn't an ftyp box" do
+      let(:bytes) { "\x89PNG\r\n\x1a\n\x00\x00\x00\x0d".b }
+
+      it { is_expected.to eq([]) }
+    end
+
+    context "when the header is truncated below 12 bytes" do
+      let(:bytes) { "\x00\x00\x00\x1cftyp".b }
+
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  describe "#matches?" do
+    subject { described_class.new("TEST", offset: 4, magic_bytes: %w[ftyp]) }
+
+    context "when the magic bytes sit at the offset" do
+      it { is_expected.to be_matches("\x00\x00\x00\x1cftypavif".b) }
+    end
+
+    context "when the magic bytes sit elsewhere" do
+      it { is_expected.not_to be_matches("ftyp\x00\x00\x00\x1cavif".b) }
+    end
+
+    context "when the header is shorter than the offset" do
+      it { is_expected.not_to be_matches("\x00\x00".b) }
+    end
+  end
+
   describe "#content_type" do
     subject { format.content_type }
 

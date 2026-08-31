@@ -10,7 +10,7 @@ module DynamicImage
   # Animated formats are opened with all their frames.
   class ImageReader
     # Number of bytes needed to identify a format.
-    HEADER_BYTES = 12
+    HEADER_BYTES = 32
 
     # @param data [Pathname, IO, String] the image
     def initialize(data)
