@@ -6,10 +6,8 @@ module DynamicImage
     #
     # Associates the image with its cached renderings.
     #
-    # Each processed size is stored as a {DynamicImage::Variant}, so the
-    # work of cropping and resizing is done once. They are destroyed
-    # with the image, and cleared whenever its data changes, so a
-    # replaced image never serves a stale rendering.
+    # Each processed size is stored as a {DynamicImage::Variant}, so cropping and resizing is done once. Variants
+    # are destroyed with the image, and cleared whenever its data changes.
     #
     # @see DynamicImage::ProcessedImage
     module Variants

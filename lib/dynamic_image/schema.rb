@@ -3,25 +3,20 @@
 module DynamicImage
   # = DynamicImage Schema
   #
-  # The database schema {DynamicImage::Model} expects on the table
-  # holding the image.
+  # The database schema {DynamicImage::Model} expects on the table holding the image.
   #
-  # DynamicImage doesn't own that table. Unlike
-  # +dynamic_image_variants+, which has a fixed name and an engine
-  # migration, the image table is created by the
-  # +dynamic_image:resource+ generator in the application, under
-  # whatever name the application picked, and there may be more than
-  # one. This is the single definition of what it should contain.
+  # DynamicImage doesn't own that table. Unlike +dynamic_image_variants+, which has a fixed name and an engine
+  # migration, the image table is created in the application by the +dynamic_image:resource+ generator, under
+  # whatever name the application picked, and there may be more than one. This is the single definition of what it
+  # should contain.
   #
   # @see DynamicImage::Model
   module Schema
-    # The expected columns, in the order they should appear in a
-    # migration. Each is described by its migration type and whether it
-    # accepts +NULL+.
+    # The expected columns, in the order they should appear in a migration. Each is described by its migration type
+    # and whether it accepts +NULL+.
     #
-    # +frame_count+ and +alpha+ are nullable because NULL means the
-    # image predates them being recorded, which is not the same as
-    # knowing an image is a still or opaque.
+    # +frame_count+ and +alpha+ are nullable. NULL means the image predates them being recorded, which is not the
+    # same as knowing the image is a still or opaque.
     #
     # @return [Hash{Symbol => Hash}]
     ATTRIBUTES = {

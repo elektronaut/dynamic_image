@@ -3,14 +3,11 @@
 module DynamicImage
   # = DynamicImage Format
   #
-  # A registry of the image formats DynamicImage understands. Each
-  # format knows its content types, extensions, the magic bytes that
-  # identify it, the options it is saved with, and whether it can hold
-  # more than one frame.
+  # A registry of the image formats DynamicImage understands. Each format knows its content types, extensions, the
+  # magic bytes that identify it, the options it is saved with, and whether it can hold more than one frame.
   #
-  # Formats are looked up by name, by content type, or by sniffing the
-  # first bytes of a file. Uploads are always identified by sniffing,
-  # never by the content type the client claims.
+  # Formats are looked up by name, by content type, or by sniffing the first bytes of a file. Uploads are always
+  # identified by sniffing, never by the content type the client claims.
   #
   # @example
   #   DynamicImage::Format.find("jpg")           # => the JPEG format
@@ -40,8 +37,7 @@ module DynamicImage
                 :magic_bytes, :offset, :save_options, :signature
 
     # @param name [String] the format name
-    # @param options [Hash] the format definition, as passed to
-    #   {Format.register}
+    # @param options [Hash] the format definition, as passed to {Format.register}
     # @see Format.register
     def initialize(name, options)
       options = default_options.merge(options)
@@ -84,21 +80,21 @@ module DynamicImage
 
     # The canonical content type.
     #
-    # @return [String] the content type
+    # @return [String]
     def content_type
       content_types.first
     end
 
     # The preferred file extension, leading dot included.
     #
-    # @return [String] the extension
+    # @return [String]
     def extension
       extensions.first
     end
 
     # The canonical content type as a Mime::Type.
     #
-    # @return [Mime::Type] the mime type
+    # @return [Mime::Type]
     def mime_type
       Mime::Type.lookup(content_type)
     end
@@ -107,23 +103,22 @@ module DynamicImage
       # Finds the format for a content type.
       #
       # @param type [String] the content type
-      # @return [DynamicImage::Format, nil] the format
+      # @return [DynamicImage::Format, nil]
       def content_type(type)
         formats.filter { |f| f.content_types.include?(type) }.first
       end
 
       # Every content type of every registered format.
       #
-      # @return [Array<String>] the content types
+      # @return [Array<String>]
       def content_types
         formats.flat_map(&:content_types)
       end
 
-      # Finds a format by name. Case insensitive, and "JPG" is
-      # understood as an alias for "JPEG".
+      # Finds a format by name. Case insensitive, and "JPG" is understood as an alias for "JPEG".
       #
       # @param name [String, Symbol] the format name
-      # @return [DynamicImage::Format, nil] the format
+      # @return [DynamicImage::Format, nil]
       def find(name)
         key = name.to_s.upcase
         key = "JPEG" if key == "JPG"
@@ -132,17 +127,15 @@ module DynamicImage
 
       # All registered formats.
       #
-      # @return [Array<DynamicImage::Format>] the formats
+      # @return [Array<DynamicImage::Format>]
       def formats
         registered_formats.map { |_, f| f }
       end
 
       # Registers a format.
       #
-      # Each option sets the attribute of the same name, except
-      # +content_type+ and +extension+, which are singular here and
-      # accept either one value or a list. Anything left out falls back
-      # to {Format#default_options}.
+      # Each option sets the attribute of the same name, except +content_type+ and +extension+, which are singular
+      # here and accept either one value or a list. Anything left out falls back to {Format#default_options}.
       #
       # @param name [String] the format name, uppercase by convention
       # @param opts [Hash] the format definition
@@ -161,12 +154,11 @@ module DynamicImage
         formats.find { |format| format.matches?(bytes) }
       end
 
-      # The brands declared by an ISO base media file, major brand
-      # first, followed by the compatible brands. Empty for anything
-      # that isn't an +ftyp+ box.
+      # The brands declared by an ISO base media file, major brand first, followed by the compatible brands. Empty for
+      # anything that isn't an +ftyp+ box.
       #
       # @param bytes [String] the file header
-      # @return [Array<String>] the brands
+      # @return [Array<String>]
       def iso_brands(bytes)
         return [] unless bytes.to_s.bytesize >= 12 && bytes[4, 4] == "ftyp".b
 
@@ -182,7 +174,7 @@ module DynamicImage
 
     # Defaults every format definition is merged over.
     #
-    # @return [Hash] the default options
+    # @return [Hash]
     def default_options
       { animated: false, alpha: false, content_type: [], extension: [],
         magic_bytes: [], offset: 0, signature: nil, save_options: {} }

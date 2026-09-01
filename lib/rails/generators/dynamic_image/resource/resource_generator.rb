@@ -9,20 +9,16 @@ require "dynamic_image/schema"
 module DynamicImage
   # Generators for setting up DynamicImage in an application.
   module Generators
-    # Creates a DynamicImage resource: a model including
-    # {DynamicImage::Model}, a controller including
-    # {DynamicImage::Controller}, a migration with the columns
-    # DynamicImage needs, and an +image_resources+ route.
+    # Creates a DynamicImage resource: a model including {DynamicImage::Model}, a controller including
+    # {DynamicImage::Controller}, a migration with the columns DynamicImage needs, and an +image_resources+ route.
     #
     #   bin/rails generate dynamic_image:resource image
     #
-    # Additional attributes are passed through to the migration, so a
-    # resource can carry fields of its own.
+    # Additional attributes are passed through to the migration, letting a resource carry fields of its own.
     #
     #   bin/rails generate dynamic_image:resource photo caption:string
     #
-    # The migration is rendered from {DynamicImage::Schema} rather than
-    # by the Active Record generator, which can't express nullability
+    # The migration is rendered from {DynamicImage::Schema}. The Active Record generator can't express nullability
     # or indexes through its +name:type+ arguments.
     class ResourceGenerator < Rails::Generators::ResourceGenerator
       include ActiveRecord::Generators::Migration
@@ -35,16 +31,14 @@ module DynamicImage
       end
 
       no_commands do
-        # Thor consumes the raw arguments while parsing, so they're kept
-        # from {#initialize} to pass on to the ORM generator.
+        # Thor consumes the raw arguments while parsing, so {#initialize} keeps a copy for the ORM generator.
         def invoke_orm_generator(orm)
           invoke(orm, @orm_args, options.merge("migration" => false))
         end
       end
 
-      # The ORM generator would write its own migration, which can't
-      # carry nullability or indexes. Invoke it with +migration: false+
-      # and render {#create_dynamic_image_migration} instead.
+      # The ORM generator would write its own migration, which can't carry nullability or indexes. Invoke it with
+      # +migration: false+ and render {#create_dynamic_image_migration} instead.
       hook_for :orm, required: true, in: :rails, as: :model do |instance, orm|
         instance.invoke_orm_generator(orm)
       end

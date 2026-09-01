@@ -3,15 +3,12 @@
 module DynamicImage
   # = DynamicImage Digest Verifier
   #
-  # Signs and verifies the digests embedded in image URLs. The instance
-  # used by the application is set up by the engine and available as
-  # <tt>DynamicImage.digest_verifier</tt>; the helpers sign with it and
-  # the controller verifies with it, so there's rarely a reason to use
-  # this directly.
+  # Signs and verifies the digests embedded in image URLs. The engine sets up the instance the application uses and
+  # exposes it as <tt>DynamicImage.digest_verifier</tt>. The helpers sign with it and the controller verifies with
+  # it, so there is rarely a reason to use this directly.
   #
-  # This has been adapted and simplified from
-  # +ActiveSupport::MessageVerifier+, since we don't need to handle
-  # arbitrary data structures and ship the serialized data to the client.
+  # Adapted from +ActiveSupport::MessageVerifier+, without the handling for arbitrary data structures and without
+  # shipping the serialized data to the client.
   #
   # @example
   #   verifier = DynamicImage::DigestVerifier.new("super secret!")
@@ -24,8 +21,7 @@ module DynamicImage
   class DigestVerifier
     # @param secret [String] the secret to sign with
     # @param options [Hash]
-    # @option options [String] :digest the OpenSSL digest to use,
-    #   defaults to "SHA1"
+    # @option options [String] :digest the OpenSSL digest to use, defaults to "SHA1"
     def initialize(secret, options = {})
       @secret = secret
       @digest = options[:digest] || "SHA1"

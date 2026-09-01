@@ -7,12 +7,11 @@ require "dynamic_image/image_processor/transform"
 module DynamicImage
   # = ImageProcessor
   #
-  # This is the image processing pipeline.
+  # The image processing pipeline.
   #
-  # Every operation returns a new processor rather than modifying the
-  # one it was called on, so they chain. Images are converted to sRGB
-  # and EXIF rotation is applied when the processor is built, so the
-  # pipeline always starts from a normalized image.
+  # Every operation returns a new processor instead of modifying the one it was called on, so operations chain.
+  # Images are converted to sRGB and EXIF rotation is applied when the processor is built, so the pipeline always
+  # starts from a normalized image.
   #
   # @see DynamicImage::ImageProcessor::Colors
   # @see DynamicImage::ImageProcessor::Frames
@@ -31,16 +30,15 @@ module DynamicImage
     include DynamicImage::ImageProcessor::Transform
 
     # @!attribute [r] image
-    #   @return [Vips::Image] the image being processed
+    #   @return [Vips::Image]
     # @!attribute [r] target_format
     #   @return [DynamicImage::Format] the format it will be written in
     attr_reader :image, :target_format
 
-    # @param image [Vips::Image, Pathname, IO, String] the image, either
-    #   an already loaded vips image or something
+    # @param image [Vips::Image, Pathname, IO, String] the image, either an already loaded vips image or something
     #   {DynamicImage::ImageReader} can read
-    # @param target_format [DynamicImage::Format, nil] the format to
-    #   write in, defaulting to the format the image was read from
+    # @param target_format [DynamicImage::Format, nil] the format to write in, defaulting to the format the image was
+    #   read from
     def initialize(image, target_format: nil)
       if image.is_a?(Vips::Image)
         @image = image
@@ -54,11 +52,9 @@ module DynamicImage
 
     # Convert the image to a different format.
     #
-    # Converting a multi-frame image to a format that doesn't support
-    # animation keeps the first frame.
+    # Converting a multi-frame image to a format that doesn't support animation keeps the first frame.
     #
-    # @param new_format [DynamicImage::Format, Symbol, String] the
-    #   format to convert to
+    # @param new_format [DynamicImage::Format, Symbol, String] the format to convert to
     # @return [DynamicImage::ImageProcessor] a new processor
     def convert(new_format)
       new_format = DynamicImage::Format.find(new_format) unless new_format.is_a?(DynamicImage::Format)
@@ -78,11 +74,10 @@ module DynamicImage
                             **target_format.save_options)
     end
 
-    # Returns the image size as a Vector2d. For multi-frame images this
-    # is the size of a single frame, not of the filmstrip vips holds
-    # them in.
+    # Returns the image size as a Vector2d. For multi-frame images this is the size of a single frame, not of the
+    # filmstrip vips holds them in.
     #
-    # @return [Vector2d] the size
+    # @return [Vector2d]
     def size
       Vector2d.new(
         image.get("width"),

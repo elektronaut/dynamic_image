@@ -4,9 +4,8 @@ module DynamicImage
   class ImageProcessor
     # = ImageProcessor::Frames
     #
-    # Support for animated GIF and WebP images, which vips represents as
-    # a single tall image with a +page-height+ of one frame. Operations
-    # are applied to each frame and the results reassembled.
+    # Support for animated GIF and WebP images, which vips represents as a single tall image with a +page-height+ of
+    # one frame. Operations are applied to each frame and the results reassembled.
     module Frames
       # Extracts a single frame from a multi-frame image.
       #
@@ -18,7 +17,7 @@ module DynamicImage
 
       # Returns the number of frames. Still images have one.
       #
-      # @return [Integer] the frame count
+      # @return [Integer]
       def frame_count
         image.get("height") / size.y
       end

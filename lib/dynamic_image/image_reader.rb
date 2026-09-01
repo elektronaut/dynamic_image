@@ -3,9 +3,8 @@
 module DynamicImage
   # = DynamicImage Image Reader
   #
-  # Reads an image into vips, identifying the format from the file
-  # header rather than from anything the client claims. Accepts a
-  # Pathname, an IO object or a binary string.
+  # Reads an image into vips, identifying the format from the file header and not from anything the client claims.
+  # Accepts a Pathname, an IO object or a binary string.
   #
   # Animated formats are opened with all their frames.
   class ImageReader
@@ -26,9 +25,8 @@ module DynamicImage
 
     # Reads the image.
     #
-    # @return [Vips::Image] the image
-    # @raise [DynamicImage::Errors::InvalidHeader] if the data isn't in
-    #   a recognized format
+    # @return [Vips::Image]
+    # @raise [DynamicImage::Errors::InvalidHeader] if the data isn't in a recognized format
     def read
       raise DynamicImage::Errors::InvalidHeader unless valid_header?
 

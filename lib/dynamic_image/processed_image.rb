@@ -3,25 +3,22 @@
 module DynamicImage
   # = DynamicImage Processed Image
   #
-  # Handles all processing of images.
+  # Crops, resizes and converts images, and reads back the processed data.
   #
-  # Results are cached as variants, so processing a size is expensive
-  # once and cheap after that.
+  # Each processed size is stored as a variant, so subsequent calls for the same size are cheap.
   #
   # @example
   #   size = DynamicImage::ImageSizing.new(image).fit("800x800")
   #   data = DynamicImage::ProcessedImage.new(image, format: :jpg)
   #                                      .cropped_and_resized(size)
   class ProcessedImage
-    # @return [DynamicImage::Model] the image being processed
+    # @return [DynamicImage::Model]
     attr_reader :record
 
     # @param record [DynamicImage::Model] the image to process
     # @param options [Hash]
-    # @option options [Boolean] :uncropped Ignore any crop stored on the
-    #   record
-    # @option options [Symbol, String] :format Format to convert to.
-    #   Defaults to the format of the stored image.
+    # @option options [Boolean] :uncropped Ignore any crop stored on the record
+    # @option options [Symbol, String] :format Format to convert to. Defaults to the format of the stored image.
     def initialize(record, options = {})
       @record    = record
       @uncropped = options[:uncropped] ? true : false
@@ -29,12 +26,12 @@ module DynamicImage
       @format_name = "JPEG" if defined?(@format_name) && @format_name == "JPG"
     end
 
-    # Crops and resizes the image. Normalization is performed as well.
+    # Crops, resizes and normalizes the image.
     #
     # @param size [Vector2d] the size to render, in pixels
     # @return [String] the image data as a binary string
-    # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a
-    #   valid image, or if the stored data can't be processed
+    # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a valid image, or if the stored data can't be
+    #   processed
     #
     # @example
     #   processed = DynamicImage::ProcessedImage.new(image)
@@ -45,23 +42,21 @@ module DynamicImage
       find_or_create_variant(size).data
     end
 
-    # Returns the variant for the given size, processing the image and
-    # creating it if it doesn't already exist.
+    # Returns the variant for the given size, creating it if it doesn't already exist.
     #
     # @param size [Vector2d] the size to render, in pixels
-    # @return [DynamicImage::Variant] the variant
-    # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a
-    #   valid image, or if the stored data can't be processed
+    # @return [DynamicImage::Variant]
+    # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a valid image, or if the stored data can't be
+    #   processed
     def find_or_create_variant(size)
       find_variant(size) || create_variant(size)
     rescue ActiveRecord::RecordNotUnique
       find_variant(size)
     end
 
-    # Find a variant with the given size.
+    # Returns the variant for the given size, if one exists.
     #
-    # Variants whose data has gone missing from storage are destroyed
-    # and treated as absent, so a lost blob heals on the next request.
+    # Variants whose data has gone missing from storage are destroyed and treated as absent.
     #
     # @param size [Vector2d] the size to look for, in pixels
     # @return [DynamicImage::Variant, nil] the variant, if one exists
@@ -79,12 +74,10 @@ module DynamicImage
       end
     end
 
-    # Find or create a variant for the given size, returning the variant
-    # record rather than its data.
+    # Same as {#cropped_and_resized}, but returns the variant record instead of its data.
     #
     # @param size [Vector2d] the size to render, in pixels
-    # @return [DynamicImage::Variant, nil] the variant, or nil if the
-    #   record isn't persisted
+    # @return [DynamicImage::Variant, nil] the variant, or nil if the record isn't persisted
     def variant_for(size)
       return nil unless record.persisted?
 
@@ -93,11 +86,9 @@ module DynamicImage
       find_variant(size)
     end
 
-    # The format the image will be rendered in. This is the format given
-    # to the constructor, falling back to the format of the stored
-    # image.
+    # The format the image is rendered in. Defaults to the format of the stored image.
     #
-    # @return [DynamicImage::Format] the format
+    # @return [DynamicImage::Format]
     def format
       DynamicImage::Format.find(@format_name) || record_format
     end
@@ -110,14 +101,12 @@ module DynamicImage
     # * Optimizes GIFs
     # * Performs format conversion if the requested format is different
     #
-    # @yield [image] an optional block to transform the image before it
-    #   is written out
+    # @yield [image] an optional block to transform the image before it is written out
     # @yieldparam image [DynamicImage::ImageProcessor] the processor
-    # @yieldreturn [DynamicImage::ImageProcessor] the transformed
-    #   processor
+    # @yieldreturn [DynamicImage::ImageProcessor] the transformed processor
     # @return [String] the image data as a binary string
-    # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a
-    #   valid image, or if the stored data can't be processed
+    # @raise [DynamicImage::Errors::InvalidImage] if the record isn't a valid image, or if the stored data can't be
+    #   processed
     #
     # @example
     #   processed = DynamicImage::ProcessedImage.new(image, format: :jpeg)

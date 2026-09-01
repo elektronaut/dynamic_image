@@ -3,9 +3,8 @@
 module DynamicImage
   # = DynamicImage Controller
   #
-  # Serves images. Include it in a controller and define a +model+
-  # method returning the class to serve, then declare the routes with
-  # {DynamicImage::Routing#image_resources}.
+  # Serves images. Include it in a controller and define a +model+ method returning the class to serve, then declare
+  # the routes with {DynamicImage::Routing#image_resources}.
   #
   #   class ImagesController < ApplicationController
   #     include DynamicImage::Controller
@@ -17,13 +16,11 @@ module DynamicImage
   #     end
   #   end
   #
-  # Generating images is rather expensive, so all requests must be
-  # signed with a HMAC digest in order to avoid denial of service attacks.
-  # The methods in +DynamicImage::Helper+ handles this transparently.
-  # As a bonus, this also prevents unauthorized URL enumeration.
+  # Generating images is expensive, so every request must be signed with an HMAC digest. This protects against
+  # denial of service attacks and URL enumeration. The helpers in {DynamicImage::Helper} sign the URLs they build.
   #
-  # Responses are cached for a year and answer +If-Modified-Since+. The
-  # URL carries a timestamp, so a changed image is a changed URL.
+  # Responses are cached for a year and answer +If-Modified-Since+. The URL carries a timestamp, so a changed image
+  # is a changed URL.
   #
   # @see DynamicImage::Helper
   # @see DynamicImage::Routing
@@ -46,8 +43,7 @@ module DynamicImage
 
     # Renders the image, cropped and resized to the requested size.
     #
-    # Responds to the image formats, and to HTML with a page showing the
-    # image and its metadata.
+    # Responds to the image formats, and to HTML with a page showing the image and its metadata.
     #
     # @return [void]
     def show
@@ -68,8 +64,7 @@ module DynamicImage
       render_raw_image
     end
 
-    # Same as +original+, but served as an attachment so the browser
-    # downloads the file rather than displaying it.
+    # Same as +original+, but served as an attachment so the browser downloads the file rather than displaying it.
     #
     # @return [void]
     def download
@@ -85,8 +80,7 @@ module DynamicImage
 
     private
 
-    # Override in your controller to return the class being served.
-    # Required.
+    # Override in your controller to return the class being served. Required.
     #
     # @!method model
     #   @return [Class] the model class
@@ -103,9 +97,8 @@ module DynamicImage
       @record = model.find(params[:id])
     end
 
-    # The filename the image is served as, the record's own filename
-    # with the extension of the rendered format. Override to name
-    # downloads something else.
+    # The filename the image is served as, the record's own filename with the extension of the rendered format.
+    # Override to name downloads something else.
     def filename(format = nil)
       if format.is_a?(DynamicImage::Format)
         File.basename(@record.filename, ".*") + format.extension

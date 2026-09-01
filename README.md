@@ -175,8 +175,9 @@ sizing options.
 ### Other versions of the image
 
 Three variations are available. `uncropped` has `_tag`, `_path` and
-`_url` helpers; `original` and `download` have `_path` and `_url`. None
-of them take sizing options.
+`_url` helpers; `original` and `download` have `_path` and `_url`.
+`uncropped` takes the sizing options; `original` and `download` serve
+the stored file untouched and ignore them.
 
 * `original_dynamic_image_path` links to the file exactly as it was
   uploaded, with no processing at all.

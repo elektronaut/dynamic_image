@@ -3,14 +3,12 @@
 module DynamicImage
   # = DynamicImage Backfill
   #
-  # Fills in the metadata columns for records stored before those
-  # columns existed. Values are read back from the stored file, which is
-  # the only place they can come from.
+  # Fills in the metadata columns for records stored before those columns existed. The values are read back from
+  # the stored file.
   #
-  # Records are written with +update_columns+, so no callbacks run and
-  # +updated_at+ is left alone. {DynamicImage::Model#to_param}
-  # fingerprints on +updated_at+, so touching it would invalidate every
-  # image URL and every cached variant.
+  # Records are written with +update_columns+, so no callbacks run and +updated_at+ is left alone.
+  # {DynamicImage::Model#to_param} fingerprints on +updated_at+, and touching it would invalidate every image URL
+  # and every cached variant.
   #
   #   DynamicImage::Backfill.new(Image).run
   #
@@ -44,8 +42,7 @@ module DynamicImage
 
     # Reads metadata for every pending record and fills the columns in.
     #
-    # @yieldparam record [DynamicImage::Model] each record, after it has
-    #   been processed
+    # @yieldparam record [DynamicImage::Model] each record, after it has been processed
     # @return [self]
     # @raise [ArgumentError] if the table doesn't have the columns yet
     def run
@@ -74,9 +71,8 @@ module DynamicImage
       @skipped += 1
     end
 
-    # Metadata reads lazily, so the values have to be resolved before
-    # the file goes out of scope. Written with update_columns so that
-    # no callbacks run.
+    # Metadata reads lazily, so the values have to be resolved before the file goes out of scope. Written with
+    # update_columns so that no callbacks run.
     def apply(record, path)
       metadata = DynamicImage::Metadata.new(path)
       return @skipped += 1 unless metadata.valid?

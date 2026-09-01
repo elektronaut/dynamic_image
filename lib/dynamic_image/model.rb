@@ -8,8 +8,7 @@ require "dynamic_image/model/variants"
 module DynamicImage
   # = DynamicImage Model
   #
-  # ActiveModel extension for the model holding image data. It assumes your
-  # database table has at least the attributes in
+  # ActiveModel extension for the model holding image data. The table needs at least the attributes in
   # {DynamicImage::Schema::ATTRIBUTES}:
   #
   #   create_table :images do |t|
@@ -25,7 +24,7 @@ module DynamicImage
   #     t.timestamps
   #   end
   #
-  # To use it, simply include it in your model:
+  # Include it in your model:
   #
   #   class Image < ActiveRecord::Base
   #     include DynamicImage::Model
@@ -33,23 +32,18 @@ module DynamicImage
   #
   # == Usage
   #
-  # To save an image, simply assign to the +file+ attribute.
+  # To save an image, assign to the +file+ attribute. The image is parsed and validated when the record is saved.
   #
   #   image = Image.create(file: params.permit(:file))
   #
-  # This will automatically parse and validate the image when your record is
-  # saved.
-  #
-  # To read back the image data, access the +data+ attribute. This will lazily
-  # load the data from the store.
+  # To read back the image data, access the +data+ attribute. The data is loaded lazily from the store.
   #
   #   data = image.data
   #
   # == Cropping
   #
-  # Images can be pre-cropped by setting +crop_width+, +crop_height+,
-  # +crop_start_x+ and +crop_start_y+. The crop dimensions cannot exceed the
-  # image size.
+  # Images can be pre-cropped by setting +crop_width+, +crop_height+, +crop_start_x+ and +crop_start_y+. The crop
+  # dimensions cannot exceed the image size.
   #
   #   image.update(
   #     crop_start_x: 15, crop_start_y: 20,
@@ -57,10 +51,9 @@ module DynamicImage
   #   )
   #   image.size # => Vector2d(300, 200)
   #
-  # By default, images will be cropped from the center. You can control this
-  # by setting +crop_gravity_x+ and +crop_gravity_y+. DynamicImage will make
-  # sure the pixel referred to by these coordinates are present in the cropped
-  # image, and as close to the center as possible without zooming in.
+  # By default, images will be cropped from the center. You can control this by setting +crop_gravity_x+ and
+  # +crop_gravity_y+. DynamicImage will make sure the pixel referred to by these coordinates are present in the
+  # cropped image, and as close to the center as possible without zooming in.
   #
   # @see DynamicImage::Model::Dimensions
   # @see DynamicImage::Model::Transformations
@@ -108,18 +101,16 @@ module DynamicImage
       colorspace == "rgb"
     end
 
-    # Finds a web safe content type, negotiated against
-    # {DynamicImage.default_formats}.
+    # Finds a web safe content type, negotiated against {DynamicImage.default_formats}.
     #
-    # @return [String] the content type
+    # @return [String]
     # @see DynamicImage::FormatNegotiator
     def safe_content_type
       DynamicImage::FormatNegotiator
         .new(self).negotiate(DynamicImage.default_formats).content_type
     end
 
-    # Includes a timestamp fingerprint in the URL param, so
-    # that rendered images can be cached indefinitely.
+    # Includes a timestamp fingerprint in the URL param, so rendered images can be cached indefinitely.
     #
     # @return [String] the id and an +updated_at+ fingerprint
     def to_param

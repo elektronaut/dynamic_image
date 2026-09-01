@@ -12,15 +12,13 @@ module DynamicImage
     #
     #   bin/rails generate dynamic_image:upgrade Image
     #
-    # The migration is derived from the difference between the table and
-    # the schema, so running it again once the migration has been
-    # applied writes nothing. An application several releases behind
-    # gets a single migration with everything it's missing.
+    # The migration is derived from the difference between the table and the schema, so running the generator
+    # again once the migration has been applied writes nothing. An application several releases behind gets a single
+    # migration with everything it's missing.
     #
-    # Only additive changes are generated. Columns are added nullable and
-    # nullability differences are reported instead of altered:
-    # +change_column_null+ fails on existing NULLs, and whether the data
-    # allows it isn't something the generator can know.
+    # Only additive changes are generated. Columns are added nullable, and nullability differences are reported
+    # instead of altered: +change_column_null+ fails on existing NULLs, and the generator can't know whether the
+    # data allows it.
     class UpgradeGenerator < Rails::Generators::NamedBase
       include ActiveRecord::Generators::Migration
 
@@ -80,8 +78,7 @@ module DynamicImage
           end
       end
 
-      # An index whose leading columns match already answers the query,
-      # so only a missing prefix counts as missing.
+      # An index whose leading columns match already answers the query, so only a missing prefix counts as missing.
       def missing_indexes
         @missing_indexes ||=
           DynamicImage::Schema::INDEXES.reject do |index|

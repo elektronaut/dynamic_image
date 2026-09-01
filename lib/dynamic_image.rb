@@ -26,16 +26,13 @@ require "dynamic_image/ratio"
 require "dynamic_image/routing"
 require "dynamic_image/schema"
 
-# DynamicImage handles image uploads in Rails. Rather than building a
-# fixed set of derivatives when a file is uploaded, it stores the
-# original and generates cropped, resized and format-converted versions
-# on demand, caching each one as a variant.
+# A Rails engine for image uploads. Rather than creating a pre-defined set of images when a file is uploaded, it
+# stores the original file and generates images on demand. It handles cropping, resizing, format and colorspace
+# conversion, and stores each processed size as a variant.
 #
-# Include {DynamicImage::Model} in the model holding the image and
-# {DynamicImage::Controller} in the controller serving it, then declare
-# the routes with {DynamicImage::Routing#image_resources}. Views render
-# images through the helpers in {DynamicImage::Helper}, which sign the
-# URLs.
+# Include {DynamicImage::Model} in the model holding the image and {DynamicImage::Controller} in the controller
+# serving it, then declare the routes with {DynamicImage::Routing#image_resources}. Views render images through the
+# helpers in {DynamicImage::Helper}, which sign the URLs.
 #
 # Files are stored with Dis, and processing is done with libvips.
 #
@@ -51,41 +48,38 @@ module DynamicImage
   # @return [Array<Symbol>] the format names, most preferred first
   COMPATIBLE_FORMATS = %i[jpeg png gif].freeze
 
-  # Verifies the HMAC digests embedded in image URLs. Set by the engine
-  # from the application's key generator, which derives it from
-  # <tt>secret_key_base</tt>.
+  # Verifies the HMAC digests embedded in image URLs. Set by the engine from the application's key generator, which
+  # derives it from <tt>secret_key_base</tt>.
   #
-  # @return [DynamicImage::DigestVerifier] the verifier
+  # @return [DynamicImage::DigestVerifier]
   cattr_accessor :digest_verifier
 
-  # The formats a view accepts when it doesn't pass <tt>format:</tt>.
-  # Also decides what {DynamicImage::Model#safe_content_type} considers
-  # safe.
+  # The formats a view accepts when it doesn't pass <tt>format:</tt>. Also decides what
+  # {DynamicImage::Model#safe_content_type} considers safe.
   #
   # @return [Array<Symbol>] the format names, most preferred first
   mattr_accessor :default_formats, default: %i[jpeg png gif webp]
 
-  # The formats a mailer view accepts when it doesn't pass
-  # <tt>format:</tt>.
+  # The formats a mailer view accepts when it doesn't pass <tt>format:</tt>.
   #
   # @return [Array<Symbol>] the format names, most preferred first
   mattr_accessor :mailer_formats, default: COMPATIBLE_FORMATS
 
-  # The breakpoints responsive images are rendered at. This can
-  # be a range, an array of explicit widths, or a single width.
+  # The breakpoints responsive images are rendered at. This can be a range, an array of explicit widths, or a single
+  # width.
   #
-  # @return [Range, Array<Integer>, Integer] the breakpoints
+  # @return [Range, Array<Integer>, Integer]
   # @see DynamicImage::Breakpoints
   mattr_accessor :default_breakpoints, default: 320..3200
 
-  # The ratio between two breakpoints. Lower means a closer fit to what the
-  # browser needs, at the price of more variants to generate and store.
+  # The ratio between two breakpoints. Lower means a closer fit to what the browser needs, at the price of more
+  # variants to generate and store.
   #
-  # @return [Float] the step
+  # @return [Float]
   mattr_accessor :breakpoint_step, default: 1.4
 
   # The width of the fallback image in a <tt>picture</tt> element.
   #
-  # @return [Integer] the width
+  # @return [Integer]
   mattr_accessor :picture_fallback_width, default: 1200
 end

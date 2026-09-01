@@ -4,7 +4,7 @@ module DynamicImage
   class Picture
     # = DynamicImage Picture Format Policy
     #
-    # Decides what a responsive image is rendered in. The <tt>source</tt> gets the best format we can currently
+    # Decides what a responsive image is rendered in. The <tt>source</tt> gets the best format available for
     # output, transcoded unconditionally. The <tt>img</tt> gets one of {DynamicImage::COMPATIBLE_FORMATS}.
     #
     # @see DynamicImage::FormatNegotiator
@@ -13,14 +13,14 @@ module DynamicImage
       DEFAULT_SOURCE_FORMAT = :webp
 
       # @!attribute [r] record
-      #   @return [DynamicImage::Model] the image
+      #   @return [DynamicImage::Model]
       # @!attribute [r] requested
-      #   @return [Symbol, Array<Symbol>, nil] the format asked for
+      #   @return [Symbol, Array<Symbol>, nil]
       attr_reader :record, :requested
 
       # @param record [DynamicImage::Model] the image
-      # @param requested [Symbol, Array<Symbol>, nil] the format the candidates are
-      #   rendered in. A symbol forces, an array is negotiated, nil takes the default.
+      # @param requested [Symbol, Array<Symbol>, nil] the format the candidates are rendered in. A symbol forces
+      #   that format, an array is negotiated, nil takes the default.
       def initialize(record, requested = nil)
         @record = record
         @requested = requested
@@ -28,14 +28,14 @@ module DynamicImage
 
       # The format the candidates are rendered in.
       #
-      # @return [DynamicImage::Format] the format
+      # @return [DynamicImage::Format]
       def source
         @source ||= resolve(requested || default_source)
       end
 
       # The format the fallback image is rendered in.
       #
-      # @return [DynamicImage::Format] the format
+      # @return [DynamicImage::Format]
       def fallback
         @fallback ||= resolve(fallback_formats)
       end

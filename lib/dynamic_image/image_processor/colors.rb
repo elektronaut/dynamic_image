@@ -4,10 +4,8 @@ module DynamicImage
   class ImageProcessor
     # = ImageProcessor::Colors
     #
-    # Performs the necessary profile conversions on the image. All
-    # images are converted to the sRGB colorspace using either the
-    # embedded profile, or the built-in generic profile. Grayscale
-    # images are converted back to grayscale after processing.
+    # Converts color profiles. All images are converted to the sRGB colorspace using either the embedded profile
+    # or the built-in generic one. Grayscale images are converted back to grayscale after processing.
     module Colors
       private
 

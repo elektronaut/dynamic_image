@@ -13,16 +13,15 @@ module DynamicImage
   #   metadata.content_type # => "image/jpeg"
   #   metadata.dimensions   # => Vector2d(320, 200)
   class Metadata
-    # @param data [Pathname, IO, String] the image, as a path, an open
-    #   file or a binary string
+    # @param data [Pathname, IO, String] the image, as a path, an open file or a binary string
     def initialize(data)
       @data = data
     end
 
-    # Returns the color space of the image as a string. The result will be one
-    # of the following: "rgb", "cmyk", "gray".
+    # Returns the color space of the image as a string. The result will be one of the following: "rgb", "cmyk",
+    # "gray".
     #
-    # @return [String, nil] the colorspace
+    # @return [String, nil]
     def colorspace
       return unless valid?
 
@@ -38,7 +37,7 @@ module DynamicImage
 
     # Returns the content type of the image.
     #
-    # @return [String, nil] the content type
+    # @return [String, nil]
     def content_type
       reader.format.content_type if valid?
     end
@@ -50,11 +49,10 @@ module DynamicImage
       reader.format.name if valid?
     end
 
-    # Returns the dimensions of the image as a vector. EXIF rotation is
-    # taken into account, so these are the dimensions the image will
-    # have once it has been normalized.
+    # Returns the dimensions of the image as a vector. EXIF rotation is applied, so these are the dimensions the
+    # image has once normalized.
     #
-    # @return [Vector2d, nil] the dimensions
+    # @return [Vector2d, nil]
     def dimensions
       Vector2d.new(metadata[:width], metadata[:height]) if valid?
     end
@@ -73,8 +71,7 @@ module DynamicImage
       metadata[:height] if valid?
     end
 
-    # Returns the number of frames. Animated formats can have more
-    # than one; everything else has a single frame.
+    # Returns the number of frames. Animated formats can have more than one; everything else has a single frame.
     #
     # @return [Integer, nil] the number of frames
     def frame_count
@@ -83,18 +80,15 @@ module DynamicImage
 
     # Returns true if the image has an alpha channel.
     #
-    # This is the presence of the channel, not of actual transparency:
-    # an image can carry a fully opaque alpha channel. Reading it costs
-    # nothing, where scanning the channel for transparency would mean
-    # decoding every pixel.
+    # This is the presence of the channel, not of actual transparency: an image can carry a fully opaque alpha
+    # channel. Reading it costs nothing, where scanning the channel for transparency would mean decoding every pixel.
     #
     # @return [Boolean, nil] true if the image has an alpha channel
     def alpha?
       metadata[:alpha] if valid?
     end
 
-    # Returns true if the data is a readable image in a supported
-    # format.
+    # Returns true if the data is a readable image in a supported format.
     #
     # @return [Boolean]
     def valid?

@@ -3,10 +3,10 @@
 module DynamicImage
   # = DynamicImage Breakpoints
   #
-  # Works out the candidate widths for a +srcset+, given the widest the image can be rendered at.
+  # Computes the candidate widths for a +srcset+, given the widest the image can be rendered at.
   #
-  # A range steps down geometrically from the available width. An array
-  # lists the widths outright. A single number asks for one candidate.
+  # A range steps down geometrically from the available width, an array lists the widths outright, and a single
+  # number gives one candidate.
   #
   # @example
   #   DynamicImage::Breakpoints.new(320..3200).widths(2000)
@@ -17,20 +17,19 @@ module DynamicImage
   #
   # @see DynamicImage::Picture
   class Breakpoints
-    # Candidate widths are snapped down to a multiple of this, so
-    # that nearby images don't each get their own set of odd sizes.
+    # Candidate widths are snapped down to a multiple of this, so that images of similar size share widths.
     SNAP = 10
 
     # @!attribute [r] spec
-    #   @return [Range, Array<Integer>, Integer] the breakpoint spec
+    #   @return [Range, Array<Integer>, Integer]
     # @!attribute [r] step
     #   @return [Float] the ratio between two candidates
     attr_reader :spec, :step
 
-    # @param spec [Range, Array<Integer>, Integer, nil] the breakpoint
-    #   spec. Defaults to {DynamicImage.default_breakpoints}.
-    # @param step [Numeric, nil] the ratio between two candidates
-    #   in a range. Defaults to {DynamicImage.breakpoint_step}.
+    # @param spec [Range, Array<Integer>, Integer, nil] the breakpoint spec. Defaults to
+    #   {DynamicImage.default_breakpoints}.
+    # @param step [Numeric, nil] the ratio between two candidates in a range. Defaults to
+    #   {DynamicImage.breakpoint_step}.
     # @raise [ArgumentError] if the step or range would never terminate
     def initialize(spec = nil, step: nil)
       @spec = spec.nil? ? DynamicImage.default_breakpoints : spec
@@ -40,12 +39,12 @@ module DynamicImage
 
     # Returns the candidate widths, smallest first.
     #
-    # The largest candidate is always the available width, whether or not it falls
-    # inside the range. An image narrower than the range gets a single candidate.
+    # The largest candidate is always the available width, whether or not it falls inside the range. An image narrower
+    # than the range gets a single candidate.
     #
-    # @param available [Integer] the widest the image can be rendered
-    #   at, as returned by {DynamicImage::ImageSizing#available_width}
-    # @return [Array<Integer>] the widths
+    # @param available [Integer] the widest the image can be rendered at, as returned by
+    #   {DynamicImage::ImageSizing#available_width}
+    # @return [Array<Integer>]
     # @raise [ArgumentError] if the spec isn't understood
     def widths(available)
       available = available.to_i

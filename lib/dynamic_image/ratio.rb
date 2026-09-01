@@ -3,7 +3,7 @@
 module DynamicImage
   # = DynamicImage Ratio
   #
-  # Coerces an aspect ratio into a float, accepting every spelling anyone would reasonably reach for.
+  # Coerces an aspect ratio into a float. Strings, rationals, floats and vectors are all accepted.
   #
   # @example
   #   DynamicImage::Ratio.parse("16:9")           # => 1.7777..
@@ -14,9 +14,9 @@ module DynamicImage
     class << self
       # Returns the ratio as width divided by height.
       #
-      # @param value [Numeric, Vector2d, String, nil] the ratio, as a number, a vector, or
-      #   a string written with <tt>:</tt>, <tt>x</tt> or <tt>/</tt> between the two sides
-      # @return [Float, nil] the ratio
+      # @param value [Numeric, Vector2d, String, nil] the ratio, as a number, a vector, or a string written with
+      #   <tt>:</tt>, <tt>x</tt> or <tt>/</tt> between the two sides
+      # @return [Float, nil]
       # @raise [ArgumentError] if the value isn't a usable ratio
       def parse(value)
         return if value.nil?

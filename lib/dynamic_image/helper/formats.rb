@@ -4,17 +4,14 @@ module DynamicImage
   module Helper
     # = DynamicImage Helper Formats
     #
-    # Resolves the <tt>format:</tt> option the helpers in
-    # {DynamicImage::Helper} pass to the router.
+    # Resolves the <tt>format:</tt> option the helpers in {DynamicImage::Helper} pass to the router.
     #
-    # A symbol forces that format. An array, or nothing at all, is
-    # negotiated against the image. The default list depends on where
-    # the view is rendered: {DynamicImage.mailer_formats} in a mailer,
+    # A symbol forces that format. An array, or nothing at all, is negotiated against the image. The default list
+    # depends on where the view is rendered: {DynamicImage.mailer_formats} in a mailer,
     # {DynamicImage.default_formats} everywhere else.
     #
-    # The +original+ and +download+ actions serve the stored file as it
-    # is, so they always get the record's own format. Negotiating one
-    # would put an extension on the URL that the response doesn't match.
+    # The +original+ and +download+ actions serve the stored file untouched, so they always get the record's own
+    # format. Negotiating one would put an extension on the URL that the response doesn't match.
     #
     # @see DynamicImage::FormatNegotiator
     module Formats

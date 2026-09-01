@@ -3,11 +3,9 @@
 module DynamicImage
   # = DynamicImage Image Sizing
   #
-  # Calculates cropping and fitting for image sizes. This is what the
-  # helpers use to work out the dimensions of a rendered image, and it
-  # is useful on its own when you need the size without rendering
-  # anything: reserving space in a layout, filling in
-  # <tt>og:image:width</tt>, or laying out a PDF.
+  # Calculates cropping and fitting for image sizes. The helpers use it to work out the dimensions of a rendered
+  # image, and it can be used on its own when you need the size without rendering anything: reserving space in a
+  # layout, filling in <tt>og:image:width</tt>, or laying out a PDF.
   #
   # @example
   #   sizing = DynamicImage::ImageSizing.new(image)
@@ -15,19 +13,17 @@ module DynamicImage
   class ImageSizing
     # @param record [DynamicImage::Model] the image
     # @param options [Hash]
-    # @option options [Boolean] :uncropped Ignore any crop stored on the
-    #   record and size against the original image
+    # @option options [Boolean] :uncropped Ignore any crop stored on the record and size against the original image
     def initialize(record, options = {})
       @record = record
       @uncropped = options[:uncropped] ? true : false
     end
 
-    # Calculates crop geometry. The given vector is scaled
-    # to match the image size, since DynamicImage performs
-    # cropping before resizing.
+    # Calculates crop geometry. The given vector is scaled to match the image size, since cropping happens before
+    # resizing.
     #
-    # The crop is positioned to keep the record's crop gravity as close
-    # to the center as possible, clamped to the bounds of the image.
+    # The crop is positioned to keep the record's crop gravity as close to the center as possible, clamped to the
+    # bounds of the image.
     #
     # @param ratio_vector [Vector2d] the aspect ratio to crop to
     # @return [Array(Vector2d, Vector2d)] the crop size and crop start
@@ -53,11 +49,11 @@ module DynamicImage
 
     # Returns the widest the image can be rendered at, in pixels.
     #
-    # Without a ratio this is simply the image's own width. With
-    # one it is the width of the largest crop matching that ratio.
+    # Without a ratio this is the image's own width. With one it is the width of the largest crop matching that
+    # ratio.
     #
     # @param ratio [Numeric, Vector2d, String, nil] the aspect ratio, in any form {DynamicImage::Ratio} understands
-    # @return [Integer] the width
+    # @return [Integer]
     #
     # @example
     #   image = Image.find(params[:id]) # 320x200 image
@@ -73,20 +69,17 @@ module DynamicImage
       crop_geometry(vector(ratio, 1)).first.x.floor
     end
 
-    # Adjusts +fit_size+ to fit the image dimensions.
-    # Any dimension set to zero will be ignored.
+    # Adjusts +fit_size+ to fit the image dimensions. Any dimension set to zero will be ignored.
     #
-    # @param fit_size [Vector2d, String] the size to fit within, either
-    #   a vector or a <tt>"{width}x{height}"</tt> string. Either
-    #   dimension may be omitted for a fixed width or height.
+    # @param fit_size [Vector2d, String] the size to fit within, either a vector or a <tt>"{width}x{height}"</tt>
+    #   string. Either dimension may be omitted for a fixed width or height.
     # @param options [Hash]
-    # @option options [Boolean] :crop Don't keep aspect ratio. This will
-    #   allow the image to be cropped to the requested size.
-    # @option options [Boolean] :upscale Don't limit to the size of the
-    #   image. Images smaller than the given size will be scaled up.
+    # @option options [Boolean] :crop Don't keep aspect ratio. This will allow the image to be cropped to the
+    #   requested size.
+    # @option options [Boolean] :upscale Don't limit to the size of the image. Images smaller than the given size will
+    #   be scaled up.
     # @return [Vector2d] the resulting size
-    # @raise [DynamicImage::Errors::InvalidSizeOptions] if
-    #   <tt>crop: true</tt> is given and either dimension is zero
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given and either dimension is zero
     #
     # @example
     #   image = Image.find(params[:id]) # 320x200 image
@@ -137,9 +130,8 @@ module DynamicImage
       end
     end
 
-    # Clamps the rectangle defined by +start+ and +size+
-    # to fit inside 0, 0 and +max_size+. It is assumed
-    # that +size+ will always be smaller than +max_size+.
+    # Clamps the rectangle defined by +start+ and +size+ to fit inside 0, 0 and +max_size+. It is assumed that +size+
+    # will always be smaller than +max_size+.
     #
     # Returns the start vector.
     def clamp(start, size, max_size)
