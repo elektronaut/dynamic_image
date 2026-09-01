@@ -10,6 +10,28 @@ describe DynamicImage::Model do
 
   let(:image) { Image.new }
 
+  describe ".animated?" do
+    subject { image.animated? }
+
+    context "when the image has several frames" do
+      let(:image) { Image.new(frame_count: 12) }
+
+      it { is_expected.to be true }
+    end
+
+    context "when the image has one frame" do
+      let(:image) { Image.new(frame_count: 1) }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the image predates the frame count" do
+      let(:image) { LegacyImage.new }
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe ".cmyk?" do
     subject { image.cmyk? }
 

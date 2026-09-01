@@ -22,9 +22,7 @@ module DynamicImage
       end
 
       def screen_profile(image)
-        if !icc_profile?(image) && %i[rgb b-w].include?(image.interpretation)
-          return image
-        end
+        return image if !icc_profile?(image) && %i[rgb b-w].include?(image.interpretation)
 
         target_space = image.interpretation == :"b-w" ? "b-w" : "srgb"
         icc_transform_srgb(image).colourspace(target_space)

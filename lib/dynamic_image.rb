@@ -6,6 +6,7 @@ require "vips"
 
 require "dynamic_image/backfill"
 require "dynamic_image/belongs_to"
+require "dynamic_image/breakpoints"
 require "dynamic_image/controller"
 require "dynamic_image/digest_verifier"
 require "dynamic_image/engine"
@@ -18,7 +19,10 @@ require "dynamic_image/image_reader"
 require "dynamic_image/image_sizing"
 require "dynamic_image/metadata"
 require "dynamic_image/model"
+require "dynamic_image/picture"
+require "dynamic_image/picture/format_policy"
 require "dynamic_image/processed_image"
+require "dynamic_image/ratio"
 require "dynamic_image/routing"
 require "dynamic_image/schema"
 
@@ -41,6 +45,12 @@ require "dynamic_image/schema"
 # @see DynamicImage::ImageSizing
 # @see DynamicImage::ProcessedImage
 module DynamicImage
+  # The formats anything that renders images will understand. Fallback images in a <tt>picture</tt> are negotiated
+  # from this list, and it is the default for {DynamicImage.mailer_formats}.
+  #
+  # @return [Array<Symbol>] the format names, most preferred first
+  COMPATIBLE_FORMATS = %i[jpeg png gif].freeze
+
   # Verifies the HMAC digests embedded in image URLs. Set by the engine
   # from the application's key generator, which derives it from
   # <tt>secret_key_base</tt>.
@@ -59,5 +69,23 @@ module DynamicImage
   # <tt>format:</tt>.
   #
   # @return [Array<Symbol>] the format names, most preferred first
-  mattr_accessor :mailer_formats, default: %i[jpeg png gif]
+  mattr_accessor :mailer_formats, default: COMPATIBLE_FORMATS
+
+  # The breakpoints responsive images are rendered at. This can
+  # be a range, an array of explicit widths, or a single width.
+  #
+  # @return [Range, Array<Integer>, Integer] the breakpoints
+  # @see DynamicImage::Breakpoints
+  mattr_accessor :default_breakpoints, default: 320..3200
+
+  # The ratio between two breakpoints. Lower means a closer fit to what the
+  # browser needs, at the price of more variants to generate and store.
+  #
+  # @return [Float] the step
+  mattr_accessor :breakpoint_step, default: 1.4
+
+  # The width of the fallback image in a <tt>picture</tt> element.
+  #
+  # @return [Integer] the width
+  mattr_accessor :picture_fallback_width, default: 1200
 end

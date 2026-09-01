@@ -105,6 +105,32 @@ describe DynamicImage::ImageSizing do
     end
   end
 
+  describe "#available_width" do
+    it "is the image's own width without a ratio" do
+      expect(sizing.available_width).to eq(320)
+    end
+
+    context "with a ratio wider than the image" do
+      it "is bounded by the width" do
+        expect(sizing.available_width(16.0 / 9)).to eq(320)
+      end
+    end
+
+    context "with a ratio taller than the image" do
+      it "is the width of the largest matching crop" do
+        expect(sizing.available_width(9.0 / 16)).to eq(113)
+      end
+    end
+
+    context "with a cropped image" do
+      let(:crop_size) { v(200, 100) }
+
+      it "sizes against the crop, not the original" do
+        expect(sizing.available_width).to eq(200)
+      end
+    end
+  end
+
   describe "#fit" do
     subject(:fit) { sizing.fit(v(100, 100)) }
 

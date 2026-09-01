@@ -39,7 +39,6 @@ Style/Documentation:
 
 Layout/LineLength:
   AutoCorrect: true
-  Max: 80
 
 Metrics/BlockLength:
   AllowedMethods:

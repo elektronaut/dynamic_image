@@ -78,6 +78,15 @@ module DynamicImage
       before_validation :read_image_metadata, if: :data_changed?
     end
 
+    # Returns true if the image holds more than one frame.
+    #
+    # Images stored before +frame_count+ existed have none, and are taken to be still.
+    #
+    # @return [Boolean]
+    def animated?
+      has_attribute?(:frame_count) && frame_count.to_i > 1
+    end
+
     # Returns true if the image is in the CMYK colorspace.
     #
     # @return [Boolean]

@@ -3,8 +3,7 @@
 
 # DynamicImage
 
-Need to handle image uploads in your Rails app?
-Give DynamicImage a try.
+A Rails engine for image uploads.
 
 Rather than creating a pre-defined set of images when a file is
 uploaded, DynamicImage stores the original file and generates images
@@ -13,9 +12,6 @@ conversion.
 
 DynamicImage is built on [Dis](https://github.com/elektronaut/dis)
 and [ruby-vips](https://github.com/libvips/ruby-vips).
-
-All URLs are signed with a HMAC to protect against denial of service
-and enumeration attacks.
 
 ## Installation
 
@@ -32,47 +28,42 @@ Add the gem to your Gemfile and run `bundle install`.
 gem "dynamic_image", "~> 3.0"
 ```
 
-Run the `dis:install` generator to set up your storage.
+Run the `dis:install` generator to set up your storage. Files are stored
+in `db/dis` by default; edit the generated initializer to change that.
+See the [Dis](https://github.com/elektronaut/dis) documentation for the
+options.
 
 ```sh
 bin/rails generate dis:install
 ```
 
-You can edit the generated initializer to configure your storage. By
-default it will store files in `db/dis`. See the
-[Dis](https://github.com/elektronaut/dis) documentation for more
-information.
+## Getting started
 
-## Creating your resource
+### Creating your resource
 
-Run the `dynamic_image:resource` generator to create your resource.
+The `dynamic_image:resource` generator creates an `Image` model and a
+controller, along with a migration and the necessary routes. The
+migration creates the table for your resource, plus the table
+DynamicImage uses to cache processed images.
 
 ```sh
 bin/rails generate dynamic_image:resource image
+bin/rails db:migrate
 ```
 
-This will create an `Image` model and a controller, along with a migration and
-the necessary routes.
-
-Note that in this case, the route will collide with any static images
-stored in `public/images`. You can customize the path if you want in the
-route declaration.
+The generated route collides with any static images stored in
+`public/images`. Customize the path in the route declaration if that's a
+problem.
 
 ```ruby
 image_resources :images, path: "dynamic_images/:digest(/:size)"
 ```
 
-Run the migrations when you're done. This creates the table for your
-resource, along with the table DynamicImage uses to cache processed
-images.
+<details>
+<summary>Setting the model up by hand</summary>
 
-```sh
-bin/rails db:migrate
-```
-
-If you'd rather set the model up by hand, include `DynamicImage::Model`
-and provide these columns. The four first are required by Dis, the rest
-hold the image metadata and crop.
+Include `DynamicImage::Model` and provide these columns. The first four
+are required by Dis, the rest hold the image metadata and crop.
 
 ```ruby
 create_table :images do |t|
@@ -109,10 +100,11 @@ class ImagesController < ApplicationController
 end
 ```
 
-## Storing an image
+</details>
 
-To save an image, simply assign the file attribute to your uploaded
-file.
+### Storing an image
+
+To save an image, assign the uploaded file to the `file` attribute.
 
 ```ruby
 Image.create(params.expect(image: [:file]))
@@ -124,34 +116,12 @@ the client claims about the upload is ignored. If the file isn't a
 readable image in a supported format, the record is invalid and an error
 is added to `data`.
 
-## Associating images with other models
+### Associating images with other models
 
-Other models can refer to images with `belongs_to_image`. It works like
-`belongs_to`, and takes the same options.
-
-```ruby
-class User < ActiveRecord::Base
-  belongs_to_image :avatar, class_name: "Image"
-end
-```
-
-In addition to a record, the association accepts an uploaded file
-directly, creating the image record for you. This means you can post a
-file straight to the parent model.
-
-```ruby
-User.create(params.expect(user: [:name, :avatar]))
-```
-
-```erb
-<%= form_with(model: user) do |f| %>
-  <%= f.file_field :avatar %>
-<% end %>
-```
-
-Add `validates_associated` if you want an invalid upload to invalidate the
-parent record. Otherwise the assignment is silently dropped when the
-parent is saved.
+`belongs_to_image` works like `belongs_to` and takes the same options.
+In addition to a record, it accepts an uploaded file directly and
+creates the image record for you, so a file can be posted straight to
+the parent model.
 
 ```ruby
 class User < ActiveRecord::Base
@@ -160,145 +130,55 @@ class User < ActiveRecord::Base
 end
 ```
 
-Like `belongs_to`, the association is required by default. Pass
-`optional: true` if the image is allowed to be missing.
-
-## Rendering images in your views
-
-You should use the provided helpers for displaying images, this will ensure
-that the generated URLs are properly signed and timestamped.
-
-To display the image at its original size, use `dynamic_image_tag` without
-any options.
-
 ```erb
-<%= dynamic_image_tag(image) %>
+<%= form_with(model: user) do |f| %>
+  <%= f.file_field :avatar %>
+<% end %>
 ```
 
-To resize it, specify a max size. This will scale the image down to fit, but
-no cropping will occur.
-
-```erb
-<%= dynamic_image_tag(image, size: "400x400") %>
+```ruby
+User.create(params.expect(user: [:name, :avatar]))
 ```
 
-Setting `crop: true` will crop the image to the exact size.
+`validates_associated` is optional, but without it an invalid upload is
+silently dropped when the parent is saved. Like `belongs_to`, the
+association is required by default; pass `optional: true` if the image
+is allowed to be missing.
+
+## Image URLs
+
+`dynamic_image_path` and `dynamic_image_url` act pretty much like
+regular URL helpers, and take the sizing options below.
 
 ```erb
-<%= dynamic_image_tag(image, size: "400x400", crop: true) %>
+<%= link_to "See image", dynamic_image_path(image, size: "400x400") %>
 ```
 
-Omitting either dimension will render the image at an exact width or height.
-
-```erb
-<%= dynamic_image_tag(image, size: "400x") %>
-```
-
-`dynamic_image_path` and `dynamic_image_url` act pretty much like regular URL
-helpers.
-
-```erb
-<%= link_to "See image", dynamic_image_path(image) %>
-```
-
-Note that no `alt` attribute is generated for you. Pass one, as you would
-to `image_tag`. Any other options that aren't listed below are passed
-along as HTML attributes.
+Every URL is signed and timestamped, so they can only be built
+server-side. See [signed URLs](#signed-urls) for why.
 
 ### Sizing options
 
-`dynamic_image_tag`, `dynamic_image_path` and `dynamic_image_url` all
-take the same sizing options.
+Every helper that renders or links to a processed image takes the same
+sizing options.
 
 * `:size` - Desired image size, as `"{width}x{height}"`. The image is
   scaled to fit within the size, preserving the aspect ratio. Omit
   either dimension (`"400x"` or `"x400"`) for a fixed width or height.
 * `:crop` - Crop the image to the exact size instead of fitting it.
-  Both dimensions are required; `size: "400x", crop: true` will raise
-  `DynamicImage::Errors::InvalidSizeOptions`.
-* `:upscale` - Images are only ever scaled down, never up. Pass
+  Both dimensions are required.
+* `:upscale` - By default, images are never scaled up, only down. Pass
   `upscale: true` to allow the image to be scaled beyond its own size.
-* `:format` - Render the image in a different format. See below.
-
-### Formats
-
-Supported formats are JPEG, PNG, GIF, WebP, JPEG XL, HEIC, AVIF, BMP and
-TIFF. HEIC, AVIF, BMP and TIFF.
-
-A subset of these (JPEG, PNG, GIF and WebP) will be served by default,
-the others will be converted to the most appropriate format.
-A HEIC from a phone camera is served as JPEG, or PNG if it's transparent,
-and an animated AVIF as an animated GIF.
-
-BMP, HEIC and AVIF can be uploaded but aren't supported for output.
-
-The preferred format lists are configurable, most preferred format first:
-
-```ruby
-DynamicImage.default_formats = %i[jpeg png gif webp]
-DynamicImage.mailer_formats = %i[jpeg png gif]
-```
-
-Pass `format:` to force conversion to a specific format.
-
-```erb
-<%= dynamic_image_tag(image, size: "400x400", format: :jxl) %>
-```
-
-Pass an array when several formats are acceptable, the most compatible
-one will be picked.
-
-```erb
-<%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
-```
-
-The format is not part of the signature, so the same image can be served
-in several formats without any extra bookkeeping.
-
-Converting an animated image to a format that doesn't support animation
-renders the first frame.
-
-All images will be converted to the sRGB colorspace for consistent
-appearance in all browsers.
-
-### Responsive images
-
-Since any size can be generated on demand, `srcset` is just a matter of
-listing the widths you want. `dynamic_image_tag` passes `srcset` and
-`sizes` through to the underlying `img` tag.
-
-```erb
-<%= dynamic_image_tag(
-      image,
-      size: "800x",
-      srcset: [400, 800, 1200].map { |w|
-        "#{dynamic_image_path(image, size: "#{w}x")} #{w}w"
-      }.join(", "),
-      sizes: "(max-width: 600px) 100vw, 600px",
-      alt: "A description of the image"
-    ) %>
-```
-
-Combine it with `format:` to offer WebP to the browsers that want it.
-
-```erb
-<picture>
-  <source srcset="<%= dynamic_image_path(image, size: "800x", format: :webp) %>"
-          type="image/webp">
-  <%= dynamic_image_tag(image, size: "800x", alt: "A description") %>
-</picture>
-```
-
-Remember that each distinct size is processed and stored the first time
-it is requested, so a handful of widths reused across the site will
-serve you better than a different set on every template.
+* `:format` - Render the image in a different format. See
+  [Formats](#formats).
 
 ### Other versions of the image
 
-Three variations are available, each with `_tag`, `_path` and `_url`
-helpers. None of them take sizing options.
+Three variations are available. `uncropped` has `_tag`, `_path` and
+`_url` helpers; `original` and `download` have `_path` and `_url`. None
+of them take sizing options.
 
-* `original_dynamic_image_tag` renders the file exactly as it was
+* `original_dynamic_image_path` links to the file exactly as it was
   uploaded, with no processing at all.
 * `download_dynamic_image_path` serves the original as an attachment,
   prompting a download.
@@ -309,7 +189,121 @@ helpers. None of them take sizing options.
 <%= link_to "Download", download_dynamic_image_path(image) %>
 ```
 
-## Cropping
+## Displaying images
+
+`dynamic_image_tag` renders an `img`, taking the sizing options above
+plus any HTML attributes.
+
+```erb
+<%= dynamic_image_tag(image) %>
+<%= dynamic_image_tag(image, size: "400x400") %>
+<%= dynamic_image_tag(image, size: "400x400", crop: true) %>
+```
+
+Note that no `alt` attribute is generated for you. Pass one, as you
+would to `image_tag`.
+
+### Responsive images
+
+`dynamic_picture_tag` renders a `picture` element covering a range of
+widths using `srcset`.
+
+```erb
+<%= dynamic_picture_tag(image, sizes: "50vw", alt: "A description") %>
+```
+
+```html
+<picture>
+  <source type="image/webp"
+          srcset="/images/… 420w, /images/… 590w, /images/… 830w, …"
+          sizes="50vw">
+  <img src="/images/…/1200x800/….jpg" width="1200" height="800"
+       alt="A description">
+</picture>
+```
+
+Note that there is no `size:` option here. Instead, pass a `ratio:`
+when you want the image cropped. In addition to the `"16:9"` example
+below, it also accepts rationals and floats.
+
+```erb
+<%= dynamic_picture_tag(image, ratio: "16:9", sizes: "50vw") %>
+```
+
+#### Image breakpoints
+
+The `srcset` sizes are computed per image based on its own width,
+stepping down geometrically in intervals, configured by `step:`.
+The default configuration yields roughly 7 variants across the range,
+depending on the original size.
+
+```ruby
+DynamicImage.default_breakpoints    = 320..3200
+DynamicImage.breakpoint_step        = 1.4
+DynamicImage.picture_fallback_width = 1200
+```
+
+If you'd rather have fixed widths, change the range to an array:
+
+```ruby
+DynamicImage.default_breakpoints = [400, 800, 1200]
+```
+
+All three options can be overridden per call.
+
+```erb
+<%= dynamic_picture_tag(image, sizes: "50vw",
+                        breakpoints: 320..1600, step: 1.25) %>
+<%= dynamic_picture_tag(image, sizes: "50vw", breakpoints: [400, 800, 1200]) %>
+<%= dynamic_picture_tag(logo, sizes: "120px", breakpoints: 240) %>
+```
+
+#### Media queries
+
+`dynamic_picture_source_tag` renders a single `source`, so you can
+compose a `picture` by hand when you want different crops depending on
+media queries.
+
+```erb
+<picture>
+  <%= dynamic_picture_source_tag(image, ratio: "21:9",
+                                 media: "(min-width: 1000px)") %>
+  <%= dynamic_picture_source_tag(image, ratio: "1:1") %>
+  <%= dynamic_image_tag(image, size: "1200x1200", crop: true, alt: "…") %>
+</picture>
+```
+
+## Formats
+
+Supported formats are JPEG, PNG, GIF, WebP, JPEG XL and TIFF.
+BMP, HEIC and AVIF can also be uploaded, but aren't supported for output.
+
+The preferred format lists are configurable, sorted most preferred format
+first:
+
+```ruby
+DynamicImage.default_formats = %i[jpeg png gif webp]
+DynamicImage.mailer_formats = %i[jpeg png gif]
+```
+
+Unless the source format matches the preferred formats, it will
+be converted to the most appropriate format. For instance, a HEIC from
+a phone will be served as either JPEG or PNG, depending on if it's
+transparent or not.
+
+Pass `format:` to override the defaults.
+
+```erb
+<%= dynamic_image_tag(image, size: "400x400", format: %i[jpeg png gif]) %>
+<%= dynamic_image_tag(image, size: "400x400", format: :jxl) %>
+```
+
+For consistent appearance, all images are converted to the sRGB colorspace.
+Any embedded color profiles will be taken into account when doing so.
+
+## Working with images
+
+### Cropping
 
 Images can be pre-cropped by setting `crop_width`, `crop_height`,
 `crop_start_x` and `crop_start_y`. The crop is applied to every rendered
@@ -318,59 +312,53 @@ version of the image, except the ones served by the `original` and
 
 ```ruby
 image.update(
-  crop_start_x: 15, crop_start_y: 20,
-  crop_width: 300, crop_height: 200
+  crop_start_x: 15,
+  crop_start_y: 20,
+  crop_width: 300,
+  crop_height: 200
 )
 image.size      # => Vector2d(300, 200)
 image.real_size # => Vector2d(500, 400)
 ```
 
 By default, images are cropped from the center. Set `crop_gravity_x` and
-`crop_gravity_y` to move that focal point. DynamicImage will keep the
-pixel at those coordinates within the cropped image, and as close to the
-center as it can get without zooming in. The coordinates are relative to
-the original image, not the pre-cropped one.
+`crop_gravity_y` to set a different focal point. When cropping,
+DynamicImage will attempt to keep this pixel as close to the center as
+possible without zooming in.
+
+The crop gravity is relative to the original image, so that the crop size
+can change without moving the focal point.
 
 ```ruby
 image.update(crop_gravity_x: 120, crop_gravity_y: 80)
 ```
 
-Gravity applies to any crop, not just the pre-crop: an image with no
-`crop_width`/`crop_height` still uses it when a view asks for
-`crop: true`.
+### Transforming the stored image
 
-## Transforming the stored image
-
-Rendering never modifies the stored file, but two methods do. Both write
-a new file and update the stored dimensions, and neither saves the record
-for you.
-
-`rotate` turns the image, taking the crop along with it. The angle must
-be a multiple of 90; anything else raises
-`DynamicImage::Errors::InvalidTransformation`.
+Rendering never modifies the stored file, but `rotate` and `resize` do.
+Both write a new file and update the stored dimensions, and neither
+saves the record for you.
 
 ```ruby
 image.rotate(90)
-image.save
-```
-
-`resize` scales the stored file down and replaces the original.
-
-```ruby
 image.resize(Vector2d.new(800, 800))
 image.save
 ```
 
-## Working with images outside of views
+`rotate` turns the image, taking the crop along with it. The angle must
+be a multiple of 90.
+
+`resize` scales the stored file down and replaces the original.
+
+### Outside of views
 
 The helpers cover rendering in HTML, but the classes underneath are
 public API and useful when you need dimensions or image data directly.
 
-### Calculating sizes
+#### Calculating sizes
 
-`DynamicImage::ImageSizing` answers the question "what size would this
-image be", without rendering anything. It takes the same options as the
-helpers.
+`DynamicImage::ImageSizing` can be used for size calculation.
+It takes the same options as the helpers.
 
 ```ruby
 sizing = DynamicImage::ImageSizing.new(image) # a 1600x1000 image
@@ -380,15 +368,10 @@ sizing.fit("400x400", crop: true) # => Vector2d(400.0, 400.0)
 sizing.fit("2000x2000")           # => Vector2d(1600.0, 1000.0)
 ```
 
-This is what you want for `og:image:width`, for JSON payloads that tell
-a JavaScript component how much space to reserve, or for laying out a
-PDF.
-
-### Processing images
+#### Processing images
 
 `DynamicImage::ProcessedImage` returns processed image data as a binary
-string. Use it when the consumer can't fetch a URL — PDF generation is
-the usual case.
+string.
 
 ```ruby
 size = DynamicImage::ImageSizing.new(image).fit("800x800")
@@ -396,26 +379,20 @@ data = DynamicImage::ProcessedImage.new(image, format: :jpg)
                                    .cropped_and_resized(size)
 ```
 
-Processing happens inline, so this is slow the first time and cheap
-afterwards; the result is stored as a variant like any other size.
+The result is stored as a variant, so that subsequent calls are cheap.
 
-## Signed URLs
+## How it works
 
-Every URL carries a HMAC digest of the action, the record id and the
-size. Requests that don't match are rejected with
-`DynamicImage::Errors::InvalidSignature`, which Rails renders as
-`401 Unauthorized`.
+### Signed URLs
 
-Generating images is expensive, so an unsigned endpoint would be trivial
-to exhaust; only sizes you have linked to can be requested. It also stops
-ids being walked to find images you haven't linked to.
+All URLs are signed with a HMAC to protect against denial of service and
+enumeration attacks.
 
 The signing key is derived from your application's `secret_key_base`.
-Rotating it invalidates every image URL you have ever generated,
-including ones sitting in a CDN or in the body of an already-sent email.
-Plan for that if you rotate secrets.
+Take care if you rotate it, this will invalidate every image URL you
+have generated. Plan for that if you rotate secrets.
 
-## Caching
+### Caching
 
 Generating images on the fly is expensive, so each processed size is
 stored as a variant, a separate record with its data in Dis, and reused
@@ -424,14 +401,11 @@ image is replaced.
 
 Responses are served with a far-future `Cache-Control` header and
 respect `If-Modified-Since`, so they play well with an HTTP cache in
-front. Here are a few options:
-
-* [CloudFlare](https://www.cloudflare.com)
-* [Rack::Cache](http://rtomayko.github.io/rack-cache/)
-* [actionpack-page_caching](https://github.com/rails/actionpack-page_caching)
-
-It's perfectly safe to cache images indefinitely. The URL is
-timestamped, and will change if the object changes.
+front — [CloudFlare](https://www.cloudflare.com),
+[Rack::Cache](http://rtomayko.github.io/rack-cache/) or
+[actionpack-page_caching](https://github.com/rails/actionpack-page_caching),
+to name a few. It's perfectly safe to cache images indefinitely: the URL
+is timestamped, and will change if the object changes.
 
 ## Upgrading
 
@@ -459,13 +433,12 @@ The backfill reads every image back from storage, so it takes a while on
 a large library. It's safe to interrupt and re-run, and it leaves
 `updated_at` alone, so existing URLs and cached variants stay valid.
 
-`add_index` locks the table while it builds. On a large table, move it
-into its own migration with `algorithm: :concurrently`.
-
-If your table was created by an older generator, its columns are all
-nullable and the generator will list the ones that should be `NOT NULL`.
-Correcting them is optional and left to you, since `change_column_null`
-fails if any row holds a `NULL`.
+Two things to watch on a large table. `add_index` locks the table while
+it builds, so move it into its own migration with
+`algorithm: :concurrently`. And if your table was created by an older
+generator, its columns are all nullable and the generator will list the
+ones that should be `NOT NULL`; correcting them is optional and left to
+you, since `change_column_null` fails if any row holds a `NULL`.
 
 ## Documentation
 

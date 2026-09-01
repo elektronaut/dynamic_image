@@ -51,6 +51,28 @@ module DynamicImage
       [crop_size, (start + crop_start)]
     end
 
+    # Returns the widest the image can be rendered at, in pixels.
+    #
+    # Without a ratio this is simply the image's own width. With
+    # one it is the width of the largest crop matching that ratio.
+    #
+    # @param ratio [Numeric, Vector2d, String, nil] the aspect ratio, in any form {DynamicImage::Ratio} understands
+    # @return [Integer] the width
+    #
+    # @example
+    #   image = Image.find(params[:id]) # 320x200 image
+    #   sizing = DynamicImage::ImageSizing.new(image)
+    #
+    #   sizing.available_width           # => 320
+    #   sizing.available_width(16.0 / 9) # => 320
+    #   sizing.available_width(9.0 / 16) # => 113
+    def available_width(ratio = nil)
+      ratio = DynamicImage::Ratio.parse(ratio)
+      return size.x.floor unless ratio
+
+      crop_geometry(vector(ratio, 1)).first.x.floor
+    end
+
     # Adjusts +fit_size+ to fit the image dimensions.
     # Any dimension set to zero will be ignored.
     #

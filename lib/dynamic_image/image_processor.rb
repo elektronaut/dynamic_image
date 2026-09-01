@@ -61,9 +61,8 @@ module DynamicImage
     #   format to convert to
     # @return [DynamicImage::ImageProcessor] a new processor
     def convert(new_format)
-      unless new_format.is_a?(DynamicImage::Format)
-        new_format = DynamicImage::Format.find(new_format)
-      end
+      new_format = DynamicImage::Format.find(new_format) unless new_format.is_a?(DynamicImage::Format)
+
       if frame_count > 1 && !new_format.animated?
         self.class.new(extract_frame(0), target_format: new_format)
       else

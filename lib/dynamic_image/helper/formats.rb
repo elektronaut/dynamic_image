@@ -41,7 +41,7 @@ module DynamicImage
       end
 
       def mime_format(format)
-        Mime::Type.lookup(format.content_type).to_sym
+        format.mime_type.to_sym
       end
 
       def accepted_image_formats
