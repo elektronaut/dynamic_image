@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "dynamic_image/helper/formats"
+require "dynamic_image/helper/pictures"
 
 module DynamicImage
   # = DynamicImage Helper
@@ -16,8 +17,10 @@ module DynamicImage
   #
   # @see DynamicImage::ImageSizing for how sizes are calculated
   # @see DynamicImage::Helper::Formats for how the format is chosen
+  # @see DynamicImage::Helper::Pictures for responsive images
   module Helper
     include DynamicImage::Helper::Formats
+    include DynamicImage::Helper::Pictures
 
     # Returns the path for a {DynamicImage::Model} record. Takes the
     # same options as {#dynamic_image_url}.
@@ -53,9 +56,6 @@ module DynamicImage
     #
     #   dynamic_image_tag(image, size: "100x100", alt: "Avatar")
     #   # => <img alt="Avatar" src="..." width="100" height="62" />
-    #
-    # @example Responsive markup
-    #   dynamic_image_tag(image, size: "800x", srcset: srcset, sizes: "50vw")
     def dynamic_image_tag(record_or_array, options = {})
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)

@@ -96,6 +96,13 @@ module DynamicImage
       extensions.first
     end
 
+    # The canonical content type as a Mime::Type.
+    #
+    # @return [Mime::Type] the mime type
+    def mime_type
+      Mime::Type.lookup(content_type)
+    end
+
     class << self
       # Finds the format for a content type.
       #
