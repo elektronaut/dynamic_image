@@ -69,4 +69,18 @@ describe DynamicImage::Picture::FormatPolicy do
       end
     end
   end
+
+  describe "a multi-page image in a still format" do
+    let(:record) do
+      Image.new(content_type: "image/tiff", frame_count: 2, alpha: false)
+    end
+
+    it "renders the source as webp" do
+      expect(described_class.new(record).source.name).to eq("WEBP")
+    end
+
+    it "does not keep the stored format as the fallback" do
+      expect(described_class.new(record).fallback.name).to eq("JPEG")
+    end
+  end
 end

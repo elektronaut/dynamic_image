@@ -14,13 +14,25 @@ describe DynamicImage::Model do
     subject { image.animated? }
 
     context "when the image has several frames" do
-      let(:image) { Image.new(frame_count: 12) }
+      let(:image) { Image.new(frame_count: 12, content_type: "image/gif") }
 
       it { is_expected.to be true }
     end
 
+    context "when the image has several frames in a still format" do
+      let(:image) { Image.new(frame_count: 2, content_type: "image/tiff") }
+
+      it { is_expected.to be false }
+    end
+
+    context "when the image has several frames in an unknown format" do
+      let(:image) { Image.new(frame_count: 2, content_type: "image/jp2") }
+
+      it { is_expected.to be false }
+    end
+
     context "when the image has one frame" do
-      let(:image) { Image.new(frame_count: 1) }
+      let(:image) { Image.new(frame_count: 1, content_type: "image/gif") }
 
       it { is_expected.to be false }
     end

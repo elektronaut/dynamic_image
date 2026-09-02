@@ -71,13 +71,17 @@ module DynamicImage
       before_validation :read_image_metadata, if: :data_changed?
     end
 
-    # Returns true if the image holds more than one frame.
+    # Returns true if the image holds more than one frame in a format that renders them.
     #
-    # Images stored before +frame_count+ existed have none, and are taken to be still.
+    # Images stored before +frame_count+ existed have none, and are taken to be still. A multi-page document in a
+    # format that isn't animated, such as TIFF, is also still: {DynamicImage::ImageReader} loads only its first
+    # page.
     #
     # @return [Boolean]
     def animated?
-      has_attribute?(:frame_count) && frame_count.to_i > 1
+      return false unless has_attribute?(:frame_count) && frame_count.to_i > 1
+
+      DynamicImage::Format.content_type(content_type)&.animated? || false
     end
 
     # Returns the alt text for the image, or nil if none has been set.

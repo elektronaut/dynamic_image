@@ -74,7 +74,7 @@ module DynamicImage
     end
 
     def animated?
-      frame_count.to_i > 1
+      record.animated?
     end
 
     def alpha?
