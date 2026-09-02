@@ -4,7 +4,7 @@ module DynamicImage
   # = DynamicImage Backfill
   #
   # Fills in the metadata columns for records stored before those columns existed. The values are read back from
-  # the stored file.
+  # the stored file, except where the format guarantees them.
   #
   # Records are written with +update_columns+, so no callbacks run and +updated_at+ is left alone.
   # {DynamicImage::Model#to_param} fingerprints on +updated_at+, and touching it would invalidate every image URL
@@ -26,11 +26,15 @@ module DynamicImage
     # @return [Integer] records left alone, unreadable or missing
     attr_reader :skipped
 
+    # @return [Integer] records filled in from the format, without a read
+    attr_reader :inferred
+
     # @param model [Class] a model including {DynamicImage::Model}
     def initialize(model)
       @model = model
       @updated = 0
       @skipped = 0
+      @inferred = 0
     end
 
     # The records with a column still unset.
@@ -40,13 +44,35 @@ module DynamicImage
       COLUMNS.map { |column| model.where(column => nil) }.reduce(:or)
     end
 
-    # Reads metadata for every pending record and fills the columns in.
+    # The formats whose values follow from the format itself. A format that holds neither animation nor an alpha
+    # channel has one frame and no transparency, whatever the file contains.
     #
-    # @yieldparam record [DynamicImage::Model] each record, after it has been processed
+    # @return [Array<DynamicImage::Format>]
+    def inferable_formats
+      DynamicImage::Format.formats.reject { |f| f.animated? || f.alpha? }
+    end
+
+    # Fills in the pending records whose format settles both columns.
+    #
+    # Written with +update_all+, so no files are read, no callbacks run and +updated_at+ is left alone.
+    #
+    # @return [Integer] records written
+    def infer_from_format
+      inferable_formats.each do |format|
+        @inferred += pending.where(content_type: format.content_types)
+                            .update_all(frame_count: 1, alpha: false)
+      end
+      @inferred
+    end
+
+    # Fills in what the format settles, then reads the rest.
+    #
+    # @yieldparam record [DynamicImage::Model] each record, after it has been read
     # @return [self]
     # @raise [ArgumentError] if the table doesn't have the columns yet
     def run
       ensure_columns
+      infer_from_format
       pending.find_each do |record|
         process(record)
         yield(record) if block_given?
