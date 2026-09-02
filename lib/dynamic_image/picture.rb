@@ -99,7 +99,7 @@ module DynamicImage
       variants.map { |v| "#{v[:url]} #{v[:width]}w" }.join(", ")
     end
 
-    # The sources to render, as +type+ and +srcset+ pairs. Always at most one entry.
+    # The sources to render, as +type+ and +srcset+ pairs.
     #
     # Empty when the candidates are in the same format as the fallback; {#srcset} goes on the <tt>img</tt> instead.
     # That is what happens to an animated image, which keeps its own format.
@@ -112,14 +112,7 @@ module DynamicImage
       [{ type:, srcset: candidates }]
     end
 
-    # The format the candidates are rendered in.
-    #
-    # @return [DynamicImage::Format]
-    def format
-      format_policy.source
-    end
-
-    # The content type of {#format}, for the +type+ attribute.
+    # The content type the candidates are rendered as, for the +type+ attribute.
     #
     # @return [String]
     def type
@@ -209,6 +202,10 @@ module DynamicImage
                                     crop: crop?,
                                     format: image_format.mime_type.to_sym
                                   ))
+    end
+
+    def format
+      format_policy.source
     end
 
     def format_policy
