@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.1.2](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.1...dynamic_image/v3.1.2) (2026-09-02)
+
+
+### Bug Fixes
+
+* Concurrent backfills ([6ade186](https://github.com/elektronaut/dynamic_image/commit/6ade18690e29399aeac906813d7ded6d5bb1117f))
+* Infer capabilities when backfilling ([4762f7d](https://github.com/elektronaut/dynamic_image/commit/4762f7ddbf82d6ed683c4e8d166f1820d9f3ff9d))
+* Multi-page TIFFs are not animated ([8a4999b](https://github.com/elektronaut/dynamic_image/commit/8a4999b2bd9d95227058ee29ed48eccce18a0d2b))
+* Remove BMP support ([071cbd6](https://github.com/elektronaut/dynamic_image/commit/071cbd67cdea20c1cae87882d56e614a2eddf83b))
+
 ## [3.1.1](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.0...dynamic_image/v3.1.1) (2026-09-02)
 
 
