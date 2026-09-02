@@ -28,21 +28,7 @@ describe DynamicImage::Backfill do
     end
   end
 
-  describe "#inferable_formats" do
-    it "includes a format with neither animation nor alpha" do
-      expect(backfill.inferable_formats.map(&:name)).to include("JPEG")
-    end
-
-    it "excludes a format that holds an alpha channel" do
-      expect(backfill.inferable_formats.map(&:name)).not_to include("PNG")
-    end
-
-    it "excludes a format that holds animation" do
-      expect(backfill.inferable_formats.map(&:name)).not_to include("GIF")
-    end
-  end
-
-  describe "#infer_from_format" do
+  describe "inferring from the format" do
     let(:jpeg_file) do
       File.open(File.expand_path("../support/fixtures/image.jpg", __dir__))
     end
@@ -53,40 +39,57 @@ describe DynamicImage::Backfill do
     before { unrecorded(jpeg) }
 
     it "fills the frame count in" do
-      backfill.infer_from_format
+      backfill.run
       expect(jpeg.reload.frame_count).to eq(1)
     end
 
     it "fills the alpha channel in" do
-      backfill.infer_from_format
+      backfill.run
       expect(jpeg.reload.alpha).to be(false)
     end
 
-    it "counts what it wrote" do
-      expect(backfill.infer_from_format).to eq(1)
-    end
-
-    it "reads no files" do
-      allow(Dis::Storage).to receive(:get)
-      backfill.infer_from_format
-      expect(Dis::Storage).not_to have_received(:get)
+    it "counts what it inferred" do
+      expect(backfill.run.inferred).to eq(1)
     end
 
     it "leaves updated_at alone" do
-      expect { backfill.infer_from_format }
-        .not_to(change { jpeg.reload.updated_at })
+      expect { backfill.run }.not_to(change { jpeg.reload.updated_at })
     end
 
-    it "leaves a format it cannot settle alone" do
+    it "does not count an inferred record as read" do
+      expect(backfill.run.updated).to eq(0)
+    end
+
+    it "reads a format it cannot settle" do
       unrecorded(image)
-      expect { backfill.infer_from_format }
-        .not_to(change { image.reload.frame_count })
+      expect(backfill.run.updated).to eq(1)
     end
 
-    it "leaves an already recorded record alone" do
-      jpeg.update_columns(frame_count: 3, alpha: true)
-      backfill.infer_from_format
-      expect(jpeg.reload.frame_count).to eq(3)
+    it "does not infer a format it cannot settle" do
+      unrecorded(image)
+      expect(backfill.run.inferred).to eq(1)
+    end
+  end
+
+  describe "concurrency" do
+    def values_at(concurrency)
+      unrecorded(image)
+      described_class.new(Image, concurrency:).run
+      image.reload.slice(:frame_count, :alpha)
+    end
+
+    it "produces the same values read serially" do
+      expect(values_at(4)).to eq(values_at(1))
+    end
+
+    it "counts every record read concurrently" do
+      unrecorded(image)
+      expect(described_class.new(Image, concurrency: 4).run.updated).to eq(1)
+    end
+
+    it "still runs when set below one" do
+      unrecorded(image)
+      expect(described_class.new(Image, concurrency: 0).run.updated).to eq(1)
     end
   end
 

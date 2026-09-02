@@ -17,9 +17,6 @@ module DynamicImage
     # The columns this fills in.
     COLUMNS = %i[frame_count alpha].freeze
 
-    # @return [Class] the model being backfilled
-    attr_reader :model
-
     # @return [Integer] records written
     attr_reader :updated
 
@@ -30,11 +27,14 @@ module DynamicImage
     attr_reader :inferred
 
     # @param model [Class] a model including {DynamicImage::Model}
-    def initialize(model)
+    # @param concurrency [Integer] how many files to read at a time. Reads are network bound; the metadata itself
+    #   comes off the header. Set to 1 to read serially.
+    def initialize(model, concurrency: 4)
       @model = model
       @updated = 0
       @skipped = 0
       @inferred = 0
+      @concurrency = [concurrency.to_i, 1].max
     end
 
     # The records with a column still unset.
@@ -42,27 +42,6 @@ module DynamicImage
     # @return [ActiveRecord::Relation] the pending records
     def pending
       COLUMNS.map { |column| model.where(column => nil) }.reduce(:or)
-    end
-
-    # The formats whose values follow from the format itself. A format that holds neither animation nor an alpha
-    # channel has one frame and no transparency, whatever the file contains.
-    #
-    # @return [Array<DynamicImage::Format>]
-    def inferable_formats
-      DynamicImage::Format.formats.reject { |f| f.animated? || f.alpha? }
-    end
-
-    # Fills in the pending records whose format settles both columns.
-    #
-    # Written with +update_all+, so no files are read, no callbacks run and +updated_at+ is left alone.
-    #
-    # @return [Integer] records written
-    def infer_from_format
-      inferable_formats.each do |format|
-        @inferred += pending.where(content_type: format.content_types)
-                            .update_all(frame_count: 1, alpha: false)
-      end
-      @inferred
     end
 
     # Fills in what the format settles, then reads the rest.
@@ -73,14 +52,33 @@ module DynamicImage
     def run
       ensure_columns
       infer_from_format
-      pending.find_each do |record|
-        process(record)
-        yield(record) if block_given?
+      pending.find_in_batches(batch_size: concurrency) do |batch|
+        read(batch).each do |record, values|
+          write(record, values)
+          yield(record) if block_given?
+        end
       end
       self
     end
 
     private
+
+    attr_reader :model, :concurrency
+
+    # The formats whose values follow from the format itself. A format that holds neither animation nor an alpha
+    # channel has one frame and no transparency, whatever the file contains.
+    def inferable_formats
+      DynamicImage::Format.formats.reject { |f| f.animated? || f.alpha? }
+    end
+
+    # Written with update_all, so no files are read, no callbacks run and updated_at is left alone.
+    def infer_from_format
+      inferable_formats.each do |format|
+        @inferred += pending.where(content_type: format.content_types)
+                            .update_all(frame_count: 1, alpha: false)
+      end
+      @inferred
+    end
 
     def ensure_columns
       missing = COLUMNS.reject { |c| model.column_names.include?(c.to_s) }
@@ -91,20 +89,30 @@ module DynamicImage
             "Run bin/rails generate dynamic_image:upgrade #{model.name}"
     end
 
-    def process(record)
-      record.with_data_file { |path| apply(record, path) }
-    rescue Dis::Errors::NotFoundError
-      @skipped += 1
+    # Reads run in threads and touch no database connection. The writes happen on the calling thread, so the
+    # counters stay consistent.
+    def read(records)
+      return records.map { |record| [record, values_for(record)] } if concurrency == 1
+
+      records.map { |record| Thread.new { [record, values_for(record)] } }
+             .map(&:value)
     end
 
-    # Metadata reads lazily, so the values have to be resolved before the file goes out of scope. Written with
-    # update_columns so that no callbacks run.
-    def apply(record, path)
-      metadata = DynamicImage::Metadata.new(path)
-      return @skipped += 1 unless metadata.valid?
+    # Metadata reads lazily, so the values have to be resolved before the file goes out of scope.
+    def values_for(record)
+      record.with_data_file do |path|
+        metadata = DynamicImage::Metadata.new(path)
+        [metadata.frame_count, metadata.alpha?] if metadata.valid?
+      end
+    rescue Dis::Errors::NotFoundError
+      nil
+    end
 
-      record.update_columns(frame_count: metadata.frame_count,
-                            alpha: metadata.alpha?)
+    # Written with update_columns so that no callbacks run.
+    def write(record, values)
+      return @skipped += 1 if values.nil?
+
+      record.update_columns(frame_count: values.first, alpha: values.last)
       @updated += 1
     end
   end
