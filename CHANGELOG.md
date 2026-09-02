@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.1](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.0...dynamic_image/v3.1.1) (2026-09-02)
+
+
+### Bug Fixes
+
+* Guard mailer_view? outside of view contexts ([16f7664](https://github.com/elektronaut/dynamic_image/commit/16f7664df7f9ed5b9494f73ccff94d3ebbfc85c1))
+* Guard mailer_view? outside of view contexts ([9c84871](https://github.com/elektronaut/dynamic_image/commit/9c84871a7ff13f93c3460b588fde058fd48dd757))
+
 ## [3.1.0](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.0.9...dynamic_image/v3.1.0) (2026-09-02)
 
 
