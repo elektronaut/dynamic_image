@@ -80,6 +80,20 @@ module DynamicImage
       has_attribute?(:frame_count) && frame_count.to_i > 1
     end
 
+    # Returns the alt text for the image, or nil if none has been set.
+    #
+    # DynamicImage doesn't add this column by default. Either create it yourself or override the method to
+    # provide your own implementation.
+    #
+    # Note that there is a distinction between nil and a blank string. <tt>alt=""</tt> means the image is
+    # purely decorative, while a missing attribute is an accessibility defect.
+    #
+    # @return [String, nil]
+    # @see DynamicImage::Helper#dynamic_image_tag
+    def alt_text
+      self[:alt_text] if has_attribute?(:alt_text)
+    end
+
     # Returns true if the image is in the CMYK colorspace.
     #
     # @return [Boolean]

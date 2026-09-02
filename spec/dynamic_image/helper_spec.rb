@@ -67,6 +67,44 @@ describe DynamicImage::Helper, type: :helper do
         )
       end
     end
+
+    context "when the record has alt text" do
+      let(:options) { { size: "100x100" } }
+
+      before { image.update(alt_text: "A kitten") }
+
+      it { is_expected.to include('alt="A kitten"') }
+    end
+
+    context "when the record has alt text and the view passes its own" do
+      let(:options) { { size: "100x100", alt: "Something else" } }
+
+      before { image.update(alt_text: "A kitten") }
+
+      it { is_expected.to include('alt="Something else"') }
+    end
+
+    context "when the record has alt text and the view marks it decorative" do
+      let(:options) { { size: "100x100", alt: "" } }
+
+      before { image.update(alt_text: "A kitten") }
+
+      it { is_expected.to include('alt=""') }
+    end
+
+    context "when neither the record nor the view has alt text" do
+      let(:options) { { size: "100x100" } }
+
+      it { is_expected.not_to include("alt=") }
+    end
+
+    context "when the record is marked as decorative" do
+      let(:options) { { size: "100x100" } }
+
+      before { image.update(alt_text: "") }
+
+      it { is_expected.to include('alt=""') }
+    end
   end
 
   describe "rendering in a mailer" do
@@ -245,6 +283,12 @@ describe DynamicImage::Helper, type: :helper do
       expect(tag).to eq(
         "<img src=\"#{path}\" width=\"100\" height=\"62\" />"
       )
+    end
+
+    context "when the record has alt text" do
+      before { image.update(alt_text: "A kitten") }
+
+      it { is_expected.to include('alt="A kitten"') }
     end
   end
 

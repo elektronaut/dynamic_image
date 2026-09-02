@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 2019_06_20_160500) do
     t.integer "real_height", null: false
     t.integer "frame_count"
     t.boolean "alpha"
+    t.string "alt_text"
     t.integer "crop_width"
     t.integer "crop_height"
     t.integer "crop_start_x"

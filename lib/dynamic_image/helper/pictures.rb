@@ -36,7 +36,7 @@ module DynamicImage
       # +srcset+ goes on the <tt>img</tt> and no <tt>picture</tt> is rendered at all. That is what happens to an
       # animated image, which keeps its own format.
       #
-      # No +alt+ attribute is generated; pass one as you would to +image_tag+.
+      # Any other options are passed on to {DynamicImage::Helper#dynamic_image_tag}.
       #
       # @param record_or_array [DynamicImage::Model, Array] the record, or an array of records for a nested route
       # @param options [Hash] sizing options, routing options and HTML attributes
