@@ -285,7 +285,7 @@ media queries.
 ## Formats
 
 Supported formats are JPEG, PNG, GIF, WebP, JPEG XL and TIFF.
-BMP, HEIC and AVIF can also be uploaded, but aren't supported for output.
+HEIC and AVIF can also be uploaded, but aren't supported for output.
 
 The preferred format lists are configurable, sorted most preferred format
 first:

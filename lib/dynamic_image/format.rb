@@ -192,13 +192,6 @@ module DynamicImage
     )
 
     register(
-      "BMP",
-      content_type: %w[image/bmp],
-      extension: %w[.bmp],
-      magic_bytes: ["\x42\x4d"]
-    )
-
-    register(
       "GIF",
       animated: true,
       alpha: true,

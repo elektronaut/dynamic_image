@@ -338,16 +338,6 @@ describe ImagesController, type: :controller do
       it { is_expected.to eq("image/heic") }
     end
 
-    context "with a BMP, which is never rendered" do
-      subject { response.media_type }
-
-      let(:image) { stored_image("bmp") }
-
-      before { get_original(image, "bmp") }
-
-      it { is_expected.to eq("image/bmp") }
-    end
-
     context "with an AVIF, which is never rendered" do
       subject { response.media_type }
 

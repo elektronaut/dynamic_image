@@ -41,27 +41,27 @@ describe DynamicImage::Helper::Formats, type: :helper do
       Image.create(
         file: Rack::Test::UploadedFile.new(
           File.open(
-            File.expand_path("../../support/fixtures/image.bmp", __dir__)
+            File.expand_path("../../support/fixtures/image.heic", __dir__)
           ),
-          "image/bmp"
+          "image/heic"
         ),
-        filename: "my-uploaded-file.bmp"
+        filename: "my-uploaded-file.heic"
       )
     end
 
     it { is_expected.to end_with(".jpeg") }
 
     it "links to the original as itself" do
-      expect(helper.original_dynamic_image_path(image)).to end_with(".bmp")
+      expect(helper.original_dynamic_image_path(image)).to end_with(".heic")
     end
 
     it "links to the download as itself" do
-      expect(helper.download_dynamic_image_path(image)).to end_with(".bmp")
+      expect(helper.download_dynamic_image_path(image)).to end_with(".heic")
     end
 
     it "ignores a format given for the original" do
       expect(helper.original_dynamic_image_path(image, format: :jpeg))
-        .to end_with(".bmp")
+        .to end_with(".heic")
     end
   end
 end

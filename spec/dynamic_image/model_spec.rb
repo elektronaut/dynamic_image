@@ -153,12 +153,6 @@ describe DynamicImage::Model do
       it { is_expected.to eq("image/jpeg") }
     end
 
-    context "when image is BMP" do
-      let(:image) { Image.new(content_type: "image/bmp") }
-
-      it { is_expected.to eq("image/jpeg") }
-    end
-
     context "when image is WEBP" do
       let(:image) { Image.new(content_type: "image/webp") }
 

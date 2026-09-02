@@ -32,7 +32,7 @@ module DynamicImage
     PROCESSED_FORMATS = %i[gif jpeg jpg jxl png tiff webp].freeze
 
     # Additional formats +original+ and +download+ will serve.
-    STORED_FORMATS = (PROCESSED_FORMATS + %i[avif bmp heic]).freeze
+    STORED_FORMATS = (PROCESSED_FORMATS + %i[avif heic]).freeze
 
     included do
       before_action :verify_signed_params

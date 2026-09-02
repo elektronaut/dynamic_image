@@ -19,7 +19,6 @@ module DynamicImage
 
     initializer "dynamic_image.mime_types" do
       Mime::Type.register "image/avif", :avif
-      Mime::Type.register "image/bmp", :bmp
       Mime::Type.register "image/gif", :gif
       Mime::Type.register "image/heic", :heic, %w[image/heif]
       Mime::Type.register "image/jpeg", :jpg

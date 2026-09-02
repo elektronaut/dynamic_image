@@ -73,12 +73,6 @@ describe DynamicImage::Metadata do
       it { is_expected.to eq("image/tiff") }
     end
 
-    context "when image is BMP" do
-      let(:image) { read_image("image.bmp") }
-
-      it { is_expected.to eq("image/bmp") }
-    end
-
     context "when image is WEBP" do
       let(:image) { webp_image }
 
@@ -241,12 +235,6 @@ describe DynamicImage::Metadata do
       let(:image) { tiff_image }
 
       it { is_expected.to eq("TIFF") }
-    end
-
-    context "when image is BMP" do
-      let(:image) { read_image("image.bmp") }
-
-      it { is_expected.to eq("BMP") }
     end
 
     context "when image is WEBP" do
