@@ -32,6 +32,32 @@ describe DynamicImage::Model do
     end
   end
 
+  describe ".alt_text" do
+    subject { image.alt_text }
+
+    context "when the image has alt text" do
+      let(:image) { Image.new(alt_text: "A kitten") }
+
+      it { is_expected.to eq("A kitten") }
+    end
+
+    context "when the image is marked as decorative" do
+      let(:image) { Image.new(alt_text: "") }
+
+      it { is_expected.to eq("") }
+    end
+
+    context "when the image has no alt text" do
+      it { is_expected.to be_nil }
+    end
+
+    context "when the table has no alt_text column" do
+      let(:image) { LegacyImage.new }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   describe ".cmyk?" do
     subject { image.cmyk? }
 

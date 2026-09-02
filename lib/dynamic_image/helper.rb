@@ -34,9 +34,11 @@ module DynamicImage
     # Returns an HTML image tag for the record, with +width+ and +height+ set to the rendered size. Without a
     # size, it renders at the original size.
     #
-    # No +alt+ attribute is generated; pass one as you would to +image_tag+. See {#dynamic_image_url} for sizing and
-    # cropping. Options supported by +polymorphic_url+ are passed to the router, and any others are added as HTML
-    # attributes.
+    # See {#dynamic_image_url} for sizing and cropping. Options supported by +polymorphic_url+ are passed to the
+    # router, and any others are added as HTML attributes.
+    #
+    # Unless an +alt+ option is given, the alt text is resolved from {DynamicImage::Model#alt_text}.
+    # Pass <tt>alt: ""</tt> to mark an image as decorative.
     #
     # @param record_or_array [DynamicImage::Model, Array] the record, or an array of records for a nested route
     # @param options [Hash] sizing options, routing options and HTML attributes
@@ -51,9 +53,10 @@ module DynamicImage
     #   dynamic_image_tag(image, size: "100x100", alt: "Avatar")
     #   # => <img alt="Avatar" src="..." width="100" height="62" />
     def dynamic_image_tag(record_or_array, options = {})
+      record = extract_dynamic_image_record(record_or_array)
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)
-      html_options = { size: }.merge(options)
+      html_options = { size:, alt: record.alt_text }.merge(options)
 
       image_tag(dynamic_image_path_with_size(record_or_array,
                                              size,

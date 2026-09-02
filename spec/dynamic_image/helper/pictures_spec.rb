@@ -67,6 +67,16 @@ describe DynamicImage::Helper::Pictures, type: :helper do
       expect(markup.scan("<img").length).to eq(1)
     end
 
+    it "takes the alt text from the record" do
+      image.update(alt_text: "A kitten")
+      expect(markup).to include('alt="A kitten"')
+    end
+
+    it "keeps the alt text off the source" do
+      image.update(alt_text: "A kitten")
+      expect(markup[/<source[^>]*>/]).not_to include("alt=")
+    end
+
     context "with a ratio" do
       let(:options) { { ratio: "16:9", fallback_width: 160 } }
 

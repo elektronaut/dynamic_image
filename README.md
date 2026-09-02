@@ -201,8 +201,16 @@ plus any HTML attributes.
 <%= dynamic_image_tag(image, size: "400x400", crop: true) %>
 ```
 
-Note that no `alt` attribute is generated for you. Pass one, as you
-would to `image_tag`.
+### Alt text
+
+The `alt` attribute is resolved from `DynamicImage::Model#alt_text`. The
+column isn't added by default, either create it yourself, or override the
+method. Alternatively, pass the `alt` option to the helper.
+
+```erb
+<%= dynamic_image_tag(image, alt: "A description") %>
+<%= dynamic_image_tag(image, alt: "") %>
+```
 
 ### Responsive images
 
