@@ -292,6 +292,20 @@ describe DynamicImage::Helper, type: :helper do
     end
   end
 
+  context "when mixed into an object that isn't a view" do
+    subject { presenter.dynamic_image_path(image, size: "100x100") }
+
+    let(:presenter) do
+      Class.new do
+        include Rails.application.routes.url_helpers
+        include DynamicImage::Helper
+      end.new
+    end
+    let(:digest) { generate_digest("show-#{image.id}-100x62") }
+
+    it { is_expected.to eq("/images/#{digest}/100x62/#{image.to_param}.png") }
+  end
+
   describe "#uncropped_dynamic_image_url" do
     subject(:url) { helper.uncropped_dynamic_image_url(image, options) }
 

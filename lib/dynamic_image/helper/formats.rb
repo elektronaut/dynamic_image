@@ -49,8 +49,11 @@ module DynamicImage
         end
       end
 
+      # The helper is also mixed into objects that aren't views, which have no controller at all.
       def mailer_view?
-        defined?(ActionMailer::Base) && controller.is_a?(ActionMailer::Base)
+        return false unless defined?(ActionMailer::Base) && respond_to?(:controller, true)
+
+        controller.is_a?(ActionMailer::Base)
       end
     end
   end
