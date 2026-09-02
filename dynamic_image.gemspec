@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
     "README.md"
   ]
 
-  s.required_ruby_version = ">= 3.2.0"
+  s.required_ruby_version = ">= 3.3.0"
 
   s.add_dependency "dis", "~> 2.1"
   s.add_dependency "rails", "> 7.0"
