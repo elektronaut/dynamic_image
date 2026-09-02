@@ -32,10 +32,6 @@ module DynamicImage
       # The <tt>img</tt> carries the +width+ and +height+ of the fallback, which needn't match whichever candidate is
       # chosen.
       #
-      # When the candidates are already in a format the <tt>img</tt> can carry, there is nothing to negotiate: the
-      # +srcset+ goes on the <tt>img</tt> and no <tt>picture</tt> is rendered at all. That is what happens to an
-      # animated image, which keeps its own format.
-      #
       # Any other options are passed on to {DynamicImage::Helper#dynamic_image_tag}.
       #
       # @param record_or_array [DynamicImage::Model, Array] the record, or an array of records for a nested route
@@ -56,11 +52,10 @@ module DynamicImage
       def dynamic_picture_tag(record_or_array, options = {})
         options = options.symbolize_keys
         picture = dynamic_picture(record_or_array, options)
+        source = picture_source_tag(picture) unless picture.sources.empty?
         image = picture_fallback_tag(record_or_array, picture, options)
 
-        return image if picture.sources.empty?
-
-        tag.picture { safe_join([picture_source_tag(picture), image]) }
+        tag.picture { safe_join([source, image].compact) }
       end
 
       # Renders a single <tt>source</tt> element, for composing a <tt>picture</tt> by hand.

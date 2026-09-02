@@ -93,8 +93,8 @@ describe DynamicImage::Helper::Pictures, type: :helper do
       let(:image) { Image.create(file: fixture("animated.gif", "image/gif")) }
       let(:options) { {} }
 
-      it "needs no picture element, having nothing to negotiate" do
-        expect(markup).to start_with("<img ")
+      it "renders no source, having nothing to negotiate" do
+        expect(markup).to match(%r{\A<picture><img .+ /></picture>\z})
       end
 
       it "keeps the stored format" do
