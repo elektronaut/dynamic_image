@@ -45,7 +45,7 @@ describe DynamicImage::Picture, type: :helper do
       let(:options) { { ratio: "9:16", breakpoints: 100..320, step: 1.4 } }
 
       it "is bounded by the crop, not the image" do
-        expect(picture.widths).to eq([110])
+        expect(picture.widths).to eq([113])
       end
     end
 

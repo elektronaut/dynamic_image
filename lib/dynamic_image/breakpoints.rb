@@ -66,11 +66,12 @@ module DynamicImage
     end
 
     def stepped(available)
-      top = [available, spec.end || available].min.to_f
+      top = [available, spec.end || available].min
       rest = Enumerator.produce(top / step) { _1 / step }
                        .take_while { _1 >= spec.begin }
+                       .map { snap(_1) }
 
-      [top, *rest].map { snap(_1) }.reverse.uniq
+      [top, *rest].reverse.uniq
     end
 
     def snap(width)

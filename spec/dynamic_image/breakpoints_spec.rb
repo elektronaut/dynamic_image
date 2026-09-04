@@ -48,8 +48,20 @@ describe DynamicImage::Breakpoints do
       expect(breakpoints.widths(200)).to eq([200])
     end
 
-    it "snaps candidates down to a multiple of ten" do
-      expect(breakpoints.widths(1103)).to eq([400, 560, 780, 1100])
+    it "never snaps the single candidate below the range" do
+      expect(breakpoints.widths(199)).to eq([199])
+    end
+
+    it "serves the image at its own width, not snapped down" do
+      expect(breakpoints.widths(16)).to eq([16])
+    end
+
+    it "snaps the interpolated steps down to a multiple of ten" do
+      expect(breakpoints.widths(1103)).to eq([400, 560, 780, 1103])
+    end
+
+    it "never snaps the available width itself" do
+      expect(breakpoints.widths(1103).last).to eq(1103)
     end
 
     it "never advertises more than the image has" do
