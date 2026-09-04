@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.3](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.2...dynamic_image/v3.1.3) (2026-09-04)
+
+
+### Bug Fixes
+
+* Don't snap the top breakpoint candidate below the image width ([f1fe196](https://github.com/elektronaut/dynamic_image/commit/f1fe19618a8093ea16e4762d4216b48d27c42ace))
+* Don't snap the top breakpoint candidate below the image width ([113609d](https://github.com/elektronaut/dynamic_image/commit/113609d5fdabb1988fa99c5e39962b5b2de5151a))
+
 ## [3.1.2](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.1...dynamic_image/v3.1.2) (2026-09-02)
 
 
