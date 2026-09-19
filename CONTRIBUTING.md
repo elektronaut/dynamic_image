@@ -21,7 +21,16 @@ bundle exec rspec
 ```
 
 The specs run against an internal Rails app in `spec/internal`, backed
-by SQLite locally and PostgreSQL in CI.
+by SQLite by default. CI also runs them against PostgreSQL, which you
+can reproduce locally with a running server:
+
+```sh
+DB=postgres bundle exec rake db:create db:migrate
+DB=postgres bundle exec rspec
+```
+
+The connection follows the standard `PGHOST`, `PGUSER` and
+`PGPASSWORD` environment variables.
 
 Check style before pushing:
 

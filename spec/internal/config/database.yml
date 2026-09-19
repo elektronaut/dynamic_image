@@ -1,9 +1,23 @@
-# SQLite version 3.x
-#   gem install sqlite3
-#
-#   Ensure the SQLite 3 gem is defined in your Gemfile
-#   gem 'sqlite3'
-#
+# Defaults to SQLite. Set DB=postgres to run against PostgreSQL, which
+# picks up the standard PGHOST/PGUSER/PGPASSWORD environment variables.
+<% if ENV["DB"] == "postgres" %>
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+
+development:
+  <<: *default
+  database: dynamic_image_development
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB", "dynamic_image_test") %>
+
+production:
+  <<: *default
+  database: dynamic_image_production
+<% else %>
 default: &default
   adapter: sqlite3
   pool: 5
@@ -13,9 +27,6 @@ development:
   <<: *default
   database: db/development.sqlite3
 
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
 test:
   <<: *default
   database: db/test.sqlite3
@@ -23,3 +34,4 @@ test:
 production:
   <<: *default
   database: db/production.sqlite3
+<% end %>

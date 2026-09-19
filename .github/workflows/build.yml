@@ -68,7 +68,7 @@ jobs:
           PGUSER: ${{ env.POSTGRES_USER }}
           PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
         run: |
-          bundle exec rake db:migrate
+          bundle exec rake db:create db:migrate
       - name: Run tests
         env:
           DB: postgres
