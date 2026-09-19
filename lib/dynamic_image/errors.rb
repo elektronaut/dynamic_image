@@ -28,8 +28,9 @@ module DynamicImage
     # @see DynamicImage::DigestVerifier#verify
     class InvalidSignature < DynamicImage::Errors::Error; end
 
-    # Raised when cropping is requested without both dimensions, as in <tt>size: "400x", crop: true</tt>. There is no
-    # way to crop to an exact size when one of them is unknown.
+    # Raised when a size can't be rendered. Either cropping was requested without both dimensions, as in
+    # <tt>size: "400x", crop: true</tt> — there is no way to crop to an exact size when one of them is unknown — or
+    # the size works out to less than a pixel, as <tt>"0x0"</tt> does, or <tt>"1x1"</tt> against a very wide image.
     #
     # @see DynamicImage::ImageSizing#fit
     class InvalidSizeOptions < DynamicImage::Errors::Error; end
