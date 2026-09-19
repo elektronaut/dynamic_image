@@ -78,7 +78,8 @@ module DynamicImage
     #   an array is negotiated against the image by {DynamicImage::FormatNegotiator}. Defaults to
     #   {DynamicImage.default_formats}, or {DynamicImage.mailer_formats} in a mailer view.
     # @return [String]
-    # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given without both dimensions
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given without both dimensions, or
+    #   if the size works out to less than a pixel
     #
     # Any options supported by +polymorphic_url+ are also accepted.
     #

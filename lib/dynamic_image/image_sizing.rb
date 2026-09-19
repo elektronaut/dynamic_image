@@ -79,7 +79,8 @@ module DynamicImage
     # @option options [Boolean] :upscale Don't limit to the size of the image. Images smaller than the given size will
     #   be scaled up.
     # @return [Vector2d] the resulting size
-    # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given and either dimension is zero
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given and either dimension is zero,
+    #   or if the result is less than a pixel in either dimension
     #
     # @example
     #   image = Image.find(params[:id]) # 320x200 image
@@ -101,6 +102,7 @@ module DynamicImage
       require_dimensions!(fit_size) if options[:crop]
       fit_size = size.fit(fit_size) unless options[:crop]
       fit_size = contain(fit_size)  unless options[:upscale]
+      require_pixels!(fit_size)
       fit_size
     end
 
@@ -156,7 +158,17 @@ module DynamicImage
     def require_dimensions!(vector)
       return if vector.x.positive? && vector.y.positive?
 
-      raise DynamicImage::Errors::InvalidSizeOptions
+      raise DynamicImage::Errors::InvalidSizeOptions,
+            "both dimensions are required when cropping"
+    end
+
+    # Rejects sizes that don't round to at least one pixel in each dimension, since there is no image to render at
+    # that point. A NaN, which is what an empty size fits to, fails this too.
+    def require_pixels!(vector)
+      return if vector.x >= 1 && vector.y >= 1
+
+      raise DynamicImage::Errors::InvalidSizeOptions,
+            "#{vector} has a dimension smaller than one pixel"
     end
 
     def shift_vector(vect)
