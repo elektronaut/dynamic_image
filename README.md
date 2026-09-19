@@ -357,7 +357,9 @@ image.save
 `rotate` turns the image, taking the crop along with it. The angle must
 be a multiple of 90.
 
-`resize` scales the stored file down and replaces the original.
+`resize` scales the stored file to fit within the given size and replaces
+the original. Note that it scales up as well as down: an image smaller
+than the given size will be upscaled.
 
 ### Outside of views
 

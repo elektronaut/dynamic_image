@@ -9,13 +9,17 @@ module DynamicImage
     # Both methods replace the data and update the stored dimensions, adjusting the crop to match. Neither saves
     # the record.
     module Transformations
-      # Resizes the image, replacing the stored file with a smaller one. The crop is scaled along with it.
+      # Resizes the image, replacing the stored file. The crop is scaled along with it.
       #
-      # @param max_size [Vector2d] the size to scale down to
+      # The image is scaled to fit within +max_size+, retaining its aspect ratio. Images smaller than +max_size+
+      # will be scaled up.
+      #
+      # @param max_size [Vector2d, String] the size to fit within, either a vector or a <tt>"{width}x{height}"</tt>
+      #   string. Either dimension may be omitted to scale by the other alone.
       # @return [self]
       def resize(max_size)
         transform_image do |image|
-          resized = image.resize(real_size.constrain_both(max_size))
+          resized = image.resize(real_size.fit(max_size))
           scale_crop(resized.size)
           resized
         end
