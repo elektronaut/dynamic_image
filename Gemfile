@@ -10,6 +10,7 @@ gemspec
 gem "jquery-rails"
 
 group :development, :test do
+  gem "pg"
   gem "pry"
   gem "pry-rescue"
   gem "pry-stack_explorer"
