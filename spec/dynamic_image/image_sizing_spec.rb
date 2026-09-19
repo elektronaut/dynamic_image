@@ -250,6 +250,40 @@ describe DynamicImage::ImageSizing do
       it { is_expected.to eq(v(500, 520)) }
     end
 
+    context "with an empty size" do
+      it "raises an error" do
+        expect { sizing.fit("x") }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "with both dimensions zero" do
+      it "raises an error" do
+        expect { sizing.fit(v(0, 0)) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "when the result is less than a pixel tall" do
+      it "raises an error" do
+        expect { sizing.fit(v(1, 1)) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "when the result is less than a pixel wide" do
+      let(:real_size) { v(200, 320) }
+
+      it "raises an error" do
+        expect { sizing.fit(v(1, 1)) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
     context "with a cropped image and normal sizing" do
       subject(:fit) { sizing.fit(v(1000, 1000)) }
 
