@@ -11,6 +11,10 @@ module DynamicImage
   #   sizing = DynamicImage::ImageSizing.new(image)
   #   sizing.fit("400x400") # => Vector2d(400.0, 250.0)
   class ImageSizing
+    # Scaling is done in floating point, so an axis that should land exactly on a whole pixel can come out a few
+    # ulps below it. Anything closer to a whole pixel than this is snapped onto it.
+    SNAP_TOLERANCE = 8 * Float::EPSILON
+
     # @param record [DynamicImage::Model] the image
     # @param options [Hash]
     # @option options [Boolean] :uncropped Ignore any crop stored on the record and size against the original image
@@ -101,7 +105,7 @@ module DynamicImage
       require_dimensions!(fit_size) if options[:crop]
       fit_size = size.fit(fit_size) unless options[:crop]
       fit_size = contain(fit_size)  unless options[:upscale]
-      fit_size
+      snap(fit_size)
     end
 
     private
@@ -164,6 +168,19 @@ module DynamicImage
         vect.x.negative? ? vect.x.abs : 0,
         vect.y.negative? ? vect.y.abs : 0
       )
+    end
+
+    # Snaps each axis of +scaled+ onto the whole pixel it is a rounding error away from. Callers floor the result,
+    # and would otherwise lose a pixel whenever scaling lands just below one.
+    def snap(scaled)
+      vector(snap_axis(scaled.x), snap_axis(scaled.y))
+    end
+
+    def snap_axis(value)
+      return value unless value.is_a?(Float)
+
+      rounded = value.round
+      (value - rounded).abs <= value.abs * SNAP_TOLERANCE ? rounded.to_f : value
     end
 
     def str_to_vector(str)
