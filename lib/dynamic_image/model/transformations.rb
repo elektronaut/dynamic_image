@@ -15,7 +15,7 @@ module DynamicImage
       # @return [self]
       def resize(max_size)
         transform_image do |image|
-          resized = image.resize(real_size.constrain_both(max_size))
+          resized = image.resize(real_size.fit(max_size))
           scale_crop(resized.size)
           resized
         end
