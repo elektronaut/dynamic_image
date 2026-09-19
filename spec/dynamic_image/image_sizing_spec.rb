@@ -162,6 +162,28 @@ describe DynamicImage::ImageSizing do
       it { is_expected.to eq(v(320, 200)) }
     end
 
+    context "when fit_size is larger and the width scales unevenly" do
+      subject(:fit) { sizing.fit(v(322, 0)) }
+
+      it { is_expected.to eq(v(320, 200)) }
+    end
+
+    context "when fit_size is larger and the height scales unevenly" do
+      subject(:fit) { sizing.fit(v(323, 0)) }
+
+      it { is_expected.to eq(v(320, 200)) }
+    end
+
+    context "when fit_size is smaller and scales unevenly" do
+      subject(:fit) { sizing.fit(v(379, 0)) }
+
+      let(:real_size) { v(3024, 4032) }
+
+      it "keeps the requested width" do
+        expect(fit.x).to eq(379)
+      end
+    end
+
     context "when fit_size is smaller and crop: true" do
       subject(:fit) { sizing.fit(v(100, 100), crop: true) }
 
@@ -188,6 +210,14 @@ describe DynamicImage::ImageSizing do
       subject(:fit) { sizing.fit(v(500, 500), crop: true) }
 
       it { is_expected.to eq(v(200, 200)) }
+    end
+
+    context "when fit_size is larger and crop: true, scaling unevenly" do
+      subject(:fit) { sizing.fit(v(321, 289), crop: true) }
+
+      it "fills the constraining axis exactly" do
+        expect(fit.y).to eq(200)
+      end
     end
 
     context "when fit_size is smaller and upscale: true" do

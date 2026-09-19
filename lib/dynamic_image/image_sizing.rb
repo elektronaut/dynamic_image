@@ -102,6 +102,7 @@ module DynamicImage
       require_dimensions!(fit_size) if options[:crop]
       fit_size = size.fit(fit_size) unless options[:crop]
       fit_size = contain(fit_size)  unless options[:upscale]
+      fit_size = snap(fit_size)
       require_pixels!(fit_size)
       fit_size
     end
@@ -176,6 +177,20 @@ module DynamicImage
         vect.x.negative? ? vect.x.abs : 0,
         vect.y.negative? ? vect.y.abs : 0
       )
+    end
+
+    # Snaps each axis of +scaled+ onto the whole pixel it is a rounding error away from. Scaling is done in floating
+    # point, so an axis that should land exactly on a pixel can come out a few ulps below it, and callers flooring
+    # the result would lose that pixel.
+    def snap(scaled)
+      vector(snap_axis(scaled.x), snap_axis(scaled.y))
+    end
+
+    def snap_axis(value)
+      return value unless value.is_a?(Float) && value.finite?
+
+      rounded = value.round
+      (value - rounded).abs <= value.abs * 8 * Float::EPSILON ? rounded.to_f : value
     end
 
     def str_to_vector(str)
