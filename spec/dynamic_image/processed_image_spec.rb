@@ -48,6 +48,18 @@ describe DynamicImage::ProcessedImage do
       end
     end
 
+    context "when the size doesn't land on a whole pixel" do
+      let(:record) { Image.create(data: image.read, filename: "test.png") }
+      let(:size) { Vector2d.new(100, 62.5) }
+
+      it { is_expected.to eq(Vector2d(100, 63)) }
+
+      it "records the rendered size on the variant" do
+        variant = processed.variant_for(size)
+        expect(Vector2d.new(variant.width, variant.height)).to eq(dimensions)
+      end
+    end
+
     context "when image isn't saved" do
       it { is_expected.to eq(size) }
 

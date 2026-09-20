@@ -197,6 +197,11 @@ describe DynamicImage::ImageProcessor do
       expect(resized.size).to eq(Vector2d(400, 250))
     end
 
+    it "rounds a fractional size to whole pixels" do
+      resized = processor.resize(Vector2d(100, 62.5))
+      expect(resized.size).to eq(Vector2d(100, 63))
+    end
+
     context "when image is animated" do
       let(:file) { image_file("animated.gif") }
       let(:image) { processor.resize(80) }
