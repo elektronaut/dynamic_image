@@ -33,6 +33,7 @@ module DynamicImage
     # the size works out to less than a pixel, as <tt>"0x0"</tt> does, or <tt>"1x1"</tt> against a very wide image.
     #
     # @see DynamicImage::ImageSizing#fit
+    # @see DynamicImage::Model::Transformations#resize
     class InvalidSizeOptions < DynamicImage::Errors::Error; end
 
     # Raised when a transformation can't be applied, either because a rotation isn't a multiple of 90 degrees or
