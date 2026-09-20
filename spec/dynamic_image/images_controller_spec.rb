@@ -146,6 +146,28 @@ describe ImagesController, type: :controller do
       end
     end
 
+    context "with a size only a pixel tall" do
+      # 1000x2, which is what a candidate width of 510 comes to
+      let(:image) do
+        Image.create(
+          file: Rack::Test::UploadedFile.new(
+            File.open(File.expand_path("../support/fixtures/wide.png",
+                                       __dir__)),
+            "image/png"
+          )
+        )
+      end
+
+      before do
+        get :show,
+            params: digested(:show, id: image.id, size: "510x1", format: :png)
+      end
+
+      it "renders it" do
+        expect(metadata.dimensions).to eq(Vector2d.new(510, 1))
+      end
+    end
+
     context "when format is GIF" do
       before do
         get :show,

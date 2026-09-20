@@ -56,6 +56,26 @@ describe DynamicImage::Picture, type: :helper do
         expect(picture.widths).to eq([110, 160, 220, 320])
       end
     end
+
+    context "with an extremely wide image" do
+      # 1000x2
+      let(:image) { Image.create(file: fixture("wide.png", "image/png")) }
+      let(:options) { { breakpoints: 100..1000, step: 1.4 } }
+
+      it "leaves out the widths it would be less than a pixel tall at" do
+        expect(picture.widths).to eq([510, 710, 1000])
+      end
+    end
+
+    context "with an image too wide for any of the breakpoints" do
+      # 1000x2
+      let(:image) { Image.create(file: fixture("wide.png", "image/png")) }
+      let(:options) { { breakpoints: 100..320, step: 1.4 } }
+
+      it "offers a single candidate at its own width" do
+        expect(picture.widths).to eq([1000])
+      end
+    end
   end
 
   describe "#variants" do
@@ -76,6 +96,16 @@ describe DynamicImage::Picture, type: :helper do
 
       it "crops to the ratio" do
         expect(picture.variants.last).to include(width: 200, height: 200)
+      end
+    end
+
+    context "with an extremely wide image" do
+      # 1000x2
+      let(:image) { Image.create(file: fixture("wide.png", "image/png")) }
+      let(:options) { { breakpoints: 100..1000, step: 1.4 } }
+
+      it "advertises a whole pixel of height" do
+        expect(picture.variants.pluck(:height)).to eq([1, 1, 2])
       end
     end
   end
@@ -202,6 +232,20 @@ describe DynamicImage::Picture, type: :helper do
       let(:options) { { fallback_width: 100 } }
 
       it { expect(picture.width).to eq(100) }
+    end
+
+    context "when the image is too wide to render at the width asked for" do
+      # 1000x2
+      let(:image) { Image.create(file: fixture("wide.png", "image/png")) }
+      let(:options) { { breakpoints: 100..1000, step: 1.4, fallback_width: 100 } }
+
+      it "asks for the widest candidate it can render instead" do
+        expect(picture.fallback_size).to eq("1000x")
+      end
+
+      it "reserves a box at least a pixel tall" do
+        expect([picture.width, picture.height]).to eq([1000, 2])
+      end
     end
   end
 

@@ -89,6 +89,15 @@ describe DynamicImage::Helper::Pictures, type: :helper do
       end
     end
 
+    context "with an extremely wide image" do
+      # 1000x2, less than a pixel tall at any of the breakpoints
+      let(:image) { Image.create(file: fixture("wide.png", "image/png")) }
+
+      it "renders the widths it can, rather than raising" do
+        expect(markup).to include('width="1000" height="2"')
+      end
+    end
+
     context "with an animated image" do
       let(:image) { Image.create(file: fixture("animated.gif", "image/gif")) }
       let(:options) { {} }

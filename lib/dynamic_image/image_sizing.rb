@@ -114,30 +114,59 @@ module DynamicImage
       fit_size
     end
 
+    # Fits the size like {#fit}, but returns the smallest size the image can be rendered at rather than raising when
+    # the result lands under a pixel.
+    #
+    # @param fit_size [Vector2d, String] the size to fit within, as taken by {#fit}
+    # @param options [Hash] as taken by {#fit}
+    # @return [Vector2d] the resulting size
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if the size is zero on both axes, or if <tt>crop: true</tt>
+    #   is given and the crop is less than a pixel
+    #
+    # @example
+    #   image = Image.find(params[:id]) # 2000x1 image
+    #   sizing = DynamicImage::ImageSizing.new(image)
+    #
+    #   sizing.fit_renderable("1200x") # => Vector2d(2000.0, 1.0)
+    def fit_renderable(fit_size, options = {})
+      require_nonzero!(parse_vector(fit_size))
+      return fit(fit_size, options) if options[:crop] || renderable?(fit_size, options)
+
+      size.cover(1).round
+    end
+
+    # Returns true if the image can be rendered at +fit_size+, false if {#fit} rejects it.
+    #
+    # @param fit_size [Vector2d, String] the size to fit within, as taken by {#fit}
+    # @param options [Hash] as taken by {#fit}
+    # @return [Boolean]
+    #
+    # @example
+    #   image = Image.find(params[:id]) # 320x200 image
+    #   sizing = DynamicImage::ImageSizing.new(image)
+    #
+    #   sizing.renderable?(Vector2d(100, 0)) # => true
+    #   sizing.renderable?(Vector2d(1, 0))   # => false
+    def renderable?(fit_size, options = {})
+      vector = parse_vector(fit_size)
+      return false if options[:crop] && !(vector.x.positive? && vector.y.positive?)
+      return false if vector.x.zero? && vector.y.zero?
+
+      pixels?(snap(scale(vector, options)))
+    end
+
     private
 
     def crop_gravity
-      if uncropped? && !record.crop_gravity?
-        size / 2
-      else
-        record.crop_gravity
-      end
+      uncropped? && !record.crop_gravity? ? size / 2 : record.crop_gravity
     end
 
     def crop_start
-      if uncropped?
-        Vector2d.new(0, 0)
-      else
-        record.crop_start
-      end
+      uncropped? ? Vector2d.new(0, 0) : record.crop_start
     end
 
     def size
-      if uncropped?
-        record.real_size
-      else
-        record.size
-      end
+      uncropped? ? record.real_size : record.size
     end
 
     # Clamps the rectangle defined by +start+ and +size+ to fit inside 0, 0 and +max_size+. It is assumed that +size+
@@ -182,10 +211,14 @@ module DynamicImage
     # Rejects sizes that don't round to at least one pixel in each dimension, since there is no image to render at
     # that point.
     def require_pixels!(vector)
-      return if vector.x >= 1 && vector.y >= 1
+      return if pixels?(vector)
 
       raise DynamicImage::Errors::InvalidSizeOptions,
             "#{vector} has a dimension smaller than one pixel"
+    end
+
+    def pixels?(vector)
+      vector.x >= 1 && vector.y >= 1
     end
 
     def shift_vector(vect)
