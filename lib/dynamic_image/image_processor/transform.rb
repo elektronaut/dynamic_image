@@ -31,7 +31,20 @@ module DynamicImage
       # @param new_size [Vector2d] the size to fit within
       # @return [DynamicImage::ImageProcessor] a new processor
       def resize(new_size)
-        new_size = size.fit(Vector2d(new_size)).round
+        resize_exact(size.fit(Vector2d(new_size)))
+      end
+
+      # Resizes the image to exactly +new_size+, rounded to whole pixels. The aspect ratio is not retained, so the
+      # image is stretched if the size doesn't match its own ratio.
+      #
+      # Use this when the size has already been worked out and has to be honored as given, as it is for a size
+      # coming from a URL. {DynamicImage::ImageSizing} computed it against this image, the helper committed to it in
+      # the markup, and refitting it here would land on a different size than the one advertised.
+      #
+      # @param new_size [Vector2d] the size to render
+      # @return [DynamicImage::ImageProcessor] a new processor
+      def resize_exact(new_size)
+        new_size = Vector2d(new_size).round
         apply image.thumbnail_image(new_size.x,
                                     height: new_size.y,
                                     crop: :none,

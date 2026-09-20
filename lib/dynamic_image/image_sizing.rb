@@ -7,6 +7,11 @@ module DynamicImage
   # image, and it can be used on its own when you need the size without rendering anything: reserving space in a
   # layout, filling in <tt>og:image:width</tt>, or laying out a PDF.
   #
+  # The size it returns is the size that gets rendered. The helper floors it into the URL and the markup, and
+  # {DynamicImage::ImageProcessor::Transform#resize_exact} honors that number instead of fitting it again. Scaling
+  # is done in floating point, so +snap+ pulls an axis that lands a rounding error below a whole pixel back onto it
+  # before the helper's floor can drop the pixel.
+  #
   # @example
   #   sizing = DynamicImage::ImageSizing.new(image)
   #   sizing.fit("400x400") # => Vector2d(400.0, 250.0)
