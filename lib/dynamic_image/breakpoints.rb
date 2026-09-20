@@ -61,15 +61,15 @@ module DynamicImage
     private
 
     def fixed(available)
-      widths = spec.map(&:to_i).select { _1 <= available }.uniq.sort
+      widths = spec.map(&:to_i).select { it <= available }.uniq.sort
       widths.any? ? widths : [available]
     end
 
     def stepped(available)
       top = [available, spec.end || available].min
-      rest = Enumerator.produce(top / step) { _1 / step }
-                       .take_while { _1 >= spec.begin }
-                       .map { snap(_1) }
+      rest = Enumerator.produce(top / step) { it / step }
+                       .take_while { it >= spec.begin }
+                       .map { snap(it) }
 
       [top, *rest].reverse.uniq
     end
