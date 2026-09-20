@@ -98,7 +98,7 @@ module DynamicImage
     #   # => Vector2d(160.0, 100.0)
     #
     #   sizing.fit(Vector2d(500, 500))
-    #   # => Vector2d(320.0, 200.0)
+    #   # => Vector2d(320, 200)
     #
     #   sizing.fit(Vector2d(500, 500), crop: true)
     #   # => Vector2d(200.0, 200.0)
@@ -109,9 +109,7 @@ module DynamicImage
       fit_size = parse_vector(fit_size)
       require_dimensions!(fit_size) if options[:crop]
       require_nonzero!(fit_size)
-      fit_size = size.fit(fit_size) unless options[:crop]
-      fit_size = contain(fit_size)  unless options[:upscale]
-      fit_size = snap(fit_size)
+      fit_size = snap(scale(fit_size, options))
       require_pixels!(fit_size)
       fit_size
     end
@@ -152,11 +150,12 @@ module DynamicImage
       start
     end
 
-    # Scales +fit_size+ down to fit inside the image, leaving it alone if it already does.
-    def contain(fit_size)
-      return fit_size unless fit_size.x > size.x || fit_size.y > size.y
+    # Scales +fit_size+ against the image, honouring <tt>:crop</tt> and <tt>:upscale</tt>.
+    def scale(fit_size, options)
+      upscale = options[:upscale] ? true : false
+      return size.fit(fit_size, upscale:) unless options[:crop]
 
-      fit_size.fit(size)
+      upscale ? fit_size : fit_size.fit(size, upscale: false)
     end
 
     def parse_vector(vector)
