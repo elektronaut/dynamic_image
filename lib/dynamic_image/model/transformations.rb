@@ -22,7 +22,7 @@ module DynamicImage
       # @raise [DynamicImage::Errors::InvalidImage] if the stored data can't be processed
       def resize(max_size)
         transform_image do |image|
-          resized = image.resize(fit_size(max_size))
+          resized = image.resize_exact(fit_size(max_size))
           scale_crop(resized.size)
           resized
         end

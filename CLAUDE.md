@@ -47,6 +47,8 @@ What gets served is decided in two places, not by a per-format flag. `DynamicIma
 
 Cropping always happens before resizing. `ImageSizing` computes both: `crop_geometry` returns the crop rect scaled to the source image, and `fit` computes the final dimensions honoring `:crop` and `:upscale`.
 
+The floored size in the URL is what gets rendered: `ImageSizing` computes it, the helper commits to it in the markup, and `ImageProcessor#resize_exact` honors it rather than refitting it against the source. That is why `snap` exists — it is what makes the helper's `.floor` safe. `ImageProcessor#resize` keeps the fit-inside-a-box semantics and is not used by the request path.
+
 ### Variants
 
 Each processed size is persisted as a `DynamicImage::Variant` — a `Dis::Model` of its own under `dis_type` `"image-variants"`, with a unique index on image, format and the full crop geometry. `ProcessedImage#find_or_create_variant` rescues `RecordNotUnique` to handle concurrent requests for the same size, and `find_variant` self-heals by destroying records whose blob has gone missing from storage. Variants are destroyed on `before_update` when the image data changes.

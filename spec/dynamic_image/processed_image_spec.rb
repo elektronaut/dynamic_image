@@ -60,6 +60,13 @@ describe DynamicImage::ProcessedImage do
       end
     end
 
+    context "when the fitted size doesn't land on the image's ratio" do
+      let(:record) { Image.create(data: image.read, filename: "test.png") }
+      let(:size) { DynamicImage::ImageSizing.new(record).fit("247x247").floor }
+
+      it { is_expected.to eq(Vector2d(247, 154)) }
+    end
+
     context "when image isn't saved" do
       it { is_expected.to eq(size) }
 

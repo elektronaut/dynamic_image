@@ -21,7 +21,7 @@ module DynamicImage
   #   DynamicImage::ImageProcessor
   #     .new(file)
   #     .crop(crop_start, crop_size)
-  #     .resize(size)
+  #     .resize_exact(size)
   #     .convert(:jpeg)
   #     .read
   class ImageProcessor

@@ -216,6 +216,32 @@ describe DynamicImage::ImageProcessor do
     end
   end
 
+  describe "#resize_exact" do
+    it "renders the size it was given" do
+      resized = processor.resize_exact(Vector2d(247, 154))
+      expect(resized.size).to eq(Vector2d(247, 154))
+    end
+
+    it "stretches the image to a size off its aspect ratio" do
+      resized = processor.resize_exact(Vector2d(400, 400))
+      expect(resized.size).to eq(Vector2d(400, 400))
+    end
+
+    it "rounds a fractional size to whole pixels" do
+      resized = processor.resize_exact(Vector2d(100, 62.5))
+      expect(resized.size).to eq(Vector2d(100, 63))
+    end
+
+    context "when image is animated" do
+      let(:file) { image_file("animated.gif") }
+      let(:image) { processor.resize_exact(Vector2d(80, 80)) }
+
+      it "resizes all frames" do
+        expect(reread.frame(2).size).to eq(Vector2d(80, 80))
+      end
+    end
+  end
+
   describe "#rotate" do
     it "rotates the image" do
       expect(processor.rotate(90).size).to eq(Vector2d(200, 320))
