@@ -58,6 +58,14 @@ describe DynamicImage::Model::Transformations do
       end
     end
 
+    context "when the size doesn't land on a whole pixel" do
+      subject(:resized) { image.resize("100x100") }
+
+      it "rounds the size" do
+        expect(resized.real_size).to eq(Vector2d(100, 63))
+      end
+    end
+
     context "when the crop rounds down to nothing" do
       subject(:resized) { image.resize("16x16") }
 

@@ -25,16 +25,17 @@ module DynamicImage
         end
       end
 
-      # Resize the image to a new size. The aspect ratio is not preserved; crop first if that matters.
+      # Resizes the image to fit within +new_size+, retaining its aspect ratio. Crop first if the image needs to
+      # fill the size exactly.
       #
-      # @param new_size [Vector2d] the size to resize to
+      # @param new_size [Vector2d] the size to fit within
       # @return [DynamicImage::ImageProcessor] a new processor
       def resize(new_size)
-        new_size = Vector2d(new_size)
-        apply image.thumbnail_image(new_size.x.to_i,
-                                    height: new_size.y.to_i,
+        new_size = size.fit(Vector2d(new_size)).round
+        apply image.thumbnail_image(new_size.x,
+                                    height: new_size.y,
                                     crop: :none,
-                                    size: :both)
+                                    size: :force)
       end
 
       # Rotates the image. The rotation must be a multiple of 90 degrees.
