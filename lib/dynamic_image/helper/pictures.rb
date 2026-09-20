@@ -45,6 +45,8 @@ module DynamicImage
       # @option options [Integer] :fallback_width The width to ask for the <tt>img</tt>, overriding
       #   {DynamicImage.picture_fallback_width}
       # @return [String] the picture element
+      # @raise [DynamicImage::Errors::InvalidSizeOptions] if the image has less than a pixel to render at the
+      #   requested ratio
       #
       # @example
       #   dynamic_picture_tag(image, sizes: "50vw", alt: "A kitten")

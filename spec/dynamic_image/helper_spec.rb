@@ -43,6 +43,28 @@ describe DynamicImage::Helper, type: :helper do
       end
     end
 
+    context "with an image too wide to render that small" do
+      # 1000x2
+      let(:image) do
+        Image.create(
+          file: Rack::Test::UploadedFile.new(
+            File.open(File.expand_path("../support/fixtures/wide.png",
+                                       __dir__)),
+            "image/png"
+          )
+        )
+      end
+      let(:options) { { size: "400x" } }
+
+      it "renders the smallest size that holds the whole frame" do
+        expect(tag).to include("/500x1/")
+      end
+
+      it "lays it out at the size asked for" do
+        expect(tag).to include('width="400" height="1"')
+      end
+    end
+
     context "with HTML options" do
       let(:options) { { size: "100x100", alt: "Foobar", class: "foo" } }
       let(:digest) { generate_digest("show-#{image.id}-100x62") }

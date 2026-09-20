@@ -314,4 +314,74 @@ describe DynamicImage::ImageSizing do
       it { is_expected.to eq(v(520, 500)) }
     end
   end
+
+  describe "#fit_renderable" do
+    subject(:renderable) { sizing.fit_renderable(v(100, 100)) }
+
+    it { is_expected.to eq(v(100, 62.5)) }
+
+    context "when the result is less than a pixel tall" do
+      subject(:renderable) { sizing.fit_renderable(v(1, 1)) }
+
+      it { is_expected.to eq(v(2, 1)) }
+    end
+
+    context "with an extremely wide image" do
+      subject(:renderable) { sizing.fit_renderable("400x") }
+
+      let(:real_size) { v(1000, 2) }
+
+      it { is_expected.to eq(v(500, 1)) }
+    end
+
+    context "with an extremely tall image" do
+      subject(:renderable) { sizing.fit_renderable("x400") }
+
+      let(:real_size) { v(2, 1000) }
+
+      it { is_expected.to eq(v(1, 500)) }
+    end
+
+    context "with a crop that leaves less than a pixel" do
+      let(:real_size) { v(1000, 2) }
+
+      it "raises an error" do
+        expect { sizing.fit_renderable(v(1, 3), crop: true) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "with an empty size" do
+      it "raises an error" do
+        expect { sizing.fit_renderable("x") }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+  end
+
+  describe "#renderable?" do
+    subject(:renderable) { sizing.renderable?(v(100, 0)) }
+
+    it { is_expected.to be(true) }
+
+    context "when the result is less than a pixel tall" do
+      subject(:renderable) { sizing.renderable?(v(1, 0)) }
+
+      it { is_expected.to be(false) }
+    end
+
+    context "with an extremely wide image" do
+      let(:real_size) { v(1000, 2) }
+
+      it { is_expected.to be(false) }
+    end
+
+    context "when the options rule the size out" do
+      subject(:renderable) { sizing.renderable?(v(100, 0), crop: true) }
+
+      it { is_expected.to be(false) }
+    end
+  end
 end

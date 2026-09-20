@@ -28,7 +28,7 @@ module DynamicImage
     # @!attribute [r] breakpoints
     #   @return [DynamicImage::Breakpoints] the candidate widths
     # @!attribute [r] fallback_width
-    #   @return [Integer] the width asked for the fallback image
+    #   @return [Integer] the width configured for the fallback image
     attr_reader :template, :record_or_array, :ratio, :sizes, :breakpoints, :fallback_width, :url_options
 
     # @param template [ActionView::Base] the view context, for routing
@@ -77,9 +77,13 @@ module DynamicImage
 
     # The candidate widths, smallest first.
     #
+    # Widths the image can't be rendered at are left out. One that can't be rendered at any of them gets a single
+    # candidate at its available width.
+    #
     # @return [Array<Integer>]
     def widths
-      @widths ||= breakpoints.widths(available_width)
+      @widths ||= breakpoints.widths(available_width).select { renderable?(it) }.presence ||
+                  [available_width].select { renderable?(it) }
     end
 
     # Every candidate, as the URL and the size it is actually rendered at.
@@ -128,9 +132,12 @@ module DynamicImage
 
     # The size asked for the fallback image, as a <tt>"{width}x{height}"</tt> string.
     #
+    # This is {#fallback_width}, unless the image can't be rendered that wide, in which case the widest candidate
+    # it can be rendered at stands in.
+    #
     # @return [String]
     def fallback_size
-      @fallback_size ||= size_for(fallback_width)
+      @fallback_size ||= size_for(renderable?(fallback_width) ? fallback_width : (widths.last || fallback_width))
     end
 
     # The size the fallback image is actually rendered at. Smaller than {#fallback_size} when the image is.
@@ -169,6 +176,10 @@ module DynamicImage
 
     def breakpoints_from(options)
       DynamicImage::Breakpoints.new(options[:breakpoints], step: options[:step])
+    end
+
+    def renderable?(width)
+      sizing.renderable?(size_for(width), crop: crop?)
     end
 
     def record

@@ -54,9 +54,11 @@ module DynamicImage
     #   # => <img alt="Avatar" src="..." width="100" height="62" />
     def dynamic_image_tag(record_or_array, options = {})
       record = extract_dynamic_image_record(record_or_array)
+      requested = options[:size]
       size = fit_size!(record_or_array, options)
       url_options = options.extract!(*allowed_dynamic_image_url_options)
-      html_options = { size:, alt: record.alt_text }.merge(options)
+      html_options = { size: display_size(size, requested), alt: record.alt_text }
+                     .merge(options)
 
       image_tag(dynamic_image_path_with_size(record_or_array,
                                              size,
@@ -78,8 +80,8 @@ module DynamicImage
     #   an array is negotiated against the image by {DynamicImage::FormatNegotiator}. Defaults to
     #   {DynamicImage.default_formats}, or {DynamicImage.mailer_formats} in a mailer view.
     # @return [String]
-    # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given without both dimensions, or
-    #   if the size works out to less than a pixel
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if the size is zero on both axes, or if <tt>crop: true</tt>
+    #   is given without both dimensions or leaves less than a pixel to render
     #
     # Any options supported by +polymorphic_url+ are also accepted.
     #
@@ -218,7 +220,16 @@ module DynamicImage
     def image_sizing(record, size_opts, uncropped)
       ImageSizing
         .new(record, uncropped:)
-        .fit(size_opts[:size], size_opts).floor.to_s
+        .fit_renderable(size_opts[:size], size_opts).floor.to_s
+    end
+
+    # Ensure either dimension is at least 1px
+    def display_size(size, requested)
+      return size unless requested
+
+      Vector2d.parse(size)
+              .fit(Vector2d.parse(requested), upscale: false)
+              .floor.max(1).to_s
     end
   end
 end
