@@ -17,9 +17,11 @@ module DynamicImage
       # @param max_size [Vector2d, String] the size to fit within, either a vector or a <tt>"{width}x{height}"</tt>
       #   string. Either dimension may be omitted to scale by the other alone.
       # @return [self]
+      # @raise [DynamicImage::Errors::InvalidSizeOptions] if the result is less than a pixel in either dimension
+      # @raise [DynamicImage::Errors::InvalidImage] if the stored data can't be processed
       def resize(max_size)
         transform_image do |image|
-          resized = image.resize(real_size.fit(max_size))
+          resized = image.resize(fit_size(max_size))
           scale_crop(resized.size)
           resized
         end
@@ -30,6 +32,7 @@ module DynamicImage
       # @param degrees [Integer] the angle, which must be a multiple of 90. Rotating by 0 is a no-op.
       # @return [self]
       # @raise [DynamicImage::Errors::InvalidTransformation] if the angle isn't a multiple of 90
+      # @raise [DynamicImage::Errors::InvalidImage] if the stored data can't be processed
       #
       # @example
       #   image.rotate(90)
@@ -51,6 +54,16 @@ module DynamicImage
       end
 
       private
+
+      # Scales +max_size+ against the image, rejecting a result smaller than a pixel in either dimension, as
+      # {DynamicImage::ImageSizing#fit} does for the sizes rendered on request.
+      def fit_size(max_size)
+        new_size = real_size.fit(max_size)
+        return new_size if new_size.x >= 1 && new_size.y >= 1
+
+        raise DynamicImage::Errors::InvalidSizeOptions,
+              "#{new_size} has a dimension smaller than one pixel"
+      end
 
       def scale_crop(new_size)
         scale = new_size.to_f_vector / real_size
@@ -121,6 +134,8 @@ module DynamicImage
         end
         read_image_metadata
         self
+      rescue Vips::Error => e
+        raise DynamicImage::Errors::InvalidImage, e.message
       end
     end
   end

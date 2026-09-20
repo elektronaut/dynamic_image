@@ -77,6 +77,27 @@ describe DynamicImage::Model::Transformations do
         expect(resized.crop_gravity).to eq(Vector2d(1, 1))
       end
     end
+
+    context "when the size is smaller than a pixel" do
+      subject(:resized) { image.resize("0x0") }
+
+      it "raises an error" do
+        expect { resized }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "when vips fails to process the data" do
+      before do
+        allow(DynamicImage::ImageProcessor)
+          .to receive(:new).and_raise(Vips::Error, "unable to read")
+      end
+
+      it "raises an error" do
+        expect { resized }.to raise_error(DynamicImage::Errors::InvalidImage)
+      end
+    end
   end
 
   describe "#rotate" do
@@ -93,6 +114,17 @@ describe DynamicImage::Model::Transformations do
         expect { image.rotate(45) }.to(
           raise_error(DynamicImage::Errors::InvalidTransformation)
         )
+      end
+    end
+
+    context "when vips fails to process the data" do
+      before do
+        allow(DynamicImage::ImageProcessor)
+          .to receive(:new).and_raise(Vips::Error, "unable to read")
+      end
+
+      it "raises an error" do
+        expect { rotated }.to raise_error(DynamicImage::Errors::InvalidImage)
       end
     end
 
