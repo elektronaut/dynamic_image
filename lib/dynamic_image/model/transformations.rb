@@ -17,7 +17,8 @@ module DynamicImage
       # @param max_size [Vector2d, String] the size to fit within, either a vector or a <tt>"{width}x{height}"</tt>
       #   string. Either dimension may be omitted to scale by the other alone.
       # @return [self]
-      # @raise [DynamicImage::Errors::InvalidSizeOptions] if the result is less than a pixel in either dimension
+      # @raise [DynamicImage::Errors::InvalidSizeOptions] if the size is zero on both axes, or if the result is less
+      #   than a pixel in either dimension
       # @raise [DynamicImage::Errors::InvalidImage] if the stored data can't be processed
       def resize(max_size)
         transform_image do |image|
@@ -55,9 +56,14 @@ module DynamicImage
 
       private
 
-      # Scales +max_size+ against the image, rejecting a result smaller than a pixel in either dimension, as
-      # {DynamicImage::ImageSizing#fit} does for the sizes rendered on request.
+      # Scales +max_size+ against the image, rejecting a size that is zero on both axes and a result smaller than a
+      # pixel in either dimension, as {DynamicImage::ImageSizing#fit} does for the sizes rendered on request.
       def fit_size(max_size)
+        max_size = Vector2d.parse(max_size)
+        if max_size.x.zero? && max_size.y.zero?
+          raise DynamicImage::Errors::InvalidSizeOptions, "#{max_size} has no size"
+        end
+
         new_size = real_size.fit(max_size)
         return new_size if new_size.x >= 1 && new_size.y >= 1
 

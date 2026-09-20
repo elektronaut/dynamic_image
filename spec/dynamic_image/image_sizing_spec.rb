@@ -58,6 +58,14 @@ describe DynamicImage::ImageSizing do
 
       it { is_expected.to eq([v(200, 200), v(120, 0)]) }
     end
+
+    context "with both dimensions zero" do
+      it "raises an error" do
+        expect { crop_geometry(0, 0) }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
   end
 
   describe "#crop_geometry (cropped image)" do
