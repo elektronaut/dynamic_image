@@ -79,6 +79,16 @@ describe DynamicImage::Model::Transformations do
     end
 
     context "when the size is smaller than a pixel" do
+      subject(:resized) { image.resize("1x1") }
+
+      it "raises an error" do
+        expect { resized }.to(
+          raise_error(DynamicImage::Errors::InvalidSizeOptions)
+        )
+      end
+    end
+
+    context "with both dimensions zero" do
       subject(:resized) { image.resize("0x0") }
 
       it "raises an error" do

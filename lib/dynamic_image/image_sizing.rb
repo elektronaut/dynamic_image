@@ -27,6 +27,7 @@ module DynamicImage
     #
     # @param ratio_vector [Vector2d] the aspect ratio to crop to
     # @return [Array(Vector2d, Vector2d)] the crop size and crop start
+    # @raise [DynamicImage::Errors::InvalidSizeOptions] if the vector is zero on both axes
     #
     # @example
     #   image = Image.find(params[:id]) # 320x200 image
@@ -35,6 +36,8 @@ module DynamicImage
     #   sizing.crop_geometry(Vector2d(100, 100))
     #   # => [Vector2d(200, 200), Vector2d(60, 0)]
     def crop_geometry(ratio_vector)
+      require_nonzero!(ratio_vector)
+
       # Maximize the crop area to fit the image size
       crop_size = ratio_vector.fit(size).round
 
@@ -66,7 +69,7 @@ module DynamicImage
       ratio = DynamicImage::Ratio.parse(ratio)
       return size.x.floor unless ratio
 
-      crop_geometry(vector(ratio, 1)).first.x.floor
+      crop_geometry(Vector2d.new(ratio, 1)).first.x.floor
     end
 
     # Adjusts +fit_size+ to fit the image dimensions. Any dimension set to zero will be ignored.
@@ -80,7 +83,7 @@ module DynamicImage
     #   be scaled up.
     # @return [Vector2d] the resulting size
     # @raise [DynamicImage::Errors::InvalidSizeOptions] if <tt>crop: true</tt> is given and either dimension is zero,
-    #   or if the result is less than a pixel in either dimension
+    #   if the size is zero on both axes, or if the result is less than a pixel in either dimension
     #
     # @example
     #   image = Image.find(params[:id]) # 320x200 image
@@ -100,6 +103,7 @@ module DynamicImage
     def fit(fit_size, options = {})
       fit_size = parse_vector(fit_size)
       require_dimensions!(fit_size) if options[:crop]
+      require_nonzero!(fit_size)
       fit_size = size.fit(fit_size) unless options[:crop]
       fit_size = contain(fit_size)  unless options[:upscale]
       fit_size = snap(fit_size)
@@ -163,8 +167,16 @@ module DynamicImage
             "both dimensions are required when cropping"
     end
 
+    # Rejects a vector that is zero on both axes. A single zero axis means the axis is unconstrained, but a vector
+    # that is zero throughout constrains nothing and describes no image.
+    def require_nonzero!(vector)
+      return unless vector.x.zero? && vector.y.zero?
+
+      raise DynamicImage::Errors::InvalidSizeOptions, "#{vector} has no size"
+    end
+
     # Rejects sizes that don't round to at least one pixel in each dimension, since there is no image to render at
-    # that point. A NaN, which is what an empty size fits to, fails this too.
+    # that point.
     def require_pixels!(vector)
       return if vector.x >= 1 && vector.y >= 1
 
@@ -173,7 +185,7 @@ module DynamicImage
     end
 
     def shift_vector(vect)
-      vector(
+      Vector2d.new(
         vect.x.negative? ? vect.x.abs : 0,
         vect.y.negative? ? vect.y.abs : 0
       )
@@ -183,7 +195,7 @@ module DynamicImage
     # point, so an axis that should land exactly on a pixel can come out a few ulps below it, and callers flooring
     # the result would lose that pixel.
     def snap(scaled)
-      vector(snap_axis(scaled.x), snap_axis(scaled.y))
+      Vector2d.new(snap_axis(scaled.x), snap_axis(scaled.y))
     end
 
     def snap_axis(value)
@@ -200,10 +212,6 @@ module DynamicImage
 
     def uncropped?
       @uncropped
-    end
-
-    def vector(width, height)
-      Vector2d.new(width, height)
     end
   end
 end
