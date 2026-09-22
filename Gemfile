@@ -21,7 +21,7 @@ group :development, :test do
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
   gem "rubocop-rspec_rails", require: false
-  gem "simplecov", "~> 1.2.0"
+  gem "simplecov", "~> 1.3.0"
   gem "sqlite3"
   gem "yard", require: false
 end
