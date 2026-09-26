@@ -60,3 +60,7 @@ Tests run against an internal Rails app at `spec/internal`, SQLite locally and P
 ## Rubocop
 
 `Layout/LineLength` is left at the default max of 120 and auto-corrects. The working target is 118 for Ruby, including doc comments; `README.md` wraps at 78. Plugins: rubocop-rails, rubocop-rspec, rubocop-rspec_rails. Target Ruby 3.2, target Rails 7.2. `Style/Documentation` is disabled.
+
+## Issues and pull requests
+
+Before filing an issue or opening a pull request, read CONTRIBUTING.md and follow it. Use the exact headings from its skeletons. Report only what you observed or verified, and don't include hypotheses about causes. Open an issue before writing non-trivial code; only changes with one obvious fix (typos, broken links, clear-cut fixes) go straight to a pull request.
