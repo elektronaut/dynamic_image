@@ -1,5 +1,27 @@
 # Changelog
 
+## [4.0.0](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.3...dynamic_image/v4.0.0) (2026-09-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* Ruby 3.4 is now the minimum version, up from 3.3.
+
+### Features
+
+* Render the exact size the URL advertises ([#148](https://github.com/elektronaut/dynamic_image/issues/148)) ([057523f](https://github.com/elektronaut/dynamic_image/commit/057523fd03d035e82d825b2036968c1b355d945e))
+
+
+### Bug Fixes
+
+* Guard against zero sizes and require Ruby 3.4 ([#146](https://github.com/elektronaut/dynamic_image/issues/146)) ([645ce79](https://github.com/elektronaut/dynamic_image/commit/645ce7975bc3f4080529098e4c834f96963681b4))
+* Reject sizes smaller than a pixel ([#142](https://github.com/elektronaut/dynamic_image/issues/142)) ([59aaa9e](https://github.com/elektronaut/dynamic_image/commit/59aaa9ea5f119025c4715a0ed5d2c8a1f86e5b42))
+* Reject sub-pixel resizes and wrap vips errors ([#145](https://github.com/elektronaut/dynamic_image/issues/145)) ([0554e6a](https://github.com/elektronaut/dynamic_image/commit/0554e6a6c26f78c9fb1b08f5580e010cfeb05f42))
+* Render extreme aspect ratios instead of raising ([#150](https://github.com/elektronaut/dynamic_image/issues/150)) ([6ed8514](https://github.com/elektronaut/dynamic_image/commit/6ed8514df9411e03076472e8c346275fca1ec21c))
+* Require vector2d 3.0 ([#149](https://github.com/elektronaut/dynamic_image/issues/149)) ([1756cb8](https://github.com/elektronaut/dynamic_image/commit/1756cb8b1d5d6ffa57df83492784205d60a33f65)), closes [#141](https://github.com/elektronaut/dynamic_image/issues/141)
+* Round resized dimensions to whole pixels ([#147](https://github.com/elektronaut/dynamic_image/issues/147)) ([563bd52](https://github.com/elektronaut/dynamic_image/commit/563bd524dee75893f218f0bcf9313f12017732c2))
+* Snap computed sizes to whole pixels ([#144](https://github.com/elektronaut/dynamic_image/issues/144)) ([1e16feb](https://github.com/elektronaut/dynamic_image/commit/1e16feb34bbea50835970fa222ff1b31cc94519b))
+
 ## [3.1.3](https://github.com/elektronaut/dynamic_image/compare/dynamic_image/v3.1.2...dynamic_image/v3.1.3) (2026-09-04)
 
 
