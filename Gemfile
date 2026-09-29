@@ -3,7 +3,7 @@
 source "https://rubygems.org"
 
 gem "mime-types"
-gem "rails", "~> 8.1.3"
+gem "rails", "~> 8.1.4"
 
 gemspec
 
@@ -21,7 +21,7 @@ group :development, :test do
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
   gem "rubocop-rspec_rails", require: false
-  gem "simplecov", "~> 1.3.0"
+  gem "simplecov", "~> 1.3.1"
   gem "sqlite3"
   gem "yard", require: false
 end
