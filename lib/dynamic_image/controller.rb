@@ -37,6 +37,7 @@ module DynamicImage
     included do
       before_action :verify_signed_params
       before_action :find_record
+      before_action :redirect_to_canonical_id
       after_action :cache_expiration_header
       helper_method :requested_size
     end
@@ -95,6 +96,15 @@ module DynamicImage
     # Finds the record being served. Override to scope the lookup.
     def find_record
       @record = model.find(params[:id])
+    end
+
+    # Redirects permanently to the same URL with the record's +to_param+ as the id, unless the URL already uses it.
+    def redirect_to_canonical_id
+      return if params[:id] == @record.to_param
+
+      expires_now
+      redirect_to url_for(params.permit(:digest, :size, :format).merge(id: @record.to_param, only_path: true)),
+                  status: :moved_permanently
     end
 
     # The filename the image is served as, the record's own filename with the extension of the rendered format.

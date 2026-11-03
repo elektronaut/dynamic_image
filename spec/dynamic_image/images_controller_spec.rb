@@ -9,7 +9,8 @@ describe ImagesController, type: :controller do
 
   def digested(action, options = {})
     key = ([action] + %i[id size]
-      .select { |k| options.key?(k) }.map { |k| options[k] }).join("-")
+      .select { |k| options.key?(k) }
+      .map { |k| k == :id ? options[k].to_i : options[k] }).join("-")
     { digest: digest(key) }.merge(options)
   end
 
@@ -26,7 +27,7 @@ describe ImagesController, type: :controller do
 
   def get_original(image, format)
     get(:original,
-        params: digested(:original, id: image.id, size: "320x200", format:))
+        params: digested(:original, id: image.to_param, size: "320x200", format:))
   end
 
   let(:image) do
@@ -66,6 +67,66 @@ describe ImagesController, type: :controller do
     end
   end
 
+  describe "canonical id verification" do
+    def get_show(id)
+      get :show, params: digested(:show, id:, size: "100x100", format: :png)
+    end
+
+    shared_examples "a canonical redirect" do
+      it "redirects permanently" do
+        expect(response).to have_http_status(:moved_permanently)
+      end
+
+      it "redirects to the canonical URL" do
+        expect(response).to redirect_to(
+          "/images/#{digest("show-#{image.id}-100x100")}/100x100/#{image.to_param}.png"
+        )
+      end
+
+      it "is not cached" do
+        expect(response.headers["Cache-Control"]).to eq("no-cache")
+      end
+    end
+
+    context "with the bare record id" do
+      before { get_show(image.id) }
+
+      it_behaves_like "a canonical redirect"
+    end
+
+    context "with a junk suffix" do
+      before { get_show("#{image.id}-junk") }
+
+      it_behaves_like "a canonical redirect"
+    end
+
+    context "with an outdated fingerprint" do
+      before do
+        stale_param = image.to_param
+        image.update(updated_at: 1.day.from_now)
+        get_show(stale_param)
+      end
+
+      it_behaves_like "a canonical redirect"
+    end
+
+    context "with a different action" do
+      it "redirects to the same action" do
+        get :download, params: digested(:download, id: image.id, size: "100x100", format: :png)
+        expect(response).to redirect_to(
+          "/images/#{digest("download-#{image.id}-100x100")}/100x100/#{image.to_param}/download.png"
+        )
+      end
+    end
+
+    context "with the canonical id" do
+      it "responds with success" do
+        get_show(image.to_param)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
+
   describe "GET show" do
     context "with a nonexistant record" do
       it "raises an error" do
@@ -83,7 +144,7 @@ describe ImagesController, type: :controller do
           10.minutes.from_now
             .httpdate
         get(:show, params: digested(:show,
-                                    id: image.id,
+                                    id: image.to_param,
                                     size: "100x100",
                                     format: :png))
       end
@@ -96,8 +157,8 @@ describe ImagesController, type: :controller do
     context "with an existing record" do
       before do
         get :show, params: digested(
-          :show, id: image.id, size: "100x100", format: :png
-        ).merge(id: image.to_param)
+          :show, id: image.to_param, size: "100x100", format: :png
+        )
       end
 
       it "responds with success" do
@@ -126,7 +187,7 @@ describe ImagesController, type: :controller do
     context "with an image format" do
       before do
         get :show,
-            params: digested(:show, id: image.id, size: "100x100", format: :png)
+            params: digested(:show, id: image.to_param, size: "100x100", format: :png)
       end
 
       it "responds with success" do
@@ -160,7 +221,7 @@ describe ImagesController, type: :controller do
 
       before do
         get :show,
-            params: digested(:show, id: image.id, size: "510x1", format: :png)
+            params: digested(:show, id: image.to_param, size: "510x1", format: :png)
       end
 
       it "renders it" do
@@ -171,7 +232,7 @@ describe ImagesController, type: :controller do
     context "when format is GIF" do
       before do
         get :show,
-            params: digested(:show, id: image.id, size: "100x100", format: :gif)
+            params: digested(:show, id: image.to_param, size: "100x100", format: :gif)
       end
 
       it "sets the content type" do
@@ -191,7 +252,7 @@ describe ImagesController, type: :controller do
       before do
         get(
           :show,
-          params: digested(:show, id: image.id, size: "100x100", format: :jpeg)
+          params: digested(:show, id: image.to_param, size: "100x100", format: :jpeg)
         )
       end
 
@@ -207,7 +268,7 @@ describe ImagesController, type: :controller do
     context "when format is JPG" do
       before do
         get :show,
-            params: digested(:show, id: image.id, size: "100x100", format: :jpg)
+            params: digested(:show, id: image.to_param, size: "100x100", format: :jpg)
       end
 
       it "sets the content type" do
@@ -222,7 +283,7 @@ describe ImagesController, type: :controller do
     context "when format is PNG" do
       before do
         get :show,
-            params: digested(:show, id: image.id, size: "100x100", format: :png)
+            params: digested(:show, id: image.to_param, size: "100x100", format: :png)
       end
 
       it "sets the content type" do
@@ -238,7 +299,7 @@ describe ImagesController, type: :controller do
       before do
         get(
           :show,
-          params: digested(:show, id: image.id, size: "100x100", format: :tiff)
+          params: digested(:show, id: image.to_param, size: "100x100", format: :tiff)
         )
       end
 
@@ -255,7 +316,7 @@ describe ImagesController, type: :controller do
       before do
         get(
           :show,
-          params: digested(:show, id: image.id, size: "100x100", format: :webp)
+          params: digested(:show, id: image.to_param, size: "100x100", format: :webp)
         )
       end
 
@@ -272,7 +333,7 @@ describe ImagesController, type: :controller do
       before do
         get(
           :show,
-          params: digested(:show, id: image.id, size: "100x100", format: :jxl)
+          params: digested(:show, id: image.to_param, size: "100x100", format: :jxl)
         )
       end
 
@@ -289,7 +350,7 @@ describe ImagesController, type: :controller do
       subject(:request) do
         get(
           :show,
-          params: digested(:show, id: image.id, size: "100x100", format: :avif)
+          params: digested(:show, id: image.to_param, size: "100x100", format: :avif)
         )
       end
 
@@ -312,7 +373,7 @@ describe ImagesController, type: :controller do
       before do
         get(:uncropped,
             params: digested(:uncropped,
-                             id: image.id,
+                             id: image.to_param,
                              size: "100x100",
                              format: :png))
       end
@@ -382,7 +443,7 @@ describe ImagesController, type: :controller do
       before do
         get(:original,
             params: digested(:original,
-                             id: image.id,
+                             id: image.to_param,
                              size: "320x200",
                              format: :png))
       end
@@ -429,7 +490,7 @@ describe ImagesController, type: :controller do
     before do
       get(:download,
           params: digested(:download,
-                           id: image.id,
+                           id: image.to_param,
                            size: "320x200",
                            format: :png))
     end
